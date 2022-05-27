@@ -1,4 +1,4 @@
-package com.addyai.googleads.campaign;
+package com.addyai.campaign;
 
 import com.addyai.models.CampaignModel;
 import com.addyai.models.CampaignNetworkSettings;
@@ -12,17 +12,15 @@ import com.google.api.gax.rpc.ServerStream;
 import com.google.common.collect.ImmutableList;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 /**
  * Manage campaigns on a customer account
  */
-public class CampaignManagementService {
+public class CampaignService {
     private final GoogleAdsClient googleAdsClient;
 
-    public CampaignManagementService(GoogleAdsClient googleAdsClient) {
+    public CampaignService(GoogleAdsClient googleAdsClient) {
         this.googleAdsClient = googleAdsClient;
     }
 
@@ -30,13 +28,14 @@ public class CampaignManagementService {
      * Retrieve campaigns from a customer campaign
      *
      * @param customerId the customer ID
+     * @return a list of CampaignModel containing all campaigns in account
      */
-    public Map<Long, String> getCampaigns(long customerId) {
-        Map<Long, String> campaignMap = new HashMap<>();
+    public List<CampaignModel> getCampaigns(long customerId) {
+        List<CampaignModel> campaignModels = new ArrayList<>();
 
         try (GoogleAdsServiceClient googleAdsServiceClient =
                      googleAdsClient.getLatestVersion().createGoogleAdsServiceClient()) {
-            String query = "SELECT campaign.id, campaign.name FROM campaign ORDER BY campaign.id";
+            String query = "SELECT campaign.id, campaign.name FROM campaign WHERE campaign.status IN ('ENABLED', 'PAUSED') ORDER BY campaign.id";
             // Constructs the SearchGoogleAdsStreamRequest.
             SearchGoogleAdsStreamRequest request =
                     SearchGoogleAdsStreamRequest.newBuilder()
@@ -51,7 +50,21 @@ public class CampaignManagementService {
             // Iterates through and prints all the results in the stream response.
             for (SearchGoogleAdsStreamResponse response : stream) {
                 for (GoogleAdsRow googleAdsRow : response.getResultsList()) {
-                    campaignMap.put(googleAdsRow.getCampaign().getId(), googleAdsRow.getCampaign().getName());
+                    CampaignModel campaignModel = new CampaignModel();
+                    campaignModel.setId(googleAdsRow.getCampaign().getId());
+                    campaignModel.setCampaignStatus(googleAdsRow.getCampaign().getStatus());
+                    campaignModel.setName(googleAdsRow.getCampaign().getName());
+                    campaignModel.setEndDate(googleAdsRow.getCampaign().getEndDate());
+                    campaignModel.setStartDate(googleAdsRow.getCampaign().getStartDate());
+                    campaignModel.setChannelType(googleAdsRow.getCampaign().getAdvertisingChannelType());
+
+                    if (!googleAdsRow.getCampaign().getCampaignBudget().equals(""))
+                        campaignModel.setBudget(googleAdsRow.getCampaign().getCampaignBudget());
+                    else
+                        campaignModel.setBudget("0");
+
+                    campaignModels.add(campaignModel);
+
                     System.out.printf(
                             "Campaign with ID %d and name '%s' was found.%n",
                             googleAdsRow.getCampaign().getId(), googleAdsRow.getCampaign().getName());
@@ -59,7 +72,7 @@ public class CampaignManagementService {
             }
         }
 
-        return campaignMap;
+        return campaignModels;
     }
 
     /**
@@ -73,7 +86,7 @@ public class CampaignManagementService {
         // Creates a single shared budget to be used by the campaigns added below.
         String budgetResourceName = addStandardCampaignBudget(
                 newCampaign.getCustomerId(),
-                newCampaign.getBudget(),
+                Long.parseLong(newCampaign.getBudget()),
                 newCampaign.getBudgetName()
         );
 

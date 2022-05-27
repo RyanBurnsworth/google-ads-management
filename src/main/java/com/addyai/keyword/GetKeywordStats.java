@@ -1,4 +1,4 @@
-package com.addyai.googleads.keyword;
+package com.addyai.keyword;
 
 import com.addyai.models.KeywordStats;
 import com.google.ads.googleads.lib.GoogleAdsClient;
@@ -12,9 +12,11 @@ import com.google.ads.googleads.v10.services.SearchGoogleAdsStreamRequest;
 import com.google.ads.googleads.v10.services.SearchGoogleAdsStreamResponse;
 import com.google.api.gax.rpc.ServerStream;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * Get detailed information on keywords for a given date range
- *
  */
 public class GetKeywordStats {
 
@@ -32,8 +34,8 @@ public class GetKeywordStats {
      * @param dateRangeCode the code for the selected date range
      */
 
-    public KeywordStats getKeywordStatsByCode(long customerId, String dateRangeCode) {
-        KeywordStats keywordStatsModel = new KeywordStats();
+    public List<KeywordStats> getKeywordStatsByCode(long customerId, String dateRangeCode) {
+        List<KeywordStats> keywordStatsList = new ArrayList<>();
 
         try (GoogleAdsServiceClient googleAdsServiceClient =
                      this.googleAdsClient
@@ -81,6 +83,10 @@ public class GetKeywordStats {
                     AdGroupCriterion adGroupCriterion = googleAdsRow.getAdGroupCriterion();
                     Metrics metrics = googleAdsRow.getMetrics();
 
+                    KeywordStats keywordStatsModel = new KeywordStats();
+                    keywordStatsModel.setCampaignId(campaign.getId());
+                    keywordStatsModel.setAdGroupId(adGroup.getId());
+                    keywordStatsModel.setKeywordId(adGroupCriterion.getCriterionId());
                     keywordStatsModel.setKeywordText(adGroupCriterion.getKeyword().getText());
                     keywordStatsModel.setAdgroupName(adGroup.getName());
                     keywordStatsModel.setCampaignName(campaign.getName());
@@ -91,9 +97,11 @@ public class GetKeywordStats {
                     keywordStatsModel.setConversions(metrics.getConversions());
                     keywordStatsModel.setAvg_cpc(metrics.getAverageCpc());
                     keywordStatsModel.setInteraction_rate(metrics.getInteractionRate());
+
+                    keywordStatsList.add(keywordStatsModel);
                 }
             }
-            return keywordStatsModel;
+            return keywordStatsList;
         }
     }
 
@@ -105,11 +113,11 @@ public class GetKeywordStats {
      * @param startDate  the date to start accumulating stats Ex: 2022-05-19
      * @param stopDate   the date to stop accumulating stats Ex: 2022-05-19
      */
-    public KeywordStats getKeywordStatsByDateRange(
+    public List<KeywordStats> getKeywordStatsByDateRange(
             long customerId,
             String startDate,
             String stopDate) {
-        KeywordStats keywordStatsModel = new KeywordStats();
+        List<KeywordStats> keywordStatsList = new ArrayList<>();
 
         try (GoogleAdsServiceClient googleAdsServiceClient =
                      this.googleAdsClient
@@ -157,6 +165,10 @@ public class GetKeywordStats {
                     AdGroupCriterion adGroupCriterion = googleAdsRow.getAdGroupCriterion();
                     Metrics metrics = googleAdsRow.getMetrics();
 
+                    KeywordStats keywordStatsModel = new KeywordStats();
+                    keywordStatsModel.setCampaignId(campaign.getId());
+                    keywordStatsModel.setAdGroupId(adGroup.getId());
+                    keywordStatsModel.setKeywordId(adGroupCriterion.getCriterionId());
                     keywordStatsModel.setKeywordText(adGroupCriterion.getKeyword().getText());
                     keywordStatsModel.setAdgroupName(adGroup.getName());
                     keywordStatsModel.setCampaignName(campaign.getName());
@@ -167,9 +179,11 @@ public class GetKeywordStats {
                     keywordStatsModel.setConversions(metrics.getConversions());
                     keywordStatsModel.setAvg_cpc(metrics.getAverageCpc());
                     keywordStatsModel.setInteraction_rate(metrics.getInteractionRate());
+
+                    keywordStatsList.add(keywordStatsModel);
                 }
             }
-            return keywordStatsModel;
+            return keywordStatsList;
         }
     }
 
@@ -181,11 +195,11 @@ public class GetKeywordStats {
      * @param customerId    the client customer ID.
      * @param dateRangeCode the code for the selected date range
      */
-    public KeywordStats getKeywordStatsForCampaignByCode(
+    public List<KeywordStats> getKeywordStatsForCampaignByCode(
             String campaignName,
             long customerId,
             String dateRangeCode) {
-        KeywordStats keywordStatsModel = new KeywordStats();
+        List<KeywordStats> keywordStatsList = new ArrayList<>();
 
         try (GoogleAdsServiceClient googleAdsServiceClient =
                      this.googleAdsClient
@@ -234,6 +248,10 @@ public class GetKeywordStats {
                     AdGroupCriterion adGroupCriterion = googleAdsRow.getAdGroupCriterion();
                     Metrics metrics = googleAdsRow.getMetrics();
 
+                    KeywordStats keywordStatsModel = new KeywordStats();
+                    keywordStatsModel.setCampaignId(campaign.getId());
+                    keywordStatsModel.setAdGroupId(adGroup.getId());
+                    keywordStatsModel.setKeywordId(adGroupCriterion.getCriterionId());
                     keywordStatsModel.setKeywordText(adGroupCriterion.getKeyword().getText());
                     keywordStatsModel.setAdgroupName(adGroup.getName());
                     keywordStatsModel.setCampaignName(campaign.getName());
@@ -244,9 +262,11 @@ public class GetKeywordStats {
                     keywordStatsModel.setConversions(metrics.getConversions());
                     keywordStatsModel.setAvg_cpc(metrics.getAverageCpc());
                     keywordStatsModel.setInteraction_rate(metrics.getInteractionRate());
+
+                    keywordStatsList.add(keywordStatsModel);
                 }
             }
-            return keywordStatsModel;
+            return keywordStatsList;
         }
     }
 
@@ -259,12 +279,12 @@ public class GetKeywordStats {
      * @param startDate    the date to start accumulating stats Ex: 2022-05-19
      * @param stopDate     the date to stop accumulating stats Ex: 2022-05-19
      */
-    public KeywordStats getKeywordStatsForCampaignByDateRange(
+    public List<KeywordStats> getKeywordStatsForCampaignByDateRange(
             String campaignName,
             long customerId,
             String startDate,
             String stopDate) {
-        KeywordStats keywordStatsModel = new KeywordStats();
+        List<KeywordStats> keywordStatsList = new ArrayList<>();
 
         try (GoogleAdsServiceClient googleAdsServiceClient =
                      this.googleAdsClient
@@ -313,6 +333,10 @@ public class GetKeywordStats {
                     AdGroupCriterion adGroupCriterion = googleAdsRow.getAdGroupCriterion();
                     Metrics metrics = googleAdsRow.getMetrics();
 
+                    KeywordStats keywordStatsModel = new KeywordStats();
+                    keywordStatsModel.setCampaignId(campaign.getId());
+                    keywordStatsModel.setAdGroupId(adGroup.getId());
+                    keywordStatsModel.setKeywordId(adGroupCriterion.getCriterionId());
                     keywordStatsModel.setKeywordText(adGroupCriterion.getKeyword().getText());
                     keywordStatsModel.setAdgroupName(adGroup.getName());
                     keywordStatsModel.setCampaignName(campaign.getName());
@@ -323,9 +347,10 @@ public class GetKeywordStats {
                     keywordStatsModel.setConversions(metrics.getConversions());
                     keywordStatsModel.setAvg_cpc(metrics.getAverageCpc());
                     keywordStatsModel.setInteraction_rate(metrics.getInteractionRate());
+                    keywordStatsList.add(keywordStatsModel);
                 }
             }
-            return keywordStatsModel;
+            return keywordStatsList;
         }
     }
 }

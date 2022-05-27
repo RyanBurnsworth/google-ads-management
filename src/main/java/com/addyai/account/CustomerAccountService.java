@@ -1,4 +1,4 @@
-package com.addyai.googleads.account;
+package com.addyai.account;
 
 import com.google.ads.googleads.lib.GoogleAdsClient;
 import com.google.ads.googleads.v10.resources.Customer;

@@ -4,6 +4,7 @@ import com.google.ads.googleads.v10.enums.AdvertisingChannelTypeEnum;
 import com.google.ads.googleads.v10.enums.CampaignStatusEnum;
 
 public class CampaignModel {
+    private long id;
 
     private long customerId;
 
@@ -15,11 +16,19 @@ public class CampaignModel {
 
     private String endDate;
 
-    private long budget;
+    private String budget;
 
     private AdvertisingChannelTypeEnum.AdvertisingChannelType channelType;
 
     private CampaignStatusEnum.CampaignStatus campaignStatus;
+
+    public long getId() {
+        return id;
+    }
+
+    public void setId(long id) {
+        this.id = id;
+    }
 
     public long getCustomerId() {
         return customerId;
@@ -61,12 +70,12 @@ public class CampaignModel {
         this.endDate = endDate;
     }
 
-    public long getBudget() {
+    public String getBudget() {
         return budget;
     }
 
-    public void setBudget(long budget) {
-        this.budget = budget * 1000000;
+    public void setBudget(String budget) {
+        this.budget = String.valueOf(Long.parseLong(budget) * 1000000);
     }
 
     public AdvertisingChannelTypeEnum.AdvertisingChannelType getChannelType() {

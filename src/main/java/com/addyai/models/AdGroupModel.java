@@ -5,6 +5,8 @@ import com.google.ads.googleads.v10.enums.AdGroupTypeEnum;
 import com.google.ads.googleads.v10.utils.ResourceNames;
 
 public class AdGroupModel {
+    private long id;
+
     private long customerId;
 
     private String adgroupName;
@@ -18,6 +20,14 @@ public class AdGroupModel {
     private long maxCPC;
 
     private long campaignId;
+
+    public long getId() {
+        return id;
+    }
+
+    public void setId(long id) {
+        this.id = id;
+    }
 
     public long getCustomerId() {
         return customerId;

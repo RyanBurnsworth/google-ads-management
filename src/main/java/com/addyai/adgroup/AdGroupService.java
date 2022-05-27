@@ -1,4 +1,4 @@
-package com.addyai.googleads.adgroup;
+package com.addyai.adgroup;
 
 import com.addyai.models.AdGroupModel;
 import com.google.ads.googleads.lib.GoogleAdsClient;
@@ -51,14 +51,14 @@ public class AdGroupService {
      * Return adgroups for a given campaign by a given page size
      *
      * @param customerId the client customer ID.
-     * @param campaignId the campaign ID for which ad groups will be retrieved. If {@code null},
      * @param pageSize   the size of the page of results to return
+     * @return a list of AdGroupModels containing all adgroups in account
      */
-    public void getAdGroups(long customerId, Long campaignId, int pageSize) {
+    public List<AdGroupModel> getAdGroups(long customerId, int pageSize) {
+        List<AdGroupModel> adGroupModels = new ArrayList<>();
         try (GoogleAdsServiceClient googleAdsServiceClient =
                      googleAdsClient.getLatestVersion().createGoogleAdsServiceClient()) {
-            String searchQuery = "SELECT campaign.id, ad_group.id, ad_group.name FROM ad_group";
-            searchQuery += String.format(" WHERE campaign.id = %d", campaignId);
+            String searchQuery = "SELECT campaign.id, ad_group.id, ad_group.name FROM ad_group WHERE campaign.status IN ('ENABLED', 'PAUSED')";
 
             // Creates a request that will retrieve all ad groups using pages of the specified page size.
             SearchGoogleAdsRequest request =
@@ -67,16 +67,26 @@ public class AdGroupService {
                             .setPageSize(pageSize)
                             .setQuery(searchQuery)
                             .build();
+
             // Issues the search request.
             GoogleAdsServiceClient.SearchPagedResponse searchPagedResponse = googleAdsServiceClient.search(request);
             // Iterates over all rows in all pages and prints the requested field values for the ad group
             // in each row.
             for (GoogleAdsRow googleAdsRow : searchPagedResponse.iterateAll()) {
                 AdGroup adGroup = googleAdsRow.getAdGroup();
-                System.out.printf(
-                        "Ad group with ID %d and name '%s' was found in campaign with ID %d.%n",
-                        adGroup.getId(), adGroup.getName(), googleAdsRow.getCampaign().getId());
+
+                AdGroupModel adGroupModel = new AdGroupModel();
+                adGroupModel.setId(adGroup.getId());
+                adGroupModel.setAdgroupName(adGroup.getName());
+                adGroupModel.setMaxCPC(adGroup.getCpcBidMicros());
+                adGroupModel.setStatus(adGroup.getStatus());
+                adGroupModel.setType(adGroup.getType());
+                adGroupModel.setCampaignId(googleAdsRow.getCampaign().getId());
+                adGroupModel.setCampaignName(googleAdsRow.getCampaign().getName());
+
+                adGroupModels.add(adGroupModel);
             }
+            return adGroupModels;
         }
     }
 }
