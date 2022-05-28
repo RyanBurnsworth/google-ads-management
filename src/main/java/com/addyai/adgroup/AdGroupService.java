@@ -26,7 +26,7 @@ public class AdGroupService {
      */
     public AdGroupModel findAdGroup(long customerId, long adGroupId) {
         List<AdGroupModel> adGroupModelList;
-        adGroupModelList = getAdGroups(customerId, 100);
+        adGroupModelList = getAdGroups(customerId, 10);
         for (AdGroupModel model : adGroupModelList) {
             if (model.getId() == adGroupId) {
                 return model;
@@ -43,7 +43,7 @@ public class AdGroupService {
      * Create aa batch of AdGroups within a campaign on a client's account
      *
      * @param customerId customerId of the client's account
-     * @param modelList adgroupmodel to pull setup data from
+     * @param modelList  adgroupmodel to pull setup data from
      */
     public void createAdgroup(long customerId, List<AdGroupModel> modelList) {
         List<AdGroupOperation> operations = new ArrayList<>();
@@ -187,22 +187,34 @@ public class AdGroupService {
      * Update a batch of AdGroups in a client account
      *
      * @param customerId             the id of the client account
-     * @param campaignId             the id of the campaign containing the adGroup
+     * @param adGroupIdList          list of AdGroup Ids to update
      * @param updateAdGroupModelList list of AdGroupModels with updated values
      */
-    public void updateAdGroup(long customerId, long campaignId, List<AdGroupModel> updateAdGroupModelList) {
+    public void updateAdGroup(long customerId,
+                              List<Long> adGroupIdList,
+                              List<AdGroupModel> updateAdGroupModelList) {
+        // if the list of adgroup Id do not match the updated adgroup list, return
+        if (adGroupIdList.size() != updateAdGroupModelList.size()) {
+            System.out.println("Error: AdGroupIdList Doesn't Match Size of Updated Ad Group List");
+            return;
+        }
+
         List<AdGroupOperation> operations = new ArrayList<>();
         try (AdGroupServiceClient adGroupServiceClient =
                      googleAdsClient.getLatestVersion().createAdGroupServiceClient()) {
 
-            for (AdGroupModel updatedAdGroupModel : updateAdGroupModelList) {
+            for (int i = 0; i < updateAdGroupModelList.size(); i++) {
                 // Get a fully completed updated campaign model
-                AdGroupModel updatedModel = buildUpdatedAdGroupModel(customerId, campaignId, updatedAdGroupModel);
+                AdGroupModel updatedModel = buildUpdatedAdGroupModel(
+                        customerId,
+                        adGroupIdList.get(i),
+                        updateAdGroupModelList.get(i)
+                );
 
                 // Creates a Campaign object with the proper resource name and any other changes.
                 AdGroup adGroup =
                         AdGroup.newBuilder()
-                                .setResourceName(ResourceNames.adGroup(customerId, campaignId))
+                                .setResourceName(ResourceNames.adGroup(customerId, adGroupIdList.get(i)))
                                 .setName(updatedModel.getAdgroupName())
                                 .setStatus(updatedModel.getStatus())
                                 .setCpcBidMicros(updatedModel.getMaxCPC())
@@ -215,6 +227,7 @@ public class AdGroupService {
                                 .setUpdate(adGroup)
                                 .setUpdateMask(FieldMasks.allSetFieldsOf(adGroup))
                                 .build();
+                operations.add(operation);
             }
             // Sends the operation in a mutate request.
             MutateAdGroupsResponse response =

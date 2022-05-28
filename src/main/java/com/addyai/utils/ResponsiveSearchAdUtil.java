@@ -1,7 +1,6 @@
 package com.addyai.utils;
 
 import com.google.ads.googleads.v10.common.AdTextAsset;
-import com.google.protobuf.ProtocolStringList;
 
 import java.util.ArrayList;
 import java.util.List;

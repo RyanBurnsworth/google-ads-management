@@ -1,7 +1,7 @@
 package com.addyai.models;
 
 import com.google.ads.googleads.v10.common.AdTextAsset;
-import com.google.protobuf.ProtocolStringList;
+import com.google.ads.googleads.v10.enums.AdGroupAdStatusEnum;
 
 import java.util.List;
 
@@ -9,6 +9,8 @@ public class ResponsiveSearchAdModel {
     private long id;
 
     private long adGroupId;
+
+    private AdGroupAdStatusEnum.AdGroupAdStatus status;
 
     private List<AdTextAsset> headlinesList;
 
@@ -34,6 +36,14 @@ public class ResponsiveSearchAdModel {
 
     public void setAdGroupId(long adGroupId) {
         this.adGroupId = adGroupId;
+    }
+
+    public AdGroupAdStatusEnum.AdGroupAdStatus getStatus() {
+        return status;
+    }
+
+    public void setStatus(AdGroupAdStatusEnum.AdGroupAdStatus status) {
+        this.status = status;
     }
 
     public List<AdTextAsset> getHeadlinesList() {

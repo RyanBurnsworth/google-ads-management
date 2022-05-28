@@ -1,13 +1,17 @@
 package com.addyai.e2e;
 
+import com.addyai.ad.AdService;
 import com.addyai.adgroup.AdGroupService;
 import com.addyai.builder.GoogleAdsClientBuilder;
 import com.addyai.campaign.CampaignService;
 import com.addyai.models.AdGroupModel;
 import com.addyai.models.CampaignModel;
 import com.addyai.models.CampaignNetworkSettings;
+import com.addyai.models.ResponsiveSearchAdModel;
+import com.addyai.utils.ResponsiveSearchAdUtil;
 import com.addyai.utils.Utils;
 import com.google.ads.googleads.lib.GoogleAdsClient;
+import com.google.ads.googleads.v10.common.AdTextAsset;
 import com.google.ads.googleads.v10.enums.AdGroupStatusEnum;
 import com.google.ads.googleads.v10.enums.AdvertisingChannelTypeEnum;
 import com.google.ads.googleads.v10.enums.CampaignStatusEnum;
@@ -17,6 +21,7 @@ import com.google.ads.googleads.v9.errors.GoogleAdsException;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * This class is to used to test run the some or all methods on a Live Test Account
@@ -33,9 +38,13 @@ public class E2ETester {
 
     private final AdGroupService adGroupService;
 
+    private final AdService adService;
+
     private List<CampaignModel> campaignModelList = new ArrayList<>();
 
     private List<AdGroupModel> adGroupModelList = new ArrayList<>();
+
+    private List<ResponsiveSearchAdModel> responsiveSearchAdModelList = new ArrayList<>();
 
     private int passedTests = 0;
     private int failedTests = 0;
@@ -47,9 +56,11 @@ public class E2ETester {
 
         campaignService = new CampaignService(googleAdsClient);
         adGroupService = new AdGroupService(googleAdsClient);
+        adService = new AdService(googleAdsClient);
 
         // runFullCampaignTests();
-        runFullAdGroupTests();
+        //runFullAdGroupTests();
+        runFullAdTests();
     }
 
     private void runFullCampaignTests() {
@@ -64,9 +75,20 @@ public class E2ETester {
     private void runFullAdGroupTests() {
         createCampaign();
         createAdGroup();
+        updateAdGroup();
         pauseAdGroup();
         removeAdGroup();
         removeCampaign();
+
+        printTestOutcome();
+    }
+
+    private void runFullAdTests() {
+        createCampaign();
+        createAdGroup();
+        createResponsiveAds();
+
+        updateResponsiveAds();
 
         printTestOutcome();
     }
@@ -210,7 +232,7 @@ public class E2ETester {
         AdGroupService adGroupService = new AdGroupService(builder.build());
         adGroupService.createAdgroup(CLIENT_ACCOUNT_ID, adGroupModels);
 
-        adGroupModelList = adGroupService.getAdGroups(CLIENT_ACCOUNT_ID, 10);
+        adGroupModelList = adGroupService.getAdGroups(CLIENT_ACCOUNT_ID, 1);
 
         for (AdGroupModel model : adGroupModelList) {
             if (model.getAdgroupName().equals("Dummy Adgroup")) {
@@ -236,6 +258,30 @@ public class E2ETester {
         }
     }
 
+    private void updateAdGroup() {
+        List<AdGroupModel> updatedAdGroupModelList = new ArrayList<>();
+        List<Long> adGroupIdList = new ArrayList<>();
+
+        AdGroupModel adGroupModel = new AdGroupModel();
+        adGroupModel.setAdgroupName("TesterGroup");
+        updatedAdGroupModelList.add(adGroupModel);
+        adGroupIdList.add(adGroupModelList.get(0).getId());
+
+        adGroupService.updateAdGroup(
+                CLIENT_ACCOUNT_ID,
+                adGroupIdList,
+                updatedAdGroupModelList
+        );
+
+        adGroupModelList = adGroupService.getAdGroups(CLIENT_ACCOUNT_ID, 1);
+        if (adGroupModelList.get(0).getAdgroupName().equals("TesterGroup")) {
+            passedTests = passedTests + 1;
+        } else {
+            failedTests = failedTests + 1;
+            failedTestNames.add("Update AdGroup");
+        }
+    }
+
     private void removeAdGroup() {
         List<Long> adGroupIds = new ArrayList<>();
         adGroupIds.add(adGroupModelList.get(0).getId());
@@ -251,7 +297,7 @@ public class E2ETester {
         }
     }
 
-/*    private void createResponsiveAds() {
+    private void createResponsiveAds() {
         List<ResponsiveSearchAdModel> responsiveSearchAdModels = new ArrayList<>();
         List<String> headlineList = new ArrayList<>();
         List<String> descriptionList = new ArrayList<>();
@@ -276,8 +322,59 @@ public class E2ETester {
         searchAdModel.setFinalUrl("http://www.addyaiz.com");
 
         responsiveSearchAdModels.add(searchAdModel);
-        adService.createResponsiveSearchAds(CLIENT_ACCOUNT_ID, adGroupModelList.get(0).getId(), responsiveSearchAdModels);
-    }*/
+        adService.createResponsiveSearchAd(CLIENT_ACCOUNT_ID, adGroupModelList.get(0).getId(), responsiveSearchAdModels);
+
+        responsiveSearchAdModelList = adService.getResponsiveSearchAds(CLIENT_ACCOUNT_ID, 1);
+        ResponsiveSearchAdModel model = responsiveSearchAdModelList.get(responsiveSearchAdModelList.size() - 1);
+
+        if (model.getHeadlinesList().get(0).getText().equals("AddyAI Improves Your Campaigns")) {
+            passedTests = passedTests + 1;
+        } else {
+            System.out.println("PATH: " + model.getPath1());
+            failedTests = failedTests + 1;
+            failedTestNames.add("Create Ad");
+        }
+    }
+
+    private void updateResponsiveAds() {
+        List<ResponsiveSearchAdModel> responsiveSearchAdModels = new ArrayList<>();
+        List<String> headlineList = new ArrayList<>();
+        List<String> descriptionList = new ArrayList<>();
+
+        headlineList.add("AddyAI Manages Your Ads");
+        headlineList.add("AI Manages Your Ads Perfectly");
+        headlineList.add("Let Our AI Improve Your Ads");
+
+        descriptionList.add("AddyAI Can Manage Your PPC Campaigns For You! Sign Up For Our Free 30 Day Trial Now!");
+        descriptionList.add("AddyAI Can Improve Your Ads Campaigns For You! Sign Up For A No-Obligation 30 Day Trial!");
+
+        ResponsiveSearchAdUtil responsiveSearchAdUtil = new ResponsiveSearchAdUtil();
+        List<AdTextAsset> headlines = responsiveSearchAdUtil.createHeadlinesList(headlineList);
+        List<AdTextAsset> descriptions = responsiveSearchAdUtil.createDescriptionList(descriptionList);
+
+        ResponsiveSearchAdModel searchAdModel = new ResponsiveSearchAdModel();
+        searchAdModel.setAdGroupId(adGroupModelList.get(adGroupModelList.size()-1).getId());
+        searchAdModel.setHeadlinesList(headlines);
+        searchAdModel.setDescriptionList(descriptions);
+        searchAdModel.setPath1("improve-roas");
+        searchAdModel.setPath2("AI For Ads");
+        searchAdModel.setFinalUrl("http://www.addyaiz.com");
+
+        responsiveSearchAdModels.add(searchAdModel);
+
+        adService.updateResponsiveSearchAds(CLIENT_ACCOUNT_ID,
+                responsiveSearchAdModelList.get(0).getId(),
+                responsiveSearchAdModels);
+    }
+
+    private void removeResponsiveSearchAds() {
+        List<Long> adGroupIdList = new ArrayList<>();
+        List<Long> adIdList = new ArrayList<>();
+
+        adIdList.stream()
+                .filter(adId -> adGroupIdList.contains(adId))
+                .collect(Collectors.toList());
+    }
 /*
     private void createKeywords() {
         List<KeywordModel> newKeywordsList = new ArrayList();

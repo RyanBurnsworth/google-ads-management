@@ -25,6 +25,18 @@ public class AdService {
         this.googleAdsClient = googleAdsClient;
     }
 
+    public ResponsiveSearchAdModel findResponsiveSearchAdModel(long customerId, long adId) {
+        List<ResponsiveSearchAdModel> searchAdModelList = new ArrayList<>();
+        searchAdModelList = getResponsiveSearchAds(customerId, 10);
+
+        for (ResponsiveSearchAdModel model : searchAdModelList) {
+            if (model.getId() == adId) {
+                return model;
+            }
+        }
+        return null;
+    }
+
     /**
      * Create Responsive Search Ads for a given AdGroup
      *
@@ -32,9 +44,9 @@ public class AdService {
      * @param adGroupId                the ad group ID.
      * @param responsiveSearchAdModels a list of ResponsiveSearchAdModels to create ads with
      */
-    public void createResponsiveSearchAds(long customerId,
-                                          long adGroupId,
-                                          List<ResponsiveSearchAdModel> responsiveSearchAdModels) {
+    public void createResponsiveSearchAd(long customerId,
+                                         long adGroupId,
+                                         List<ResponsiveSearchAdModel> responsiveSearchAdModels) {
         String adGroupResourceName = ResourceNames.adGroup(customerId, adGroupId);
         List<AdGroupAdOperation> adOperations = new ArrayList<>();
 
@@ -97,10 +109,13 @@ public class AdService {
                     "SELECT ad_group.id, ad_group_ad.ad.id, "
                             + "ad_group_ad.ad.responsive_search_ad.headlines, "
                             + "ad_group_ad.ad.responsive_search_ad.descriptions, "
-                            + "ad_group_ad.status "
+                            + "ad_group_ad.status, "
+                            + "ad_group_ad.ad.responsive_search_ad.path1, "
+                            + "ad_group_ad.ad.responsive_search_ad.path2, "
+                            + "ad_group_ad.ad.final_urls "
                             + "FROM ad_group_ad "
-                            + "WHERE ad_group_ad.ad.type = RESPONSIVE_SEARCH_AD "
-                            + "AND ad_group_ad.status != 'REMOVED'";
+                            + "WHERE ad_group_ad.status IN ('ENABLED', 'PAUSED') AND "
+                            + "ad_group_ad.ad.type = RESPONSIVE_SEARCH_AD ";
 
             // Creates a request that will retrieve all ad group ads using pages of the specified page
             // size.
@@ -133,9 +148,10 @@ public class AdService {
                 ResponsiveSearchAdModel searchAdModel = new ResponsiveSearchAdModel();
                 searchAdModel.setHeadlinesList(responsiveSearchAdInfo.getHeadlinesList());
                 searchAdModel.setDescriptionList(responsiveSearchAdInfo.getDescriptionsList());
-                //searchAdModel.setFinalUrl(googleAdsRow.getAdGroupAd().getAd().getFinalUrls(0)); // TODO: research final urls
+                searchAdModel.setFinalUrl(googleAdsRow.getAdGroupAd().getAd().getFinalUrls(0)); // TODO: research final urls
                 searchAdModel.setPath1(responsiveSearchAdInfo.getPath1());
                 searchAdModel.setPath2(responsiveSearchAdInfo.getPath2());
+                searchAdModel.setStatus(googleAdsRow.getAdGroupAd().getStatus());
                 searchAdModel.setId(googleAdsRow.getAdGroupAd().getAd().getId());
                 searchAdModel.setAdGroupId(googleAdsRow.getAdGroup().getId());
                 responsiveSearchAdModelList.add(searchAdModel);
@@ -151,7 +167,9 @@ public class AdService {
      * @param adId                     the ad ID to update.
      * @param responsiveSearchAdModels a list of updates to a list of ResponsiveSearchAds
      */
-    private void updateResponsiveSearchAds(long customerId, long adId, List<ResponsiveSearchAdModel> responsiveSearchAdModels) {
+    public void updateResponsiveSearchAds(long customerId,
+                                          long adId,
+                                          List<ResponsiveSearchAdModel> responsiveSearchAdModels) {
         // Creates an AdOperation to update an ad.
         AdOperation.Builder adOperation = AdOperation.newBuilder();
         List<AdOperation> operationsList = new ArrayList<>();
@@ -186,6 +204,36 @@ public class AdService {
             // Displays the result.
             for (MutateAdResult result : response.getResultsList()) {
                 System.out.printf("Ad with resource name '%s' was updated.%n", result.getResourceName());
+            }
+        }
+    }
+
+    public void removeResponsiveSearchAds(long customerId, List<Long> adGroupIdList, List<Long> adIdList) {
+        if (adGroupIdList.size() != adIdList.size()) {
+            System.out.println("Error: adGroupIdList does not equal adIdList in size");
+            return;
+        }
+
+        List<AdGroupAdOperation> operations = new ArrayList<>();
+        try (AdGroupAdServiceClient adGroupServiceClient =
+                     googleAdsClient.getLatestVersion().createAdGroupAdServiceClient()) {
+
+            for (int i = 0; i < adGroupIdList.size(); i++) {
+                String adResource = ResourceNames.adGroupAd(customerId, adGroupIdList.get(i), adIdList.get(i));
+                // Constructs an operation that will remove the campaign with the specified resource name.
+                AdGroupAdOperation operation =
+                        AdGroupAdOperation.newBuilder().setRemove(adResource).build();
+                operations.add(operation);
+            }
+
+            // Sends the operation in a mutate request.
+            MutateAdGroupAdsResponse response =
+                    adGroupServiceClient.mutateAdGroupAds(
+                            Long.toString(customerId), operations);
+            // Prints the resource name of each removed object.
+            for (MutateAdGroupAdResult mutateAdGroupAdResult : response.getResultsList()) {
+                System.out.printf(
+                        "Removed adGroup with resource name: '%s'.%n", mutateAdGroupAdResult.getResourceName());
             }
         }
     }
