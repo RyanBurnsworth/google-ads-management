@@ -1,7 +1,9 @@
 package com.addyai.models;
 
+import com.addyai.utils.Utils;
 import com.google.ads.googleads.v10.enums.AdvertisingChannelTypeEnum;
 import com.google.ads.googleads.v10.enums.CampaignStatusEnum;
+import com.google.ads.googleads.v10.resources.CampaignBudget;
 
 public class CampaignModel {
     private long id;
@@ -12,11 +14,7 @@ public class CampaignModel {
 
     private String budgetName;
 
-    private String startDate;
-
-    private String endDate;
-
-    private String budget;
+    private CampaignBudget budget;
 
     private AdvertisingChannelTypeEnum.AdvertisingChannelType channelType;
 
@@ -54,28 +52,12 @@ public class CampaignModel {
         this.budgetName = budgetName;
     }
 
-    public String getStartDate() {
-        return startDate;
-    }
-
-    public void setStartDate(String startDate) {
-        this.startDate = startDate;
-    }
-
-    public String getEndDate() {
-        return endDate;
-    }
-
-    public void setEndDate(String endDate) {
-        this.endDate = endDate;
-    }
-
-    public String getBudget() {
+    public CampaignBudget getBudget() {
         return budget;
     }
 
-    public void setBudget(String budget) {
-        this.budget = String.valueOf(Long.parseLong(budget) * 1000000);
+    public void setBudget(CampaignBudget budget) {
+        this.budget = budget;
     }
 
     public AdvertisingChannelTypeEnum.AdvertisingChannelType getChannelType() {

@@ -28,10 +28,11 @@ public class GetKeywordStats {
 
     /**
      * Retrieves keyword statistics by pre-defined date range code:
-     * # https://developers.google.com/google-ads/api/docs/query/date-ranges#predefined_date_range
+     * # <a href="https://developers.google.com/google-ads/api/docs/query/date-ranges#predefined_date_range"/>
      *
      * @param customerId    the client customer ID.
      * @param dateRangeCode the code for the selected date range
+     * @return a list of KeywordStats for the given date range code
      */
 
     public List<KeywordStats> getKeywordStatsByCode(long customerId, String dateRangeCode) {
@@ -107,11 +108,12 @@ public class GetKeywordStats {
 
     /**
      * Retrieves keyword stats by date range
-     * # https://developers.google.com/google-ads/api/docs/query/date-ranges#custom_date_range
+     * # <a href="https://developers.google.com/google-ads/api/docs/query/date-ranges#custom_date_range"/>
      *
      * @param customerId the client customer ID.
      * @param startDate  the date to start accumulating stats Ex: 2022-05-19
      * @param stopDate   the date to stop accumulating stats Ex: 2022-05-19
+     * @return a list of KeywordStats for a given date range
      */
     public List<KeywordStats> getKeywordStatsByDateRange(
             long customerId,
@@ -189,11 +191,12 @@ public class GetKeywordStats {
 
     /**
      * Retrieves keyword statistics by pre-defined date range code:
-     * # https://developers.google.com/google-ads/api/docs/query/date-ranges#predefined_date_range
+     * # <a href="https://developers.google.com/google-ads/api/docs/query/date-ranges#predefined_date_range"/>
      *
      * @param campaignName  the name of the campaign you are searching upon
      * @param customerId    the client customer ID.
      * @param dateRangeCode the code for the selected date range
+     * @return a list of KeywordStats for a given campaign by date range code
      */
     public List<KeywordStats> getKeywordStatsForCampaignByCode(
             String campaignName,
@@ -272,12 +275,13 @@ public class GetKeywordStats {
 
     /**
      * Retrieves keyword stats by date range
-     * # https://developers.google.com/google-ads/api/docs/query/date-ranges#custom_date_range
+     * # <a href="https://developers.google.com/google-ads/api/docs/query/date-ranges#custom_date_range"/>
      *
      * @param campaignName the name of the campaign you are searching upon
      * @param customerId   the client customer ID.
      * @param startDate    the date to start accumulating stats Ex: 2022-05-19
      * @param stopDate     the date to stop accumulating stats Ex: 2022-05-19
+     * @return a list of KeywordStats for a given campaign by date range
      */
     public List<KeywordStats> getKeywordStatsForCampaignByDateRange(
             String campaignName,

@@ -2,15 +2,19 @@ package com.addyai.keyword;
 
 import com.addyai.models.KeywordModel;
 import com.google.ads.googleads.lib.GoogleAdsClient;
+import com.google.ads.googleads.lib.utils.FieldMasks;
 import com.google.ads.googleads.v10.common.KeywordInfo;
 import com.google.ads.googleads.v10.enums.AdGroupCriterionStatusEnum;
 import com.google.ads.googleads.v10.resources.AdGroup;
 import com.google.ads.googleads.v10.resources.AdGroupCriterion;
 import com.google.ads.googleads.v10.services.*;
 import com.google.ads.googleads.v10.utils.ResourceNames;
+import com.google.common.collect.ImmutableList;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import static com.google.ads.googleads.v10.enums.AdGroupCriterionStatusEnum.AdGroupCriterionStatus.PAUSED;
 
 public class KeywordService {
     private final GoogleAdsClient googleAdsClient;
@@ -20,7 +24,7 @@ public class KeywordService {
     }
 
     /**
-     * Runs the example.
+     * Add keywords to a given adgroup for a client account.
      *
      * @param customerId       the client customer ID.
      * @param adGroupId        the ad group ID.
@@ -45,7 +49,7 @@ public class KeywordService {
                             .setAdGroup(adGroupResourceName)
                             .setStatus(AdGroupCriterionStatusEnum.AdGroupCriterionStatus.ENABLED)
                             .setKeyword(keywordInfo)
-                            .setCpcBidMicros(model.getCpcBid())
+                            .setCpcBidMicros(Long.parseLong(model.getCpcBid()))
                             .build();
 
             AdGroupCriterionOperation op =
@@ -83,9 +87,9 @@ public class KeywordService {
                             + "ad_group_criterion.type, "
                             + "ad_group_criterion.criterion_id, "
                             + "ad_group_criterion.keyword.text, "
-                            + "ad_group_criterion.keyword.match_type, "
-                            + "ad_group_criterion.keyword.cpc_bid_micros, " //TODO: This is failing
-                            + "ad_group_criterion.keyword.bid_modifier "
+                            + "ad_group_criterion.keyword.match_type "
+                            // + "ad_group_criterion.keyword.cpc_bid_micros, " //TODO: This is failing
+                            //  + "ad_group_criterion.keyword.bid_modifier "
                             + "FROM ad_group_criterion "
                             + "WHERE ad_group_criterion.type = KEYWORD ";
             searchQuery += " PARAMETERS omit_unselected_resource_names=true";
@@ -116,6 +120,35 @@ public class KeywordService {
                 keywordModelList.add(keywordModel);
             }
             return keywordModelList;
+        }
+    }
+
+    /**
+     * Pause a Campaign in the specified client account
+     *
+     * @param customerId the id of the client account
+     * @param adGroupId  the id of the adgroup the keyword is within
+     * @param keywordId  the id of the keyword to be paused
+     */
+    public void pauseKeyword(long customerId, long adGroupId, long keywordId) {
+        String keywordResource = ResourceNames.adGroupCriterion(customerId, adGroupId, keywordId);
+        AdGroupCriterion adGroupCriterion = AdGroupCriterion.newBuilder()
+                .setResourceName(keywordResource)
+                .setStatus(PAUSED)
+                .build();
+
+        AdGroupCriterionOperation op = AdGroupCriterionOperation.newBuilder()
+                .setUpdate(adGroupCriterion)
+                .setUpdateMask(FieldMasks.allSetFieldsOf(adGroupCriterion))
+                .build();
+
+        try (AdGroupCriterionServiceClient adGroupCriterionServiceClient =
+                     googleAdsClient.getLatestVersion().createAdGroupCriterionServiceClient()) {
+            MutateAdGroupCriteriaResponse response =
+                    adGroupCriterionServiceClient.mutateAdGroupCriteria(Long.toString(customerId), ImmutableList.of(op));
+            for (MutateAdGroupCriterionResult result : response.getResultsList()) {
+                System.out.printf("Keyword with resource name '%s' is paused. %n", result.getResourceName());
+            }
         }
     }
 }

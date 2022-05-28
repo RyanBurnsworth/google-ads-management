@@ -1,5 +1,6 @@
 package com.addyai.models;
 
+import com.addyai.utils.Utils;
 import com.google.ads.googleads.v10.enums.KeywordMatchTypeEnum.KeywordMatchType;
 
 public class KeywordModel {
@@ -9,7 +10,7 @@ public class KeywordModel {
 
     public String text;
 
-    public long cpcBid;
+    public String cpcBid;
 
     public KeywordMatchType matchType;
 
@@ -37,12 +38,12 @@ public class KeywordModel {
         this.text = text;
     }
 
-    public long getCpcBid() {
-        return cpcBid * 1000000;
+    public String getCpcBid() {
+        return cpcBid;
     }
 
-    public void setCpcBid(long cpcBid) {
-        this.cpcBid = cpcBid;
+    public void setCpcBid(String cpcBid) {
+        this.cpcBid = String.valueOf(Utils.convertMicrosValue(cpcBid));
     }
 
     public KeywordMatchType getMatchType() {

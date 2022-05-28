@@ -9,7 +9,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Add an ad group to a campaign
+ * Manage AdGroup operations on a campaign for a client's account
  */
 public class AdGroupService {
     private final GoogleAdsClient googleAdsClient;
@@ -19,7 +19,7 @@ public class AdGroupService {
     }
 
     /**
-     * Create an adgroup within a campaign on a customer account
+     * Create an AdGroup within a campaign on a client's account
      *
      * @param model the adgroupmodel to pull setup data from
      */
@@ -30,7 +30,7 @@ public class AdGroupService {
                         .setStatus(model.getStatus())
                         .setCampaign(model.getCampaignName())
                         .setType(model.getType())
-                        .setCpcBidMicros(model.getMaxCPC())
+                        .setCpcBidMicros(Long.parseLong(model.getMaxCPC()))
                         .build();
 
         List<AdGroupOperation> operations = new ArrayList<>();
@@ -48,7 +48,7 @@ public class AdGroupService {
     }
 
     /**
-     * Return adgroups for a given campaign by a given page size
+     * Return AdGroups for a given campaign by a given page size
      *
      * @param customerId the client customer ID.
      * @param pageSize   the size of the page of results to return
@@ -78,7 +78,7 @@ public class AdGroupService {
                 AdGroupModel adGroupModel = new AdGroupModel();
                 adGroupModel.setId(adGroup.getId());
                 adGroupModel.setAdgroupName(adGroup.getName());
-                adGroupModel.setMaxCPC(adGroup.getCpcBidMicros());
+                adGroupModel.setMaxCPC(String.valueOf(adGroup.getCpcBidMicros()));
                 adGroupModel.setStatus(adGroup.getStatus());
                 adGroupModel.setType(adGroup.getType());
                 adGroupModel.setCampaignId(googleAdsRow.getCampaign().getId());

@@ -3,7 +3,7 @@ package com.addyai.ad;
 import com.addyai.models.ExpandedTextAdModel;
 import com.addyai.models.ResponsiveSearchAdModel;
 import com.google.ads.googleads.lib.GoogleAdsClient;
-import com.google.ads.googleads.v10.common.AdTextAsset;
+import com.google.ads.googleads.lib.utils.FieldMasks;
 import com.google.ads.googleads.v10.common.ExpandedTextAdInfo;
 import com.google.ads.googleads.v10.common.ResponsiveSearchAdInfo;
 import com.google.ads.googleads.v10.enums.AdGroupAdStatusEnum;
@@ -12,19 +12,25 @@ import com.google.ads.googleads.v10.resources.AdGroupAd;
 import com.google.ads.googleads.v10.services.*;
 import com.google.ads.googleads.v10.utils.ResourceNames;
 
-import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
+/**
+ * Manages Ad Operations within a client's Google Ads campaigns
+ */
 public class AdService {
     private final GoogleAdsClient googleAdsClient;
+
+    public AdService(GoogleAdsClient googleAdsClient) {
+        this.googleAdsClient = googleAdsClient;
+    }
 
     /**
      * Create Responsive Search Ads for a given AdGroup
      *
-     * @param customerId the client customer ID.
-     * @param adGroupId  the ad group ID.
+     * @param customerId               the client customer ID.
+     * @param adGroupId                the ad group ID.
+     * @param responsiveSearchAdModels a list of ResponsiveSearchAdModels to create ads with
      */
     public void createResponsiveSearchAds(long customerId,
                                           long adGroupId,
@@ -44,9 +50,9 @@ public class AdService {
 
             // Wraps the info in an Ad object.
             Ad ad = Ad.newBuilder()
-                            .setResponsiveSearchAd(responsiveSearchAdInfo)
-                            .addFinalUrls(model.getFinalUrl())
-                            .build();
+                    .setResponsiveSearchAd(responsiveSearchAdInfo)
+                    .addFinalUrls(model.getFinalUrl())
+                    .build();
 
             // Builds the final ad group ad representation.
             AdGroupAd adGroupAd =
@@ -72,10 +78,6 @@ public class AdService {
                 System.out.printf("Responsive search ad created with resource name: %s.%n", result.getResourceName());
             }
         }
-    }
-
-    public AdService(GoogleAdsClient googleAdsClient) {
-        this.googleAdsClient = googleAdsClient;
     }
 
     /**
@@ -137,40 +139,63 @@ public class AdService {
                 searchAdModel.setId(googleAdsRow.getAdGroupAd().getAd().getId());
                 searchAdModel.setAdGroupId(googleAdsRow.getAdGroup().getId());
                 responsiveSearchAdModelList.add(searchAdModel);
-
-                System.out.printf(
-                        "Headlines:%n'%s'%nDescriptions:%n'%s'%n",
-                        adTextAssetsToStrings(responsiveSearchAdInfo.getHeadlinesList()),
-                        adTextAssetsToStrings(responsiveSearchAdInfo.getDescriptionsList()));
-                responsiveSearchAdInfo.getPath1();
-                responsiveSearchAdInfo.getPath2();
-                System.out.println(googleAdsRow.getAdGroupAd().getAd().getFinalUrlsList());
-
             }
         }
         return responsiveSearchAdModelList;
     }
 
     /**
-     * Converts a list of AdTextAssets to a user-friendly string.
+     * Update ResponsiveSearchAds
      *
-     * @param adTextAssets the list of AdTextAsset objects.
-     * @return the string representation of the provided list of AdTextAsset objects.
+     * @param customerId               the customer ID to update.
+     * @param adId                     the ad ID to update.
+     * @param responsiveSearchAdModels a list of updates to a list of ResponsiveSearchAds
      */
-    private String adTextAssetsToStrings(List<AdTextAsset> adTextAssets) {
-        return adTextAssets.stream()
-                .map(
-                        adTextAsset ->
-                                adTextAsset.getText()
-                                        + " pinned to "
-                                        + adTextAsset.getPinnedField().getValueDescriptor().getName())
-                .collect(Collectors.joining(", "));
+    private void updateResponsiveSearchAds(long customerId, long adId, List<ResponsiveSearchAdModel> responsiveSearchAdModels) {
+        // Creates an AdOperation to update an ad.
+        AdOperation.Builder adOperation = AdOperation.newBuilder();
+        List<AdOperation> operationsList = new ArrayList<>();
+
+        for (ResponsiveSearchAdModel model : responsiveSearchAdModels) {
+            // Creates an Ad in the update field of the operation.
+            Ad.Builder adBuilder =
+                    adOperation
+                            .getUpdateBuilder()
+                            .setResourceName(ResourceNames.ad(customerId, adId))
+                            .addFinalUrls(model.getFinalUrl());
+
+            // Sets the expanded text ad properties to update on the ad.
+            adBuilder.getResponsiveSearchAdBuilder()
+                    .addAllHeadlines(model.getHeadlinesList())
+                    .addAllDescriptions(model.getDescriptionList())
+                    .build();
+
+            // Sets the update mask (the fields which will be modified) to be all the fields we set above.
+            adOperation.setUpdateMask(FieldMasks.allSetFieldsOf(adBuilder.build()));
+            operationsList.add(adOperation.build());
+        }
+
+        // Creates a service client to connect to the API.
+        try (AdServiceClient adServiceClient =
+                     googleAdsClient.getLatestVersion().createAdServiceClient()) {
+            // Issues the mutate request.
+            MutateAdsResponse response =
+                    adServiceClient.mutateAds(
+                            String.valueOf(customerId), operationsList);
+
+            // Displays the result.
+            for (MutateAdResult result : response.getResultsList()) {
+                System.out.printf("Ad with resource name '%s' was updated.%n", result.getResourceName());
+            }
+        }
     }
 
     /**
      * Retrieve a list of ExpandedTextAds from the account or adgroup
      *
      * @param customerId the client customer ID.
+     * @param adGroupId  the adgroup id from to get the ExpandedTextAds from
+     * @param pageSize   the number of ExpandedTextAds to return within a page
      * @return list of ExpandedTextAdModel containing all expanded ads in account
      */
     public List<ExpandedTextAdModel> getExpandedTextAds(long customerId, long adGroupId, int pageSize) {

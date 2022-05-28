@@ -1,25 +1,21 @@
 package com.addyai.e2e;
 
-import com.addyai.ad.AdService;
-import com.addyai.adgroup.AdGroupService;
 import com.addyai.builder.GoogleAdsClientBuilder;
 import com.addyai.campaign.CampaignService;
-import com.addyai.keyword.KeywordService;
-import com.addyai.models.*;
-import com.addyai.utils.DateTimeUtils;
-import com.addyai.utils.ResponsiveSearchAdUtil;
+import com.addyai.models.CampaignModel;
+import com.addyai.models.CampaignNetworkSettings;
+import com.addyai.utils.Utils;
 import com.google.ads.googleads.lib.GoogleAdsClient;
-import com.google.ads.googleads.v10.common.AdTextAsset;
-import com.google.ads.googleads.v10.enums.*;
+import com.google.ads.googleads.v10.enums.AdvertisingChannelTypeEnum;
+import com.google.ads.googleads.v10.enums.CampaignStatusEnum;
+import com.google.ads.googleads.v10.resources.CampaignBudget;
 import com.google.ads.googleads.v9.errors.GoogleAdsException;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import static java.lang.System.exit;
-
 /**
- * This class is to run the Google Ads methods on a Live Test Account
+ * This class is to used to test run the some or all methods on a Live Test Account
  * using a Test Manager Account
  */
 public class E2ETester {
@@ -30,76 +26,131 @@ public class E2ETester {
     private final GoogleAdsClientBuilder builder;
 
     private final CampaignService campaignService;
-    private AdGroupService adGroupService;
-    private KeywordService keywordService;
-
-    private AdService adService;
 
     private List<CampaignModel> campaignModelList = new ArrayList<>();
-    private List<AdGroupModel> adGroupModelList = new ArrayList<>();
-    private List<KeywordModel> keywordModelList = new ArrayList<>();
 
-    private List<ResponsiveSearchAdModel> responsiveSearchAdModelList = new ArrayList<>();
+    private int passedTests = 0;
+    private int failedTests = 0;
+    private final List<String> failedTestNames = new ArrayList<>();
 
     public E2ETester() {
         builder = new GoogleAdsClientBuilder();
         GoogleAdsClient googleAdsClient = builder.build();
 
         campaignService = new CampaignService(googleAdsClient);
-        adGroupService = new AdGroupService(googleAdsClient);
-        keywordService = new KeywordService(googleAdsClient);
-        adService = new AdService(googleAdsClient);
 
-        startE2ETesting();
+        runFullCampaignTests();
     }
 
-    private void startE2ETesting() {
-//        createCampaign();
-//        createAdGroup();
-//        createResponsiveAds();
-//        createKeywords();
-        adService.getResponsiveSearchAds(CLIENT_ACCOUNT_ID, 100);
+    private void runFullCampaignTests() {
+        createCampaign();
+        updateCampaign();
+        pauseCampaign();
+        removeCampaign();
 
+        printTestOutcome();
     }
 
+    /**
+     * Create a dummy campaign in the test account
+     */
     private void createCampaign() {
-        String startDate = DateTimeUtils.getFutureDate(1);
-        String endDate = DateTimeUtils.getFutureDate(31);
-
+        // create networking settings for campaign
         CampaignNetworkSettings networkSettings = new CampaignNetworkSettings();
         networkSettings.setTargetContentNetwork(false);
         networkSettings.setTargetGoogleSearch(true);
         networkSettings.setTargetPartnerSearchNetwork(false);
         networkSettings.setTargetSearchNetwork(true);
 
+        CampaignBudget budget = CampaignBudget
+                .newBuilder()
+                .setAmountMicros(Utils.convertMicrosValue("85.50"))
+                .build();
+
+        // generate a dummy CampaignModel
         CampaignModel campaign = new CampaignModel();
-        campaign.setCampaignStatus(CampaignStatusEnum.CampaignStatus.PAUSED);
-        campaign.setBudget("1000000");
+        campaign.setCampaignStatus(CampaignStatusEnum.CampaignStatus.ENABLED);
+        campaign.setBudget(budget);
         campaign.setCustomerId(CLIENT_ACCOUNT_ID);
-        campaign.setBudgetName("Dummy Budget1");
+        campaign.setBudgetName("Dummy Budget");
         campaign.setChannelType(AdvertisingChannelTypeEnum.AdvertisingChannelType.SEARCH);
         campaign.setName("Dummy Test Campaign");
-        campaign.setStartDate(startDate);
-        campaign.setEndDate(endDate);
 
+        // create the dummy campaign in test account
         try {
             CampaignService campaignService = new CampaignService(builder.build());
             campaignService.createSearchCampaign(campaign, networkSettings);
         } catch (GoogleAdsException adsException) {
             log("Error: " + adsException.getGoogleAdsFailure().toString());
-            exit(1);
         }
 
+        // udpate campaignModelList with latest campaigns
         campaignModelList = campaignService.getCampaigns(CLIENT_ACCOUNT_ID);
 
+        // verify the campaign name is matched
+        if (isCampaignVerified("Dummy Test Campaign")) {
+            passedTests = passedTests + 1;
+        } else {
+            failedTests = failedTests + 1;
+            failedTestNames.add("Create Campaign");
+        }
+    }
+
+    private void updateCampaign() {
+        CampaignModel campaign = new CampaignModel();
+        campaign.setName("Updated Test Campaign"); // Updating Name
+
+        campaignService.updateCampaign(CLIENT_ACCOUNT_ID, campaignModelList.get(0).getId(), campaign);
+
+        campaignModelList = campaignService.getCampaigns(CLIENT_ACCOUNT_ID);
+        if (isCampaignVerified("Updated Test Campaign")) {
+            passedTests = passedTests + 1;
+        } else {
+            failedTests = failedTests + 1;
+            failedTestNames.add("Update Campaign");
+        }
+    }
+
+    private void pauseCampaign() {
+        campaignService.pauseCampaign(CLIENT_ACCOUNT_ID, campaignModelList.get(0).getId());
+
+        CampaignModel model = campaignService.findCampaignById(CLIENT_ACCOUNT_ID, campaignModelList.get(0).getId());
+        if (model.getCampaignStatus() == CampaignStatusEnum.CampaignStatus.PAUSED) {
+            passedTests = passedTests + 1;
+        } else {
+            failedTests = failedTests + 1;
+            failedTestNames.add("Pause Campaign");
+        }
+    }
+
+    private void removeCampaign() {
+        campaignService.removeCampaign(CLIENT_ACCOUNT_ID, campaignModelList.get(0).getId());
+
+        CampaignModel model = campaignService.findCampaignById(CLIENT_ACCOUNT_ID, campaignModelList.get(0).getId());
+        if (model == null) {
+            passedTests = passedTests + 1;
+        } else {
+            failedTests = failedTests + 1;
+            failedTestNames.add("Remove Campaign");
+        }
+    }
+
+    /**
+     * Verify there is a campaign with the same name in the account
+     *
+     * @param expectedCampaignName the name of the campaign expected to be in the list
+     * @return true if the campaign name exists, false if it does not
+     */
+    private boolean isCampaignVerified(String expectedCampaignName) {
         for (CampaignModel model : campaignModelList) {
-            if (model.getName().equals("Dummy Test Campaign")) {
-                log("Campaign Created Successfully!");
-                return;
+            if (model.getName().equals(expectedCampaignName)) {
+                return true;
             }
         }
-        log("FAILED: Campaign Creation");
+        return false;
     }
+
+/*
 
     private void createAdGroup() {
         AdGroupModel adGroupModel = new AdGroupModel();
@@ -156,7 +207,7 @@ public class E2ETester {
         searchAdModel.setFinalUrl("http://www.addyaiz.com");
 
         responsiveSearchAdModels.add(searchAdModel);
-        adService.createResponsiveSearchAds(CLIENT_ACCOUNT_ID, adGroupModelList.get(0).getId(),responsiveSearchAdModels);
+        adService.createResponsiveSearchAds(CLIENT_ACCOUNT_ID, adGroupModelList.get(0).getId(), responsiveSearchAdModels);
     }
 
     private void createKeywords() {
@@ -187,8 +238,16 @@ public class E2ETester {
             log(k.getText());
         }
     }
+*/
 
     private void log(String message) {
         System.out.println(message);
+    }
+
+    private void printTestOutcome() {
+        System.out.println("\n");
+        System.out.println("Success Tests: " + passedTests);
+        System.out.println("Failed Tests Count: " + failedTests);
+        System.out.println("Failed Tests Cases" + failedTestNames.toString());
     }
 }

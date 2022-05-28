@@ -5,6 +5,9 @@ import com.google.ads.googleads.lib.GoogleAdsClient;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 
+/**
+ * Builds a GoogleAdsClient for single use throughout application
+ */
 public class GoogleAdsClientBuilder {
     private final GoogleAdsClient googleAdsClient;
 

@@ -3,11 +3,14 @@ package com.addyai.campaign;
 import com.addyai.models.CampaignModel;
 import com.addyai.models.CampaignNetworkSettings;
 import com.google.ads.googleads.lib.GoogleAdsClient;
+import com.google.ads.googleads.lib.utils.FieldMasks;
 import com.google.ads.googleads.v10.common.ManualCpc;
 import com.google.ads.googleads.v10.enums.BudgetDeliveryMethodEnum;
+import com.google.ads.googleads.v10.enums.CampaignStatusEnum;
 import com.google.ads.googleads.v10.resources.Campaign;
 import com.google.ads.googleads.v10.resources.CampaignBudget;
 import com.google.ads.googleads.v10.services.*;
+import com.google.ads.googleads.v10.utils.ResourceNames;
 import com.google.api.gax.rpc.ServerStream;
 import com.google.common.collect.ImmutableList;
 
@@ -15,13 +18,30 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Manage campaigns on a customer account
+ * Manage campaigns within a client's account
  */
 public class CampaignService {
     private final GoogleAdsClient googleAdsClient;
 
     public CampaignService(GoogleAdsClient googleAdsClient) {
         this.googleAdsClient = googleAdsClient;
+    }
+
+    /**
+     * Find a campaign given it's campaignId
+     *
+     * @param customerId the id of the client's account
+     * @param campaignId the id of the campaign to find
+     * @return the CampaignModel if it existing or null if not
+     */
+    public CampaignModel findCampaignById(long customerId, long campaignId) {
+        List<CampaignModel> campaignModelList = getCampaigns(customerId);
+        for (CampaignModel model : campaignModelList) {
+            if (model.getId() == campaignId) {
+                return model;
+            }
+        }
+        return null;
     }
 
     /**
@@ -35,7 +55,13 @@ public class CampaignService {
 
         try (GoogleAdsServiceClient googleAdsServiceClient =
                      googleAdsClient.getLatestVersion().createGoogleAdsServiceClient()) {
-            String query = "SELECT campaign.id, campaign.name FROM campaign WHERE campaign.status IN ('ENABLED', 'PAUSED') ORDER BY campaign.id";
+            String query = "SELECT campaign.id, " +
+                    "campaign.name, campaign.status, " +
+                    "campaign.advertising_channel_type, " +
+                    "campaign.campaign_budget " +
+                    "FROM campaign " +
+                    "WHERE campaign.status IN ('ENABLED', 'PAUSED') ORDER BY campaign.id";
+
             // Constructs the SearchGoogleAdsStreamRequest.
             SearchGoogleAdsStreamRequest request =
                     SearchGoogleAdsStreamRequest.newBuilder()
@@ -54,14 +80,8 @@ public class CampaignService {
                     campaignModel.setId(googleAdsRow.getCampaign().getId());
                     campaignModel.setCampaignStatus(googleAdsRow.getCampaign().getStatus());
                     campaignModel.setName(googleAdsRow.getCampaign().getName());
-                    campaignModel.setEndDate(googleAdsRow.getCampaign().getEndDate());
-                    campaignModel.setStartDate(googleAdsRow.getCampaign().getStartDate());
                     campaignModel.setChannelType(googleAdsRow.getCampaign().getAdvertisingChannelType());
-
-                    if (!googleAdsRow.getCampaign().getCampaignBudget().equals(""))
-                        campaignModel.setBudget(googleAdsRow.getCampaign().getCampaignBudget());
-                    else
-                        campaignModel.setBudget("0");
+                    campaignModel.setBudget(googleAdsRow.getCampaignBudget());
 
                     campaignModels.add(campaignModel);
 
@@ -86,7 +106,7 @@ public class CampaignService {
         // Creates a single shared budget to be used by the campaigns added below.
         String budgetResourceName = addStandardCampaignBudget(
                 newCampaign.getCustomerId(),
-                Long.parseLong(newCampaign.getBudget()),
+                newCampaign.getBudget().getAmountMicros(),
                 newCampaign.getBudgetName()
         );
 
@@ -108,8 +128,6 @@ public class CampaignService {
                         .setManualCpc(ManualCpc.newBuilder().build())
                         .setCampaignBudget(budgetResourceName)
                         .setNetworkSettings(networkSettings)
-                        .setStartDate(newCampaign.getStartDate())
-                        .setEndDate(newCampaign.getEndDate())
                         .build();
 
         List<CampaignOperation> campaignOperations = new ArrayList<>();
@@ -128,6 +146,101 @@ public class CampaignService {
     }
 
     /**
+     * Pause a Campaign in the specified client account
+     *
+     * @param customerId the id of the client account
+     * @param campaignId the id of the campaign to be paused
+     */
+    public void pauseCampaign(long customerId, long campaignId) {
+        String campaignResourceName = ResourceNames.campaign(customerId, campaignId);
+        Campaign campaign = Campaign.newBuilder()
+                .setResourceName(campaignResourceName)
+                .setStatus(CampaignStatusEnum.CampaignStatus.PAUSED)
+                .build();
+
+        CampaignOperation op = CampaignOperation.newBuilder()
+                .setUpdate(campaign)
+                .setUpdateMask(FieldMasks.allSetFieldsOf(campaign))
+                .build();
+
+        try (CampaignServiceClient campaignServiceClient =
+                     googleAdsClient.getLatestVersion().createCampaignServiceClient()) {
+            MutateCampaignsResponse response =
+                    campaignServiceClient.mutateCampaigns(Long.toString(customerId), ImmutableList.of(op));
+            for (MutateCampaignResult result : response.getResultsList()) {
+                System.out.printf("Campaign with resource name '%s' is paused. %n", result.getResourceName());
+            }
+        }
+    }
+
+    /**
+     * Remove a campaign from a client account
+     *
+     * @param customerId the id of the client account
+     * @param campaignId the id of the campaign to be removed
+     */
+    public void removeCampaign(long customerId, long campaignId) {
+        try (CampaignServiceClient campaignServiceClient =
+                     googleAdsClient.getLatestVersion().createCampaignServiceClient()) {
+            String campaignResourceName = ResourceNames.campaign(customerId, campaignId);
+            // Constructs an operation that will remove the campaign with the specified resource name.
+            CampaignOperation operation =
+                    CampaignOperation.newBuilder().setRemove(campaignResourceName).build();
+            // Sends the operation in a mutate request.
+            MutateCampaignsResponse response =
+                    campaignServiceClient.mutateCampaigns(
+                            Long.toString(customerId), ImmutableList.of(operation));
+            // Prints the resource name of each removed object.
+            for (MutateCampaignResult mutateCampaignResult : response.getResultsList()) {
+                System.out.printf(
+                        "Removed campaign with resource name: '%s'.%n", mutateCampaignResult.getResourceName());
+            }
+        }
+    }
+
+    /**
+     * Update a campaign in a client account
+     *
+     * @param customerId           the id of the client account
+     * @param campaignId           the id of the campaign to update
+     * @param updatedCampaignModel the updated campaign values
+     */
+    public void updateCampaign(long customerId, long campaignId, CampaignModel updatedCampaignModel) {
+        try (CampaignServiceClient campaignServiceClient =
+                     googleAdsClient.getLatestVersion().createCampaignServiceClient()) {
+
+            // Get a fully completed updated campaign model
+            CampaignModel updatedModel = buildUpdatedCampaignModel(customerId, campaignId, updatedCampaignModel);
+
+            // Creates a Campaign object with the proper resource name and any other changes.
+            Campaign campaign =
+                    Campaign.newBuilder()
+                            .setResourceName(ResourceNames.campaign(customerId, campaignId))
+                            .setName(updatedModel.getName())
+                            .setStatus(updatedModel.getCampaignStatus())
+                            // .setCampaignBudget(updatedCampaign.getBudget()) // TODO: Update budget
+                            .build();
+            // Constructs an operation that will update the campaign, using the FieldMasks utility to
+            // derive the update mask. This mask tells the Google Ads API which attributes of the
+            // campaign you want to change.
+            CampaignOperation operation =
+                    CampaignOperation.newBuilder()
+                            .setUpdate(campaign)
+                            .setUpdateMask(FieldMasks.allSetFieldsOf(campaign))
+                            .build();
+            // Sends the operation in a mutate request.
+            MutateCampaignsResponse response =
+                    campaignServiceClient.mutateCampaigns(
+                            String.valueOf(customerId), ImmutableList.of(operation));
+            // Prints the resource name of each updated object.
+            for (MutateCampaignResult mutateCampaignResult : response.getResultsList()) {
+                System.out.printf(
+                        "Updated campaign with resourceName: %s.%n", mutateCampaignResult.getResourceName());
+            }
+        }
+    }
+
+    /**
      * Creates a new CampaignBudget in the specified client account.
      *
      * @param customerId the client customer ID.
@@ -139,6 +252,7 @@ public class CampaignService {
                         .setName(budgetName)
                         .setDeliveryMethod(BudgetDeliveryMethodEnum.BudgetDeliveryMethod.STANDARD)
                         .setAmountMicros(budgetAmount)
+                        .setExplicitlyShared(false)
                         .build();
 
         CampaignBudgetOperation op = CampaignBudgetOperation.newBuilder().setCreate(budget).build();
@@ -152,5 +266,35 @@ public class CampaignService {
             System.out.printf("Added budget: %s%n", budgetResourceName);
             return budgetResourceName;
         }
+    }
+
+    /**
+     * Builds an updated CampaignModel given a fully or partially completed CampaignModel
+     *
+     * @param customer_id the id of the client's account
+     * @param campaignId  the id of the campaign to update
+     * @param model       a fully or partially completed CampaignModel
+     * @return an updated CampaignModel composed of the existing model and updated changes
+     */
+    private CampaignModel buildUpdatedCampaignModel(long customer_id, long campaignId, CampaignModel model) {
+        CampaignModel existingModel = findCampaignById(customer_id, campaignId);
+
+        // if the campaign name is not updated, set to existing name
+        if (model.getName() == null || model.getName().equals(""))
+            model.setName(existingModel.getName());
+
+        if (model.getCampaignStatus() == null)
+            model.setCampaignStatus(existingModel.getCampaignStatus());
+
+        if (model.getBudget() == null || model.getBudget().equals(""))
+            model.setBudget(existingModel.getBudget());
+
+        if (model.getBudgetName() == null || model.getBudgetName().equals(""))
+            model.setBudgetName(existingModel.getBudgetName());
+
+        if (model.getChannelType() == null)
+            model.setChannelType(existingModel.getChannelType());
+
+        return model;
     }
 }
