@@ -43,7 +43,7 @@ public class KeywordModel {
     }
 
     public void setCpcBid(String cpcBid) {
-        this.cpcBid = String.valueOf(Utils.convertMicrosValue(cpcBid));
+        this.cpcBid = String.valueOf(Utils.convertDollarsToMicros(cpcBid));
     }
 
     public KeywordMatchType getMatchType() {

@@ -7,7 +7,7 @@ public class Utils {
      * @param value the dollar value to be returned
      * @return an integer that converts to dollars as micros
      */
-    public static int convertMicrosValue(String value) {
+    public static int convertDollarsToMicros(String value) {
         return (int) (Float.parseFloat(value) * 1000000);
     }
 }

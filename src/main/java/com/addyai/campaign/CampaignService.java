@@ -32,7 +32,7 @@ public class CampaignService {
      *
      * @param customerId the id of the client's account
      * @param campaignId the id of the campaign to find
-     * @return the CampaignModel if it existing or null if not
+     * @return the CampaignModel if it's existing or null if not
      */
     public CampaignModel findCampaignById(long customerId, long campaignId) {
         List<CampaignModel> campaignModelList = getCampaigns(customerId);
@@ -96,48 +96,55 @@ public class CampaignService {
     }
 
     /**
-     * Create a Search CampaignModel
+     * Create a batch of Search Campaigns
      *
-     * @param newCampaign a campaign model with details for new campaign
-     * @param settings    a networking settings model with details for new campaign
+     * @param customerId      customerId of the client's account
+     * @param newCampaignList a list of campaign models with details for new campaigns
+     * @param settingsList    a list of networking settings models with details for new campaigns
      */
-    public void createSearchCampaign(CampaignModel newCampaign, CampaignNetworkSettings settings) {
-
-        // Creates a single shared budget to be used by the campaigns added below.
-        String budgetResourceName = addStandardCampaignBudget(
-                newCampaign.getCustomerId(),
-                newCampaign.getBudget().getAmountMicros(),
-                newCampaign.getBudgetName()
-        );
-
-        // Setup campaign network settings
-        Campaign.NetworkSettings networkSettings =
-                Campaign.NetworkSettings.newBuilder()
-                        .setTargetGoogleSearch(settings.isTargetGoogleSearch())
-                        .setTargetSearchNetwork(settings.isTargetSearchNetwork())
-                        .setTargetContentNetwork(settings.isTargetContentNetwork())
-                        .setTargetPartnerSearchNetwork(settings.isTargetPartnerSearchNetwork())
-                        .build();
-
-        // Creates the campaign.
-        Campaign campaign =
-                Campaign.newBuilder()
-                        .setName(newCampaign.getName())
-                        .setAdvertisingChannelType(newCampaign.getChannelType())
-                        .setStatus(newCampaign.getCampaignStatus())
-                        .setManualCpc(ManualCpc.newBuilder().build())
-                        .setCampaignBudget(budgetResourceName)
-                        .setNetworkSettings(networkSettings)
-                        .build();
-
+    public void createSearchCampaign(long customerId, List<CampaignModel> newCampaignList, List<CampaignNetworkSettings> settingsList) {
         List<CampaignOperation> campaignOperations = new ArrayList<>();
-        CampaignOperation op = CampaignOperation.newBuilder().setCreate(campaign).build();
-        campaignOperations.add(op);
+
+        if (newCampaignList.size() != settingsList.size()) {
+            System.out.println("Incorrect Campaign Format. Campaigns and Network Settings don't match");
+            return;
+        }
+        for (int i = 0; i < newCampaignList.size(); i++) {
+            // Creates a single shared budget to be used by the campaigns added below.
+            String budgetResourceName = addStandardCampaignBudget(
+                    newCampaignList.get(i).getCustomerId(),
+                    newCampaignList.get(i).getBudget().getAmountMicros(),
+                    newCampaignList.get(i).getBudgetName()
+            );
+
+            // Setup campaign network settings
+            Campaign.NetworkSettings networkSettings =
+                    Campaign.NetworkSettings.newBuilder()
+                            .setTargetGoogleSearch(settingsList.get(i).isTargetGoogleSearch())
+                            .setTargetSearchNetwork(settingsList.get(i).isTargetSearchNetwork())
+                            .setTargetContentNetwork(settingsList.get(i).isTargetContentNetwork())
+                            .setTargetPartnerSearchNetwork(settingsList.get(i).isTargetPartnerSearchNetwork())
+                            .build();
+
+            // Creates the campaign.
+            Campaign campaign =
+                    Campaign.newBuilder()
+                            .setName(newCampaignList.get(i).getName())
+                            .setAdvertisingChannelType(newCampaignList.get(i).getChannelType())
+                            .setStatus(newCampaignList.get(i).getCampaignStatus())
+                            .setManualCpc(ManualCpc.newBuilder().build())
+                            .setCampaignBudget(budgetResourceName)
+                            .setNetworkSettings(networkSettings)
+                            .build();
+
+            CampaignOperation op = CampaignOperation.newBuilder().setCreate(campaign).build();
+            campaignOperations.add(op);
+        }
 
         try (CampaignServiceClient campaignServiceClient =
                      googleAdsClient.getLatestVersion().createCampaignServiceClient()) {
             MutateCampaignsResponse response =
-                    campaignServiceClient.mutateCampaigns(Long.toString(newCampaign.getCustomerId()), campaignOperations);
+                    campaignServiceClient.mutateCampaigns(String.valueOf(customerId), campaignOperations);
             System.out.printf("Added %d campaigns:%n", response.getResultsCount());
             for (MutateCampaignResult result : response.getResultsList()) {
                 System.out.println(result.getResourceName());
@@ -146,27 +153,32 @@ public class CampaignService {
     }
 
     /**
-     * Pause a Campaign in the specified client account
+     * Pause Campaigns in the specified client account in batches
      *
-     * @param customerId the id of the client account
-     * @param campaignId the id of the campaign to be paused
+     * @param customerId     the id of the client account
+     * @param campaignIdList the list of Campaign Ids to be paused
      */
-    public void pauseCampaign(long customerId, long campaignId) {
-        String campaignResourceName = ResourceNames.campaign(customerId, campaignId);
-        Campaign campaign = Campaign.newBuilder()
-                .setResourceName(campaignResourceName)
-                .setStatus(CampaignStatusEnum.CampaignStatus.PAUSED)
-                .build();
+    public void pauseCampaign(long customerId, List<Long> campaignIdList) {
+        List<CampaignOperation> campaignOperations = new ArrayList<>();
 
-        CampaignOperation op = CampaignOperation.newBuilder()
-                .setUpdate(campaign)
-                .setUpdateMask(FieldMasks.allSetFieldsOf(campaign))
-                .build();
+        for (Long campaignId : campaignIdList) {
+            String campaignResourceName = ResourceNames.campaign(customerId, campaignId);
+            Campaign campaign = Campaign.newBuilder()
+                    .setResourceName(campaignResourceName)
+                    .setStatus(CampaignStatusEnum.CampaignStatus.PAUSED)
+                    .build();
+
+            CampaignOperation op = CampaignOperation.newBuilder()
+                    .setUpdate(campaign)
+                    .setUpdateMask(FieldMasks.allSetFieldsOf(campaign))
+                    .build();
+            campaignOperations.add(op);
+        }
 
         try (CampaignServiceClient campaignServiceClient =
                      googleAdsClient.getLatestVersion().createCampaignServiceClient()) {
             MutateCampaignsResponse response =
-                    campaignServiceClient.mutateCampaigns(Long.toString(customerId), ImmutableList.of(op));
+                    campaignServiceClient.mutateCampaigns(Long.toString(customerId), campaignOperations);
             for (MutateCampaignResult result : response.getResultsList()) {
                 System.out.printf("Campaign with resource name '%s' is paused. %n", result.getResourceName());
             }
@@ -174,22 +186,27 @@ public class CampaignService {
     }
 
     /**
-     * Remove a campaign from a client account
+     * Remove Campaigns from a client account in batches
      *
-     * @param customerId the id of the client account
-     * @param campaignId the id of the campaign to be removed
+     * @param customerId     the id of the client account
+     * @param campaignIdList list of Campaign ids to be removed
      */
-    public void removeCampaign(long customerId, long campaignId) {
+    public void removeCampaign(long customerId, List<Long> campaignIdList) {
+        List<CampaignOperation> operations = new ArrayList<>();
+
         try (CampaignServiceClient campaignServiceClient =
                      googleAdsClient.getLatestVersion().createCampaignServiceClient()) {
-            String campaignResourceName = ResourceNames.campaign(customerId, campaignId);
-            // Constructs an operation that will remove the campaign with the specified resource name.
-            CampaignOperation operation =
-                    CampaignOperation.newBuilder().setRemove(campaignResourceName).build();
+            for (Long campaignId : campaignIdList) {
+                String campaignResourceName = ResourceNames.campaign(customerId, campaignId);
+                // Constructs an operation that will remove the campaign with the specified resource name.
+                CampaignOperation operation =
+                        CampaignOperation.newBuilder().setRemove(campaignResourceName).build();
+                operations.add(operation);
+            }
             // Sends the operation in a mutate request.
             MutateCampaignsResponse response =
                     campaignServiceClient.mutateCampaigns(
-                            Long.toString(customerId), ImmutableList.of(operation));
+                            Long.toString(customerId), operations);
             // Prints the resource name of each removed object.
             for (MutateCampaignResult mutateCampaignResult : response.getResultsList()) {
                 System.out.printf(

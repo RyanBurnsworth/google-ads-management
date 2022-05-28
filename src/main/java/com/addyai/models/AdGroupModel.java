@@ -1,25 +1,21 @@
 package com.addyai.models;
 
-import com.addyai.utils.Utils;
 import com.google.ads.googleads.v10.enums.AdGroupStatusEnum;
-import com.google.ads.googleads.v10.enums.AdGroupTypeEnum;
 
 public class AdGroupModel {
     private long id;
 
     private long customerId;
 
+    private long campaignId;
+
     private String adgroupName;
 
     private AdGroupStatusEnum.AdGroupStatus status;
 
-    private AdGroupTypeEnum.AdGroupType type;
-
     private String campaignName;
 
-    private String maxCPC;
-
-    private long campaignId;
+    private long maxCPC;
 
     public long getId() {
         return id;
@@ -53,14 +49,6 @@ public class AdGroupModel {
         this.status = status;
     }
 
-    public AdGroupTypeEnum.AdGroupType getType() {
-        return type;
-    }
-
-    public void setType(AdGroupTypeEnum.AdGroupType type) {
-        this.type = type;
-    }
-
     public String getCampaignName() {
         return campaignName;
     }
@@ -69,12 +57,12 @@ public class AdGroupModel {
         this.campaignName = "/customers/" + this.customerId + "/campaigns/" + this.campaignId;
     }
 
-    public String getMaxCPC() {
+    public long getMaxCPC() {
         return maxCPC;
     }
 
-    public void setMaxCPC(String maxCPC) {
-        this.maxCPC = String.valueOf(Utils.convertMicrosValue(maxCPC));
+    public void setMaxCPC(long maxCPC) {
+        this.maxCPC = maxCPC;
     }
 
     public long getCampaignId() {

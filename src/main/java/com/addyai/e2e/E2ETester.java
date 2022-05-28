@@ -1,13 +1,17 @@
 package com.addyai.e2e;
 
+import com.addyai.adgroup.AdGroupService;
 import com.addyai.builder.GoogleAdsClientBuilder;
 import com.addyai.campaign.CampaignService;
+import com.addyai.models.AdGroupModel;
 import com.addyai.models.CampaignModel;
 import com.addyai.models.CampaignNetworkSettings;
 import com.addyai.utils.Utils;
 import com.google.ads.googleads.lib.GoogleAdsClient;
+import com.google.ads.googleads.v10.enums.AdGroupStatusEnum;
 import com.google.ads.googleads.v10.enums.AdvertisingChannelTypeEnum;
 import com.google.ads.googleads.v10.enums.CampaignStatusEnum;
+import com.google.ads.googleads.v10.resources.AdGroupCriterion;
 import com.google.ads.googleads.v10.resources.CampaignBudget;
 import com.google.ads.googleads.v9.errors.GoogleAdsException;
 
@@ -27,7 +31,11 @@ public class E2ETester {
 
     private final CampaignService campaignService;
 
+    private final AdGroupService adGroupService;
+
     private List<CampaignModel> campaignModelList = new ArrayList<>();
+
+    private List<AdGroupModel> adGroupModelList = new ArrayList<>();
 
     private int passedTests = 0;
     private int failedTests = 0;
@@ -38,8 +46,10 @@ public class E2ETester {
         GoogleAdsClient googleAdsClient = builder.build();
 
         campaignService = new CampaignService(googleAdsClient);
+        adGroupService = new AdGroupService(googleAdsClient);
 
-        runFullCampaignTests();
+        // runFullCampaignTests();
+        runFullAdGroupTests();
     }
 
     private void runFullCampaignTests() {
@@ -51,20 +61,34 @@ public class E2ETester {
         printTestOutcome();
     }
 
+    private void runFullAdGroupTests() {
+        createCampaign();
+        createAdGroup();
+        pauseAdGroup();
+        removeAdGroup();
+        removeCampaign();
+
+        printTestOutcome();
+    }
+
     /**
      * Create a dummy campaign in the test account
      */
     private void createCampaign() {
+        List<CampaignNetworkSettings> networkSettingsList = new ArrayList<>();
+        List<CampaignModel> campaignModels = new ArrayList<>();
+
         // create networking settings for campaign
         CampaignNetworkSettings networkSettings = new CampaignNetworkSettings();
         networkSettings.setTargetContentNetwork(false);
         networkSettings.setTargetGoogleSearch(true);
         networkSettings.setTargetPartnerSearchNetwork(false);
         networkSettings.setTargetSearchNetwork(true);
+        networkSettingsList.add(networkSettings);
 
         CampaignBudget budget = CampaignBudget
                 .newBuilder()
-                .setAmountMicros(Utils.convertMicrosValue("85.50"))
+                .setAmountMicros(Utils.convertDollarsToMicros("85.50"))
                 .build();
 
         // generate a dummy CampaignModel
@@ -75,16 +99,17 @@ public class E2ETester {
         campaign.setBudgetName("Dummy Budget");
         campaign.setChannelType(AdvertisingChannelTypeEnum.AdvertisingChannelType.SEARCH);
         campaign.setName("Dummy Test Campaign");
+        campaignModels.add(campaign);
 
         // create the dummy campaign in test account
         try {
             CampaignService campaignService = new CampaignService(builder.build());
-            campaignService.createSearchCampaign(campaign, networkSettings);
+            campaignService.createSearchCampaign(CLIENT_ACCOUNT_ID, campaignModels, networkSettingsList);
         } catch (GoogleAdsException adsException) {
             log("Error: " + adsException.getGoogleAdsFailure().toString());
         }
 
-        // udpate campaignModelList with latest campaigns
+        // update campaignModelList with the latest campaigns
         campaignModelList = campaignService.getCampaigns(CLIENT_ACCOUNT_ID);
 
         // verify the campaign name is matched
@@ -112,7 +137,10 @@ public class E2ETester {
     }
 
     private void pauseCampaign() {
-        campaignService.pauseCampaign(CLIENT_ACCOUNT_ID, campaignModelList.get(0).getId());
+        List<Long> campaignIds = new ArrayList<>();
+        campaignIds.add(campaignModelList.get(0).getId());
+
+        campaignService.pauseCampaign(CLIENT_ACCOUNT_ID, campaignIds);
 
         CampaignModel model = campaignService.findCampaignById(CLIENT_ACCOUNT_ID, campaignModelList.get(0).getId());
         if (model.getCampaignStatus() == CampaignStatusEnum.CampaignStatus.PAUSED) {
@@ -124,7 +152,10 @@ public class E2ETester {
     }
 
     private void removeCampaign() {
-        campaignService.removeCampaign(CLIENT_ACCOUNT_ID, campaignModelList.get(0).getId());
+        List<Long> campaignIds = new ArrayList<>();
+        campaignIds.add(campaignModelList.get(0).getId());
+
+        campaignService.removeCampaign(CLIENT_ACCOUNT_ID, campaignIds);
 
         CampaignModel model = campaignService.findCampaignById(CLIENT_ACCOUNT_ID, campaignModelList.get(0).getId());
         if (model == null) {
@@ -150,9 +181,9 @@ public class E2ETester {
         return false;
     }
 
-/*
-
     private void createAdGroup() {
+        List<AdGroupModel> adGroupModels = new ArrayList<>();
+
         AdGroupModel adGroupModel = new AdGroupModel();
         adGroupModel.setCustomerId(CLIENT_ACCOUNT_ID);
 
@@ -164,12 +195,20 @@ public class E2ETester {
             }
         }
 
+        // create your ad group bid
+        long bidValueMicros = Utils.convertDollarsToMicros("8.43");
+        AdGroupCriterion adGroupCriterion = AdGroupCriterion
+                .newBuilder()
+                .setCpcBidMicros(bidValueMicros)
+                .build();
+
         adGroupModel.setAdgroupName("Dummy Adgroup");
         adGroupModel.setStatus(AdGroupStatusEnum.AdGroupStatus.ENABLED);
-        adGroupModel.setType(AdGroupTypeEnum.AdGroupType.SEARCH_STANDARD);
-        adGroupModel.setMaxCPC(8);
+        adGroupModel.setMaxCPC(adGroupCriterion.getCpcBidMicros());
+        adGroupModels.add(adGroupModel);
+
         AdGroupService adGroupService = new AdGroupService(builder.build());
-        adGroupService.createAdgroup(adGroupModel);
+        adGroupService.createAdgroup(CLIENT_ACCOUNT_ID, adGroupModels);
 
         adGroupModelList = adGroupService.getAdGroups(CLIENT_ACCOUNT_ID, 10);
 
@@ -182,7 +221,37 @@ public class E2ETester {
         log("FAILED: AdGroup creation");
     }
 
-    private void createResponsiveAds() {
+    private void pauseAdGroup() {
+        List<Long> adGroupIds = new ArrayList<>();
+        adGroupIds.add(adGroupModelList.get(0).getId());
+
+        adGroupService.pauseAdGroup(CLIENT_ACCOUNT_ID, adGroupIds);
+
+        AdGroupModel model = adGroupService.findAdGroup(CLIENT_ACCOUNT_ID, adGroupModelList.get(0).getId());
+        if (model.getStatus() == AdGroupStatusEnum.AdGroupStatus.PAUSED) {
+            passedTests = passedTests + 1;
+        } else {
+            failedTests = failedTests + 1;
+            failedTestNames.add("Pause AdGroup");
+        }
+    }
+
+    private void removeAdGroup() {
+        List<Long> adGroupIds = new ArrayList<>();
+        adGroupIds.add(adGroupModelList.get(0).getId());
+
+        adGroupService.removeAdGroup(CLIENT_ACCOUNT_ID, adGroupIds);
+
+        AdGroupModel model = adGroupService.findAdGroup(CLIENT_ACCOUNT_ID, adGroupModelList.get(0).getId());
+        if (model == null) {
+            passedTests = passedTests + 1;
+        } else {
+            failedTests = failedTests + 1;
+            failedTestNames.add("Remove AdGroup");
+        }
+    }
+
+/*    private void createResponsiveAds() {
         List<ResponsiveSearchAdModel> responsiveSearchAdModels = new ArrayList<>();
         List<String> headlineList = new ArrayList<>();
         List<String> descriptionList = new ArrayList<>();
@@ -208,8 +277,8 @@ public class E2ETester {
 
         responsiveSearchAdModels.add(searchAdModel);
         adService.createResponsiveSearchAds(CLIENT_ACCOUNT_ID, adGroupModelList.get(0).getId(), responsiveSearchAdModels);
-    }
-
+    }*/
+/*
     private void createKeywords() {
         List<KeywordModel> newKeywordsList = new ArrayList();
 
@@ -237,8 +306,7 @@ public class E2ETester {
         for (KeywordModel k : keywordModelList) {
             log(k.getText());
         }
-    }
-*/
+    }*/
 
     private void log(String message) {
         System.out.println(message);
