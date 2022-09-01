@@ -1,8 +1,8 @@
 package com.addyai.account;
 
 import com.google.ads.googleads.lib.GoogleAdsClient;
-import com.google.ads.googleads.v10.resources.Customer;
-import com.google.ads.googleads.v10.services.*;
+import com.google.ads.googleads.v11.resources.Customer;
+import com.google.ads.googleads.v11.services.*;
 
 import java.util.ArrayList;
 import java.util.List;
