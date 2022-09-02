@@ -24,11 +24,17 @@ public class CampaignDetails {
 
     private boolean isEnhancedCpcEnabled;
 
-    private double optimizationScore;
-
     private String startDate;
 
     private String endDate;
+
+    private boolean isTargetingGoogleSearch;
+
+    private boolean isTargetingSearchNetwork;
+
+    private boolean isTargetingContentNetwork;
+
+    private boolean isTargetingPartnerSearchNetwork;
 
     public long getCampaignId() {
         return campaignId;
@@ -102,14 +108,6 @@ public class CampaignDetails {
         isEnhancedCpcEnabled = enhancedCpcEnabled;
     }
 
-    public double getOptimizationScore() {
-        return optimizationScore;
-    }
-
-    public void setOptimizationScore(double optimizationScore) {
-        this.optimizationScore = optimizationScore;
-    }
-
     public String getStartDate() {
         return startDate;
     }
@@ -124,5 +122,37 @@ public class CampaignDetails {
 
     public void setEndDate(String endDate) {
         this.endDate = endDate;
+    }
+
+    public boolean isTargetingGoogleSearch() {
+        return isTargetingGoogleSearch;
+    }
+
+    public void setTargetingGoogleSearch(boolean targetingGoogleSearch) {
+        isTargetingGoogleSearch = targetingGoogleSearch;
+    }
+
+    public boolean isTargetingSearchNetwork() {
+        return isTargetingSearchNetwork;
+    }
+
+    public void setTargetingSearchNetwork(boolean targetingSearchNetwork) {
+        isTargetingSearchNetwork = targetingSearchNetwork;
+    }
+
+    public boolean isTargetingContentNetwork() {
+        return isTargetingContentNetwork;
+    }
+
+    public void setTargetingContentNetwork(boolean targetingContentNetwork) {
+        isTargetingContentNetwork = targetingContentNetwork;
+    }
+
+    public boolean isTargetingPartnerSearchNetwork() {
+        return isTargetingPartnerSearchNetwork;
+    }
+
+    public void setTargetingPartnerSearchNetwork(boolean targetingPartnerSearchNetwork) {
+        isTargetingPartnerSearchNetwork = targetingPartnerSearchNetwork;
     }
 }
