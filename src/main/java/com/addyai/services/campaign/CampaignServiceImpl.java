@@ -8,6 +8,10 @@ import com.addyai.models.CampaignDetails;
 import com.addyai.repos.campaigns.CampaignRepository;
 import com.google.ads.googleads.lib.utils.FieldMasks;
 import com.google.ads.googleads.v11.common.ManualCpc;
+import com.google.ads.googleads.v11.enums.AdvertisingChannelTypeEnum;
+import com.google.ads.googleads.v11.enums.CampaignStatusEnum;
+import com.google.ads.googleads.v11.enums.NegativeGeoTargetTypeEnum;
+import com.google.ads.googleads.v11.enums.PositiveGeoTargetTypeEnum;
 import com.google.ads.googleads.v11.resources.Campaign;
 import com.google.ads.googleads.v11.services.CampaignOperation;
 import org.springframework.stereotype.Service;
@@ -26,7 +30,7 @@ public class CampaignServiceImpl implements CampaignService {
     /**
      * Add campaigns to a client's account
      *
-     * @param customerId      the customer id of the client account
+     * @param customerId          the customer id of the client account
      * @param campaignDetailsList the campaign details to be used in campaign creation
      * @throws CreateResourceException
      */
@@ -80,7 +84,7 @@ public class CampaignServiceImpl implements CampaignService {
             campaignOperations.add(operation);
         }
 
-        campaignRepository.updateCampaignDetails(customerId, campaignOperations);
+        campaignRepository.updateCampaigns(customerId, campaignOperations);
     }
 
     /**
@@ -100,12 +104,18 @@ public class CampaignServiceImpl implements CampaignService {
                 .setEnhancedCpcEnabled(campaignDetails.isEnhancedCpcEnabled())
                 .build();
 
+        NegativeGeoTargetTypeEnum.NegativeGeoTargetType negativeGeoTargetType = NegativeGeoTargetTypeEnum.NegativeGeoTargetType
+                .valueOf(campaignDetails.getNegativeGeoTargetType());
+
+        PositiveGeoTargetTypeEnum.PositiveGeoTargetType positiveGeoTargetType = PositiveGeoTargetTypeEnum.PositiveGeoTargetType
+                .valueOf(campaignDetails.getPositiveGeoTargetType());
+
         Campaign.GeoTargetTypeSetting geoTargetTypeSetting = Campaign.GeoTargetTypeSetting.newBuilder()
-                .setNegativeGeoTargetType(campaignDetails.getNegativeGeoTargetType())
-                .setPositiveGeoTargetType(campaignDetails.getPositiveGeoTargetType())
+                .setNegativeGeoTargetType(negativeGeoTargetType)
+                .setPositiveGeoTargetType(positiveGeoTargetType)
                 .build();
 
-        // extract network settings into it's own object
+        // extract network settings into its own object
         Campaign.NetworkSettings networkSettings = Campaign.NetworkSettings.newBuilder()
                 .setTargetContentNetwork(campaignDetails.isTargetingContentNetwork())
                 .setTargetSearchNetwork(campaignDetails.isTargetingSearchNetwork())
@@ -113,9 +123,15 @@ public class CampaignServiceImpl implements CampaignService {
                 .setTargetPartnerSearchNetwork(campaignDetails.isTargetingPartnerSearchNetwork())
                 .build();
 
+        CampaignStatusEnum.CampaignStatus status =
+                CampaignStatusEnum.CampaignStatus.valueOf(campaignDetails.getStatus());
+
+        AdvertisingChannelTypeEnum.AdvertisingChannelType advertisingChannelType =
+                AdvertisingChannelTypeEnum.AdvertisingChannelType.valueOf(campaignDetails.getAdvertisingChannelType());
+
         return Campaign.newBuilder()
                 .setManualCpc(manualCpc)
-                .setStatus(campaignDetails.getStatus())
+                .setStatus(status)
                 .setId(campaignDetails.getCampaignId())
                 .setStartDate(campaignDetails.getStartDate())
                 .setEndDate(campaignDetails.getEndDate())
@@ -124,7 +140,7 @@ public class CampaignServiceImpl implements CampaignService {
                 .setCampaignBudget(campaignDetails.getBudget())
                 .setBiddingStrategy(campaignDetails.getBiddingStrategy())
                 .setNetworkSettings(networkSettings)
-                .setAdvertisingChannelType(campaignDetails.getAdvertisingChannelType())
+                .setAdvertisingChannelType(advertisingChannelType)
                 .build();
     }
 }

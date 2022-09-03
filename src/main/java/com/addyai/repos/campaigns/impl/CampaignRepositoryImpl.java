@@ -18,18 +18,21 @@ import org.springframework.stereotype.Repository;
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.addyai.GoogleAdsManagementApplication.CLIENT_ACCOUNT_ID;
 import static com.addyai.utils.Constants.*;
 
 @Repository
 public class CampaignRepositoryImpl implements CampaignRepository {
     private final GoogleAdsServiceClient googleAdsServiceClient;
 
+    private final StreamRequest requestBuilder;
+
     public CampaignRepositoryImpl() {
         this.googleAdsServiceClient = GoogleAdsManagementApplication
                 .getGoogleAdsClient()
                 .getLatestVersion()
                 .createGoogleAdsServiceClient();
+
+        this.requestBuilder = new StreamRequestImpl(googleAdsServiceClient);
     }
 
     /**
@@ -46,8 +49,7 @@ public class CampaignRepositoryImpl implements CampaignRepository {
         try {
             String query = GAQLUtils.getCampaignDetailsQuery();
 
-            StreamRequest requestBuilder = new StreamRequestImpl(googleAdsServiceClient);
-            SearchGoogleAdsStreamRequest request = requestBuilder.buildStreamRequest(CLIENT_ACCOUNT_ID, query);
+            SearchGoogleAdsStreamRequest request = requestBuilder.buildStreamRequest(customerId, query);
 
             ServerStream<SearchGoogleAdsStreamResponse> response = requestBuilder.callStreamRequest(request);
 
@@ -67,8 +69,8 @@ public class CampaignRepositoryImpl implements CampaignRepository {
      * @throws UpdateResourceException
      */
     @Override
-    public void updateCampaignDetails(long customerId,
-                                      List<CampaignOperation> campaignOperations) throws UpdateResourceException {
+    public void updateCampaigns(long customerId,
+                                List<CampaignOperation> campaignOperations) throws UpdateResourceException {
         try {
             CampaignServiceClient campaignServiceClient = GoogleAdsManagementApplication.getGoogleAdsClient()
                     .getLatestVersion().createCampaignServiceClient();

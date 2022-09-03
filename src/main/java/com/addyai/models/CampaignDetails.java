@@ -1,40 +1,38 @@
 package com.addyai.models;
 
-import com.google.ads.googleads.v11.enums.AdvertisingChannelTypeEnum;
-import com.google.ads.googleads.v11.enums.CampaignStatusEnum;
-import com.google.ads.googleads.v11.enums.NegativeGeoTargetTypeEnum;
-import com.google.ads.googleads.v11.enums.PositiveGeoTargetTypeEnum;
+import static com.addyai.utils.Constants.ADVERTISING_TYPE_SEARCH;
+import static com.addyai.utils.Constants.GEO_TARGET_TYPE_UNKNOWN;
 
 public class CampaignDetails {
-    private long campaignId;
+    private long campaignId = 0L;
 
-    private String campaignName;
+    private String campaignName = "";
 
-    private CampaignStatusEnum.CampaignStatus status;
+    private String status = "";
 
-    private String budget;
+    private String budget = "";
 
-    private AdvertisingChannelTypeEnum.AdvertisingChannelType advertisingChannelType;
+    private String advertisingChannelType = ADVERTISING_TYPE_SEARCH;
 
-    private String biddingStrategy;
+    private String biddingStrategy = "";
 
-    private PositiveGeoTargetTypeEnum.PositiveGeoTargetType positiveGeoTargetType;
+    private String positiveGeoTargetType = GEO_TARGET_TYPE_UNKNOWN;
 
-    private NegativeGeoTargetTypeEnum.NegativeGeoTargetType negativeGeoTargetType;
+    private String negativeGeoTargetType = GEO_TARGET_TYPE_UNKNOWN;
 
-    private boolean isEnhancedCpcEnabled;
+    private boolean isEnhancedCpcEnabled = false;
 
-    private String startDate;
+    private String startDate = "";
 
-    private String endDate;
+    private String endDate = "";
 
-    private boolean isTargetingGoogleSearch;
+    private boolean isTargetingGoogleSearch = false;
 
-    private boolean isTargetingSearchNetwork;
+    private boolean isTargetingSearchNetwork = false;
 
-    private boolean isTargetingContentNetwork;
+    private boolean isTargetingContentNetwork = false;
 
-    private boolean isTargetingPartnerSearchNetwork;
+    private boolean isTargetingPartnerSearchNetwork = false;
 
     public long getCampaignId() {
         return campaignId;
@@ -52,11 +50,11 @@ public class CampaignDetails {
         this.campaignName = campaignName;
     }
 
-    public CampaignStatusEnum.CampaignStatus getStatus() {
+    public String getStatus() {
         return status;
     }
 
-    public void setStatus(CampaignStatusEnum.CampaignStatus status) {
+    public void setStatus(String status) {
         this.status = status;
     }
 
@@ -68,11 +66,11 @@ public class CampaignDetails {
         this.budget = budget;
     }
 
-    public AdvertisingChannelTypeEnum.AdvertisingChannelType getAdvertisingChannelType() {
+    public String getAdvertisingChannelType() {
         return advertisingChannelType;
     }
 
-    public void setAdvertisingChannelType(AdvertisingChannelTypeEnum.AdvertisingChannelType advertisingChannelType) {
+    public void setAdvertisingChannelType(String advertisingChannelType) {
         this.advertisingChannelType = advertisingChannelType;
     }
 
@@ -84,19 +82,19 @@ public class CampaignDetails {
         this.biddingStrategy = biddingStrategy;
     }
 
-    public PositiveGeoTargetTypeEnum.PositiveGeoTargetType getPositiveGeoTargetType() {
+    public String getPositiveGeoTargetType() {
         return positiveGeoTargetType;
     }
 
-    public void setPositiveGeoTargetType(PositiveGeoTargetTypeEnum.PositiveGeoTargetType positiveGeoTargetType) {
+    public void setPositiveGeoTargetType(String positiveGeoTargetType) {
         this.positiveGeoTargetType = positiveGeoTargetType;
     }
 
-    public NegativeGeoTargetTypeEnum.NegativeGeoTargetType getNegativeGeoTargetType() {
+    public String getNegativeGeoTargetType() {
         return negativeGeoTargetType;
     }
 
-    public void setNegativeGeoTargetType(NegativeGeoTargetTypeEnum.NegativeGeoTargetType negativeGeoTargetType) {
+    public void setNegativeGeoTargetType(String negativeGeoTargetType) {
         this.negativeGeoTargetType = negativeGeoTargetType;
     }
 

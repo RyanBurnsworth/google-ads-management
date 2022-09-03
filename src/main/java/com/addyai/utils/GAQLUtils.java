@@ -21,7 +21,11 @@ public class GAQLUtils {
                 " campaign.manual_cpc.enhanced_cpc_enabled," +
                 " campaign.optimization_score," +
                 " campaign.start_date," +
-                " campaign.end_date" +
+                " campaign.end_date," +
+                " campaign.network_settings.target_content_network," +
+                " campaign.network_settings.target_google_search," +
+                " campaign.network_settings.target_partner_search_network," +
+                " campaign.network_settings.target_search_network" +
                 " FROM campaign ORDER BY campaign.id";
     }
 
@@ -33,14 +37,19 @@ public class GAQLUtils {
                 CampaignDetails details = new CampaignDetails();
                 details.setCampaignId(googleAdsRow.getCampaign().getId());
                 details.setCampaignName(googleAdsRow.getCampaign().getName());
-                details.setAdvertisingChannelType(googleAdsRow.getCampaign().getAdvertisingChannelType());
+                details.setStatus(googleAdsRow.getCampaign().getStatus().toString());
+                details.setAdvertisingChannelType(googleAdsRow.getCampaign().getAdvertisingChannelType().toString());
                 details.setBudget(googleAdsRow.getCampaign().getCampaignBudget());
-                details.setBiddingStrategy(googleAdsRow.getCampaign().getBiddingStrategy());
-                details.setPositiveGeoTargetType(googleAdsRow.getCampaign().getGeoTargetTypeSetting().getPositiveGeoTargetType());
-                details.setNegativeGeoTargetType(googleAdsRow.getCampaign().getGeoTargetTypeSetting().getNegativeGeoTargetType());
+                details.setBiddingStrategy(googleAdsRow.getCampaign().getBiddingStrategyType().toString());
+                details.setPositiveGeoTargetType(googleAdsRow.getCampaign().getGeoTargetTypeSetting().getPositiveGeoTargetType().toString());
+                details.setNegativeGeoTargetType(googleAdsRow.getCampaign().getGeoTargetTypeSetting().getNegativeGeoTargetType().toString());
                 details.setEnhancedCpcEnabled(googleAdsRow.getCampaign().getManualCpc().getEnhancedCpcEnabled());
                 details.setStartDate(googleAdsRow.getCampaign().getStartDate());
                 details.setEndDate(googleAdsRow.getCampaign().getEndDate());
+                details.setTargetingSearchNetwork(googleAdsRow.getCampaign().getNetworkSettings().getTargetSearchNetwork());
+                details.setTargetingContentNetwork(googleAdsRow.getCampaign().getNetworkSettings().getTargetContentNetwork());
+                details.setTargetingGoogleSearch(googleAdsRow.getCampaign().getNetworkSettings().getTargetGoogleSearch());
+                details.setTargetingPartnerSearchNetwork(googleAdsRow.getCampaign().getNetworkSettings().getTargetPartnerSearchNetwork());
 
                 campaignDetailsList.add(details);
             }
@@ -48,5 +57,4 @@ public class GAQLUtils {
 
         return campaignDetailsList;
     }
-
 }

@@ -12,7 +12,7 @@ import java.util.List;
 public interface CampaignRepository {
     List<CampaignDetails> getCampaignDetails(long customerId) throws GetResourceException;
 
-    void updateCampaignDetails(long customerId, List<CampaignOperation> campaignOperations) throws UpdateResourceException;
+    void updateCampaigns(long customerId, List<CampaignOperation> campaignOperations) throws UpdateResourceException;
 
     void deleteCampaigns(long customerId, List<Long> campaignOperations) throws DeleteResourceException;
 
