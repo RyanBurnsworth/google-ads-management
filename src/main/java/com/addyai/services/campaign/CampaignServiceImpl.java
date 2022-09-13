@@ -8,10 +8,12 @@ import com.addyai.models.CampaignDetails;
 import com.addyai.repos.campaigns.CampaignRepository;
 import com.google.ads.googleads.lib.utils.FieldMasks;
 import com.google.ads.googleads.v11.common.ManualCpc;
+import com.google.ads.googleads.v11.common.MaximizeConversionValue;
 import com.google.ads.googleads.v11.enums.AdvertisingChannelTypeEnum;
 import com.google.ads.googleads.v11.enums.CampaignStatusEnum;
 import com.google.ads.googleads.v11.enums.NegativeGeoTargetTypeEnum;
 import com.google.ads.googleads.v11.enums.PositiveGeoTargetTypeEnum;
+import com.google.ads.googleads.v11.resources.BiddingStrategy;
 import com.google.ads.googleads.v11.resources.Campaign;
 import com.google.ads.googleads.v11.services.CampaignOperation;
 import org.springframework.stereotype.Service;
@@ -39,7 +41,7 @@ public class CampaignServiceImpl implements CampaignService {
         List<CampaignOperation> campaignOperations = new ArrayList<>();
 
         for (CampaignDetails campaignDetails : campaignDetailsList) {
-            Campaign campaign = extractCampaignFromDetails(campaignDetails);
+            Campaign campaign = buildCampaignFromDetails(customerId, campaignDetails);
 
             // create campaign operation and add to list
             CampaignOperation op = CampaignOperation.newBuilder()
@@ -75,7 +77,7 @@ public class CampaignServiceImpl implements CampaignService {
         List<CampaignOperation> campaignOperations = new ArrayList<>();
 
         for (CampaignDetails campaignDetails : campaignDetailsList) {
-            Campaign campaign = extractCampaignFromDetails(campaignDetails);
+            Campaign campaign = buildCampaignFromDetails(customerId, campaignDetails);
             CampaignOperation operation = CampaignOperation.newBuilder()
                     .setUpdate(campaign)
                     .setUpdateMask(FieldMasks.allSetFieldsOf(campaign))
@@ -99,46 +101,59 @@ public class CampaignServiceImpl implements CampaignService {
         campaignRepository.deleteCampaigns(customerId, campaignIds);
     }
 
-    private Campaign extractCampaignFromDetails(CampaignDetails campaignDetails) {
+    /**
+     * Create a campaign object using a CampaignDetails object
+     *
+     * @param customerId      the customer id of the client account
+     * @param campaignDetails the details of the campaign to be created
+     * @return campaign object based on campaign details provided
+     */
+    private Campaign buildCampaignFromDetails(long customerId, CampaignDetails campaignDetails) {
+        // create a Manual cpc object with or without enhanced CPC
         ManualCpc manualCpc = ManualCpc.newBuilder()
                 .setEnhancedCpcEnabled(campaignDetails.isEnhancedCpcEnabled())
                 .build();
 
-        NegativeGeoTargetTypeEnum.NegativeGeoTargetType negativeGeoTargetType = NegativeGeoTargetTypeEnum.NegativeGeoTargetType
-                .valueOf(campaignDetails.getNegativeGeoTargetType());
-
-        PositiveGeoTargetTypeEnum.PositiveGeoTargetType positiveGeoTargetType = PositiveGeoTargetTypeEnum.PositiveGeoTargetType
-                .valueOf(campaignDetails.getPositiveGeoTargetType());
-
+        // create a GeoTargetTypeSetting using the negative and positive targets
         Campaign.GeoTargetTypeSetting geoTargetTypeSetting = Campaign.GeoTargetTypeSetting.newBuilder()
-                .setNegativeGeoTargetType(negativeGeoTargetType)
-                .setPositiveGeoTargetType(positiveGeoTargetType)
+                .setNegativeGeoTargetType(NegativeGeoTargetTypeEnum.NegativeGeoTargetType
+                        .forNumber(campaignDetails.getNegativeGeoTargetType()))
+                .setPositiveGeoTargetType(PositiveGeoTargetTypeEnum.PositiveGeoTargetType
+                        .forNumber(campaignDetails.getPositiveGeoTargetType()))
                 .build();
 
         // extract network settings into its own object
         Campaign.NetworkSettings networkSettings = Campaign.NetworkSettings.newBuilder()
                 .setTargetContentNetwork(campaignDetails.isTargetingContentNetwork())
                 .setTargetSearchNetwork(campaignDetails.isTargetingSearchNetwork())
-                .setTargetGoogleSearch(campaignDetails.isTargetingGoogleSearch())
                 .setTargetPartnerSearchNetwork(campaignDetails.isTargetingPartnerSearchNetwork())
                 .build();
 
+        // create the campaign status object
         CampaignStatusEnum.CampaignStatus status =
                 CampaignStatusEnum.CampaignStatus.valueOf(campaignDetails.getStatus());
 
+        //create the advertising channel type object
         AdvertisingChannelTypeEnum.AdvertisingChannelType advertisingChannelType =
                 AdvertisingChannelTypeEnum.AdvertisingChannelType.valueOf(campaignDetails.getAdvertisingChannelType());
 
+        // Create the budget on the client account and get the resource name
+        String budgetResName = campaignRepository.createCampaignBudget(
+                customerId,
+                campaignDetails.getBudget(),
+                false
+        );
+
+        // create and return a campaign object with the above settings
         return Campaign.newBuilder()
-                .setManualCpc(manualCpc)
                 .setStatus(status)
                 .setId(campaignDetails.getCampaignId())
                 .setStartDate(campaignDetails.getStartDate())
                 .setEndDate(campaignDetails.getEndDate())
                 .setName(campaignDetails.getCampaignName())
                 .setGeoTargetTypeSetting(geoTargetTypeSetting)
-                .setCampaignBudget(campaignDetails.getBudget())
-                .setBiddingStrategy(campaignDetails.getBiddingStrategy())
+                .setCampaignBudget(budgetResName)
+                .setManualCpc(manualCpc)
                 .setNetworkSettings(networkSettings)
                 .setAdvertisingChannelType(advertisingChannelType)
                 .build();

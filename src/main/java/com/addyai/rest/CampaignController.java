@@ -26,7 +26,7 @@ public class CampaignController {
         }
     }
 
-    @PutMapping("create")
+    @PostMapping("create")
     void createCampaigns(@PathVariable String customerId, @RequestBody List<CampaignDetails> campaignDetails) {
         try {
             campaignService.addCampaignsToAccount(Long.parseLong(customerId), campaignDetails);

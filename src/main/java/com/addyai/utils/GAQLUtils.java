@@ -29,20 +29,31 @@ public class GAQLUtils {
                 " FROM campaign ORDER BY campaign.id";
     }
 
+    public static String getCampaignBudgetQuery() {
+        return "SELECT" +
+                "  campaign_budget.amount_micros," +
+                "  campaign_budget.resource_name," +
+                "  campaign_budget.recommended_budget_amount_micros," +
+                "  campaign_budget.explicitly_shared," +
+                "  campaign_budget.delivery_method," +
+                "  campaign_budget.name," +
+                "  campaign_budget.id" +
+                "FROM campaign_budget  ";
+    }
+
     public static List<CampaignDetails> convertStreamResponseToCampaignDetailsList(ServerStream<SearchGoogleAdsStreamResponse> streamResponse) {
         List<CampaignDetails> campaignDetailsList = new ArrayList<>();
 
         for (SearchGoogleAdsStreamResponse response : streamResponse) {
             for (GoogleAdsRow googleAdsRow : response.getResultsList()) {
                 CampaignDetails details = new CampaignDetails();
+
                 details.setCampaignId(googleAdsRow.getCampaign().getId());
                 details.setCampaignName(googleAdsRow.getCampaign().getName());
                 details.setStatus(googleAdsRow.getCampaign().getStatus().toString());
                 details.setAdvertisingChannelType(googleAdsRow.getCampaign().getAdvertisingChannelType().toString());
-                details.setBudget(googleAdsRow.getCampaign().getCampaignBudget());
-                details.setBiddingStrategy(googleAdsRow.getCampaign().getBiddingStrategyType().toString());
-                details.setPositiveGeoTargetType(googleAdsRow.getCampaign().getGeoTargetTypeSetting().getPositiveGeoTargetType().toString());
-                details.setNegativeGeoTargetType(googleAdsRow.getCampaign().getGeoTargetTypeSetting().getNegativeGeoTargetType().toString());
+                details.setPositiveGeoTargetType(googleAdsRow.getCampaign().getGeoTargetTypeSetting().getPositiveGeoTargetTypeValue());
+                details.setNegativeGeoTargetType(googleAdsRow.getCampaign().getGeoTargetTypeSetting().getNegativeGeoTargetTypeValue());
                 details.setEnhancedCpcEnabled(googleAdsRow.getCampaign().getManualCpc().getEnhancedCpcEnabled());
                 details.setStartDate(googleAdsRow.getCampaign().getStartDate());
                 details.setEndDate(googleAdsRow.getCampaign().getEndDate());
@@ -57,4 +68,5 @@ public class GAQLUtils {
 
         return campaignDetailsList;
     }
+
 }

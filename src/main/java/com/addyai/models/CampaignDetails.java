@@ -10,15 +10,13 @@ public class CampaignDetails {
 
     private String status = "";
 
-    private String budget = "";
+    private int budget = 0;
 
     private String advertisingChannelType = ADVERTISING_TYPE_SEARCH;
 
-    private String biddingStrategy = "";
+    private int positiveGeoTargetType = 0;
 
-    private String positiveGeoTargetType = GEO_TARGET_TYPE_UNKNOWN;
-
-    private String negativeGeoTargetType = GEO_TARGET_TYPE_UNKNOWN;
+    private int negativeGeoTargetType = 0;
 
     private boolean isEnhancedCpcEnabled = false;
 
@@ -58,11 +56,11 @@ public class CampaignDetails {
         this.status = status;
     }
 
-    public String getBudget() {
+    public int getBudget() {
         return budget;
     }
 
-    public void setBudget(String budget) {
+    public void setBudget(int budget) {
         this.budget = budget;
     }
 
@@ -74,27 +72,19 @@ public class CampaignDetails {
         this.advertisingChannelType = advertisingChannelType;
     }
 
-    public String getBiddingStrategy() {
-        return biddingStrategy;
-    }
-
-    public void setBiddingStrategy(String biddingStrategy) {
-        this.biddingStrategy = biddingStrategy;
-    }
-
-    public String getPositiveGeoTargetType() {
+    public int getPositiveGeoTargetType() {
         return positiveGeoTargetType;
     }
 
-    public void setPositiveGeoTargetType(String positiveGeoTargetType) {
+    public void setPositiveGeoTargetType(int positiveGeoTargetType) {
         this.positiveGeoTargetType = positiveGeoTargetType;
     }
 
-    public String getNegativeGeoTargetType() {
+    public int getNegativeGeoTargetType() {
         return negativeGeoTargetType;
     }
 
-    public void setNegativeGeoTargetType(String negativeGeoTargetType) {
+    public void setNegativeGeoTargetType(int negativeGeoTargetType) {
         this.negativeGeoTargetType = negativeGeoTargetType;
     }
 

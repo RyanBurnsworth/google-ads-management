@@ -1,34 +1,7 @@
 package com.addyai.services;
 
-import com.addyai.exceptions.CreateResourceException;
-import com.addyai.exceptions.DeleteResourceException;
-import com.addyai.exceptions.GetResourceException;
-import com.addyai.exceptions.UpdateResourceException;
-import com.addyai.models.CampaignDetails;
-import com.addyai.repos.campaigns.CampaignRepository;
-import com.addyai.services.campaign.CampaignService;
 import com.addyai.services.campaign.CampaignServiceImpl;
-import com.google.ads.googleads.lib.utils.FieldMasks;
-import com.google.ads.googleads.v11.common.ManualCpc;
-import com.google.ads.googleads.v11.enums.AdvertisingChannelTypeEnum;
-import com.google.ads.googleads.v11.enums.CampaignStatusEnum;
-import com.google.ads.googleads.v11.enums.NegativeGeoTargetTypeEnum;
-import com.google.ads.googleads.v11.enums.PositiveGeoTargetTypeEnum;
-import com.google.ads.googleads.v11.resources.BiddingStrategy;
-import com.google.ads.googleads.v11.resources.Campaign;
-import com.google.ads.googleads.v11.services.CampaignOperation;
-import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
-
-import java.util.ArrayList;
-import java.util.List;
-
-import static com.addyai.utils.Constants.GET_RES_EXCEPTION_MSG;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.Mockito.*;
 
 @SpringBootTest(classes = CampaignServiceImpl.class)
 public class CampaignServiceTest {

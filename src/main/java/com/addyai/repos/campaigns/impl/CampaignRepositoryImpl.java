@@ -10,9 +10,13 @@ import com.addyai.repos.campaigns.CampaignRepository;
 import com.addyai.repos.requests.StreamRequest;
 import com.addyai.repos.requests.impl.StreamRequestImpl;
 import com.addyai.utils.GAQLUtils;
+import com.google.ads.googleads.v11.enums.BudgetDeliveryMethodEnum;
+import com.google.ads.googleads.v11.enums.BudgetStatusEnum;
+import com.google.ads.googleads.v11.resources.CampaignBudget;
 import com.google.ads.googleads.v11.services.*;
 import com.google.ads.googleads.v11.utils.ResourceNames;
 import com.google.api.gax.rpc.ServerStream;
+import com.google.common.collect.Lists;
 import org.springframework.stereotype.Repository;
 
 import java.util.ArrayList;
@@ -62,7 +66,7 @@ public class CampaignRepositoryImpl implements CampaignRepository {
     }
 
     /**
-     * Update a list of campaigns for a given customer account
+     * Update a list of campaigns within a given customer account
      *
      * @param customerId         the customerId of the account to update
      * @param campaignOperations the list of campaign operations to be performed on the account
@@ -85,7 +89,7 @@ public class CampaignRepositoryImpl implements CampaignRepository {
     }
 
     /**
-     * Delete campaigns from a client's account
+     * Delete campaigns within a client's account
      *
      * @param customerId  the customer id of the client account
      * @param campaignIds the ids of the campaigns to delete
@@ -116,6 +120,13 @@ public class CampaignRepositoryImpl implements CampaignRepository {
         }
     }
 
+    /**
+     * Add campaigns to a client's campaign
+     *
+     * @param customerId         the id of the customer account
+     * @param campaignOperations a list of [CampaignOperation] for processing
+     * @throws CreateResourceException
+     */
     @Override
     public void addCampaigns(long customerId, List<CampaignOperation> campaignOperations) throws CreateResourceException {
         try {
@@ -127,5 +138,42 @@ public class CampaignRepositoryImpl implements CampaignRepository {
         } catch (Exception e) {
             throw new CreateResourceException(ADD_RES_EXCEPTION_MSG + customerId);
         }
+    }
+
+    /**
+     * Create a campaign budget within a client's account
+     *
+     * @param customerId  the customer id for the client account
+     * @param budgetValue the amount for the daily budget
+     * @param isShared    is a shared budget
+     * @return campaign budget's resource name
+     */
+    @Override
+    public String createCampaignBudget(final long customerId,
+                                       long budgetValue,
+                                       final boolean isShared) {
+        budgetValue = budgetValue * 1000000;
+
+        CampaignBudgetServiceClient campaignBudgetServiceClient = GoogleAdsManagementApplication.getGoogleAdsClient()
+                .getLatestVersion().createCampaignBudgetServiceClient();
+
+        CampaignBudget budget = CampaignBudget.newBuilder()
+                .setName("Budget # 902923")
+                .setAmountMicros(budgetValue)
+                .setStatus(BudgetStatusEnum.BudgetStatus.ENABLED)
+                .setDeliveryMethod(BudgetDeliveryMethodEnum.BudgetDeliveryMethod.STANDARD)
+                .setExplicitlyShared(isShared)
+                .build();
+
+        CampaignBudgetOperation operation = CampaignBudgetOperation.newBuilder()
+                .setCreate(budget)
+                .build();
+
+        MutateCampaignBudgetsResponse budgetsResponse = campaignBudgetServiceClient.mutateCampaignBudgets(
+                Long.toString(customerId), Lists.newArrayList(operation));
+
+        MutateCampaignBudgetResult campaignBudgetResult = budgetsResponse.getResults(0);
+
+        return campaignBudgetResult.getResourceName();
     }
 }
