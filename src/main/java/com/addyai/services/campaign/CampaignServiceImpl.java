@@ -8,12 +8,10 @@ import com.addyai.models.CampaignDetails;
 import com.addyai.repos.campaigns.CampaignRepository;
 import com.google.ads.googleads.lib.utils.FieldMasks;
 import com.google.ads.googleads.v11.common.ManualCpc;
-import com.google.ads.googleads.v11.common.MaximizeConversionValue;
 import com.google.ads.googleads.v11.enums.AdvertisingChannelTypeEnum;
 import com.google.ads.googleads.v11.enums.CampaignStatusEnum;
 import com.google.ads.googleads.v11.enums.NegativeGeoTargetTypeEnum;
 import com.google.ads.googleads.v11.enums.PositiveGeoTargetTypeEnum;
-import com.google.ads.googleads.v11.resources.BiddingStrategy;
 import com.google.ads.googleads.v11.resources.Campaign;
 import com.google.ads.googleads.v11.services.CampaignOperation;
 import org.springframework.stereotype.Service;
@@ -137,12 +135,15 @@ public class CampaignServiceImpl implements CampaignService {
         AdvertisingChannelTypeEnum.AdvertisingChannelType advertisingChannelType =
                 AdvertisingChannelTypeEnum.AdvertisingChannelType.valueOf(campaignDetails.getAdvertisingChannelType());
 
-        // Create the budget on the client account and get the resource name
-        String budgetResName = campaignRepository.createCampaignBudget(
-                customerId,
-                campaignDetails.getBudget(),
-                false
-        );
+        // if needed, create the budget within the client account and set the resource name
+        String budgetResourceName = "";
+        if (campaignDetails.getBudgetDetails().getResourceName() == null ||
+                campaignDetails.getBudgetDetails().getResourceName().isEmpty()) {
+            budgetResourceName = campaignRepository
+                    .createSingleCampaignBudget(customerId, campaignDetails.getBudgetDetails());
+        } else {
+            budgetResourceName = campaignDetails.getBudgetDetails().getResourceName();
+        }
 
         // create and return a campaign object with the above settings
         return Campaign.newBuilder()
@@ -152,7 +153,7 @@ public class CampaignServiceImpl implements CampaignService {
                 .setEndDate(campaignDetails.getEndDate())
                 .setName(campaignDetails.getCampaignName())
                 .setGeoTargetTypeSetting(geoTargetTypeSetting)
-                .setCampaignBudget(budgetResName)
+                .setCampaignBudget(budgetResourceName)
                 .setManualCpc(manualCpc)
                 .setNetworkSettings(networkSettings)
                 .setAdvertisingChannelType(advertisingChannelType)

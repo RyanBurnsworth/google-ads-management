@@ -6,6 +6,7 @@ import com.addyai.exceptions.DeleteResourceException;
 import com.addyai.exceptions.GetResourceException;
 import com.addyai.exceptions.UpdateResourceException;
 import com.addyai.models.CampaignDetails;
+import com.addyai.models.BudgetDetails;
 import com.addyai.repos.campaigns.CampaignRepository;
 import com.addyai.repos.requests.StreamRequest;
 import com.addyai.repos.requests.impl.StreamRequestImpl;
@@ -105,9 +106,11 @@ public class CampaignRepositoryImpl implements CampaignRepository {
 
             for (long campaignId : campaignIds) {
                 String campaignResourceName = ResourceNames.campaign(customerId, campaignId);
+
                 // Constructs an operation that will remove the campaign with the specified resource name.
                 CampaignOperation operation =
                         CampaignOperation.newBuilder().setRemove(campaignResourceName).build();
+
                 campaignOperations.add(operation);
             }
 
@@ -136,7 +139,7 @@ public class CampaignRepositoryImpl implements CampaignRepository {
             MutateCampaignsResponse response =
                     campaignServiceClient.mutateCampaigns(Long.toString(customerId), campaignOperations);
         } catch (Exception e) {
-            throw new CreateResourceException(ADD_RES_EXCEPTION_MSG + customerId);
+            throw new CreateResourceException(ADD_RES_EXCEPTION_MSG + e);
         }
     }
 
@@ -144,25 +147,25 @@ public class CampaignRepositoryImpl implements CampaignRepository {
      * Create a campaign budget within a client's account
      *
      * @param customerId  the customer id for the client account
-     * @param budgetValue the amount for the daily budget
-     * @param isShared    is a shared budget
+     * @param budgetDetails the details of the budget
      * @return campaign budget's resource name
      */
     @Override
-    public String createCampaignBudget(final long customerId,
-                                       long budgetValue,
-                                       final boolean isShared) {
-        budgetValue = budgetValue * 1000000;
+    public String createSingleCampaignBudget(final long customerId,
+                                       final BudgetDetails budgetDetails) {
+
+        // convert budget to micros
+        long budgetValue = budgetDetails.getDailyBudgetAmount() * 1000000L;
 
         CampaignBudgetServiceClient campaignBudgetServiceClient = GoogleAdsManagementApplication.getGoogleAdsClient()
                 .getLatestVersion().createCampaignBudgetServiceClient();
 
         CampaignBudget budget = CampaignBudget.newBuilder()
-                .setName("Budget # 902923")
+                .setName(budgetDetails.getName())
                 .setAmountMicros(budgetValue)
-                .setStatus(BudgetStatusEnum.BudgetStatus.ENABLED)
-                .setDeliveryMethod(BudgetDeliveryMethodEnum.BudgetDeliveryMethod.STANDARD)
-                .setExplicitlyShared(isShared)
+                .setStatus(BudgetStatusEnum.BudgetStatus.forNumber(budgetDetails.getStatus()))
+                .setDeliveryMethod(BudgetDeliveryMethodEnum.BudgetDeliveryMethod.forNumber(budgetDetails.getDeliveryMethod()))
+                .setExplicitlyShared(budgetDetails.isShared())
                 .build();
 
         CampaignBudgetOperation operation = CampaignBudgetOperation.newBuilder()

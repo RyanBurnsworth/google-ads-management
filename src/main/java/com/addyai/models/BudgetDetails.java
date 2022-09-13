@@ -1,4 +1,4 @@
-package com.addyai.models.campaign_criterion;
+package com.addyai.models;
 
 public class BudgetDetails {
     private long budgetId;
@@ -11,7 +11,9 @@ public class BudgetDetails {
 
     private String resourceName;
 
-    private double dailyBudgetAmount;
+    private int dailyBudgetAmount;
+
+    private int status;
 
     public long getBudgetId() {
         return budgetId;
@@ -53,11 +55,19 @@ public class BudgetDetails {
         this.resourceName = resourceName;
     }
 
-    public double getDailyBudgetAmount() {
+    public int getDailyBudgetAmount() {
         return dailyBudgetAmount;
     }
 
-    public void setDailyBudgetAmount(double dailyBudgetAmount) {
+    public void setDailyBudgetAmount(int dailyBudgetAmount) {
         this.dailyBudgetAmount = dailyBudgetAmount;
+    }
+
+    public int getStatus() {
+        return status;
+    }
+
+    public void setStatus(int status) {
+        this.status = status;
     }
 }

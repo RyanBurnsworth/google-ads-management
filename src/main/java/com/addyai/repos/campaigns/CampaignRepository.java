@@ -5,6 +5,7 @@ import com.addyai.exceptions.DeleteResourceException;
 import com.addyai.exceptions.GetResourceException;
 import com.addyai.exceptions.UpdateResourceException;
 import com.addyai.models.CampaignDetails;
+import com.addyai.models.BudgetDetails;
 import com.google.ads.googleads.v11.services.CampaignOperation;
 
 import java.util.List;
@@ -18,5 +19,5 @@ public interface CampaignRepository {
 
     void addCampaigns(long customerId, List<CampaignOperation> campaignOperations) throws CreateResourceException;
 
-    String createCampaignBudget(long customerId, long budgetValue, boolean isShared);
+    String createSingleCampaignBudget(long customerId, BudgetDetails budgetDetails);
 }

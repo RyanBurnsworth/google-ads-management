@@ -1,7 +1,6 @@
 package com.addyai.models;
 
 import static com.addyai.utils.Constants.ADVERTISING_TYPE_SEARCH;
-import static com.addyai.utils.Constants.GEO_TARGET_TYPE_UNKNOWN;
 
 public class CampaignDetails {
     private long campaignId = 0L;
@@ -9,8 +8,6 @@ public class CampaignDetails {
     private String campaignName = "";
 
     private String status = "";
-
-    private int budget = 0;
 
     private String advertisingChannelType = ADVERTISING_TYPE_SEARCH;
 
@@ -31,6 +28,8 @@ public class CampaignDetails {
     private boolean isTargetingContentNetwork = false;
 
     private boolean isTargetingPartnerSearchNetwork = false;
+
+    private BudgetDetails budgetDetails = new BudgetDetails();
 
     public long getCampaignId() {
         return campaignId;
@@ -54,14 +53,6 @@ public class CampaignDetails {
 
     public void setStatus(String status) {
         this.status = status;
-    }
-
-    public int getBudget() {
-        return budget;
-    }
-
-    public void setBudget(int budget) {
-        this.budget = budget;
     }
 
     public String getAdvertisingChannelType() {
@@ -142,5 +133,13 @@ public class CampaignDetails {
 
     public void setTargetingPartnerSearchNetwork(boolean targetingPartnerSearchNetwork) {
         isTargetingPartnerSearchNetwork = targetingPartnerSearchNetwork;
+    }
+
+    public BudgetDetails getBudgetDetails() {
+        return budgetDetails;
+    }
+
+    public void setBudgetDetails(BudgetDetails budgetDetails) {
+        this.budgetDetails = budgetDetails;
     }
 }
