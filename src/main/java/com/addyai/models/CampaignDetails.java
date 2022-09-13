@@ -21,13 +21,13 @@ public class CampaignDetails {
 
     private String endDate = "";
 
-    private boolean isTargetingGoogleSearch = false;
-
     private boolean isTargetingSearchNetwork = false;
 
     private boolean isTargetingContentNetwork = false;
 
     private boolean isTargetingPartnerSearchNetwork = false;
+
+    private String budgetResourceName;
 
     private BudgetDetails budgetDetails = new BudgetDetails();
 
@@ -103,14 +103,6 @@ public class CampaignDetails {
         this.endDate = endDate;
     }
 
-    public boolean isTargetingGoogleSearch() {
-        return isTargetingGoogleSearch;
-    }
-
-    public void setTargetingGoogleSearch(boolean targetingGoogleSearch) {
-        isTargetingGoogleSearch = targetingGoogleSearch;
-    }
-
     public boolean isTargetingSearchNetwork() {
         return isTargetingSearchNetwork;
     }
@@ -133,6 +125,14 @@ public class CampaignDetails {
 
     public void setTargetingPartnerSearchNetwork(boolean targetingPartnerSearchNetwork) {
         isTargetingPartnerSearchNetwork = targetingPartnerSearchNetwork;
+    }
+
+    public String getBudgetResourceName() {
+        return budgetResourceName;
+    }
+
+    public void setBudgetResourceName(String budgetResourceName) {
+        this.budgetResourceName = budgetResourceName;
     }
 
     public BudgetDetails getBudgetDetails() {

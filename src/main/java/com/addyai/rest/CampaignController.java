@@ -20,7 +20,7 @@ public class CampaignController {
     @GetMapping("details")
     List<CampaignDetails> getCampaignDetails(@PathVariable String customerId) {
         try {
-            return campaignService.getCampaignDetailsForAccount(Long.parseLong(customerId));
+            return campaignService.findAllCampaignDetails(Long.parseLong(customerId));
         } catch (GetResourceException e) {
             throw new RuntimeException(e);
         }

@@ -5,11 +5,11 @@ public class BudgetDetails {
 
     private String name;
 
+    private String resourceName;
+
     private int deliveryMethod;
 
     private boolean isShared;
-
-    private String resourceName;
 
     private int dailyBudgetAmount;
 
@@ -31,6 +31,14 @@ public class BudgetDetails {
         this.name = name;
     }
 
+    public String getResourceName() {
+        return resourceName;
+    }
+
+    public void setResourceName(String resourceName) {
+        this.resourceName = resourceName;
+    }
+
     public int getDeliveryMethod() {
         return deliveryMethod;
     }
@@ -45,14 +53,6 @@ public class BudgetDetails {
 
     public void setShared(boolean shared) {
         isShared = shared;
-    }
-
-    public String getResourceName() {
-        return resourceName;
-    }
-
-    public void setResourceName(String resourceName) {
-        this.resourceName = resourceName;
     }
 
     public int getDailyBudgetAmount() {

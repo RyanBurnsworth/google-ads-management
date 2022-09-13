@@ -4,6 +4,7 @@ import com.addyai.exceptions.CreateResourceException;
 import com.addyai.exceptions.DeleteResourceException;
 import com.addyai.exceptions.GetResourceException;
 import com.addyai.exceptions.UpdateResourceException;
+import com.addyai.models.BudgetDetails;
 import com.addyai.models.CampaignDetails;
 import com.addyai.repos.campaigns.CampaignRepository;
 import com.google.ads.googleads.lib.utils.FieldMasks;
@@ -39,16 +40,19 @@ public class CampaignServiceImpl implements CampaignService {
         List<CampaignOperation> campaignOperations = new ArrayList<>();
 
         for (CampaignDetails campaignDetails : campaignDetailsList) {
+            // create a Google Ads campaign object from campaign details
             Campaign campaign = buildCampaignFromDetails(customerId, campaignDetails);
 
-            // create campaign operation and add to list
+            // create a CREATE campaign operation
             CampaignOperation op = CampaignOperation.newBuilder()
                     .setCreate(campaign)
                     .build();
 
+            // add to campaign operations list
             campaignOperations.add(op);
         }
 
+        // add all of the campaign to the client account
         campaignRepository.addCampaigns(customerId, campaignOperations);
     }
 
@@ -56,12 +60,12 @@ public class CampaignServiceImpl implements CampaignService {
      * Fetch campaigns from a client account
      *
      * @param customerId the customer id of the client account
-     * @return a list of campaign details containing all campaigns in a client's account
+     * @return a list of complete campaign details containing all campaigns in a client's account
      * @throws GetResourceException
      */
     @Override
-    public List<CampaignDetails> getCampaignDetailsForAccount(long customerId) throws GetResourceException {
-        return campaignRepository.getCampaignDetails(customerId);
+    public List<CampaignDetails> findAllCampaignDetails(long customerId) throws GetResourceException {
+        return buildCompleteCampaignDetailsList(customerId, campaignRepository.getCampaignDetails(customerId));
     }
 
     /**
@@ -74,6 +78,7 @@ public class CampaignServiceImpl implements CampaignService {
     public void updateCampaign(long customerId, List<CampaignDetails> campaignDetailsList) throws UpdateResourceException {
         List<CampaignOperation> campaignOperations = new ArrayList<>();
 
+        // create an UPDATE campaign operation for each campaign
         for (CampaignDetails campaignDetails : campaignDetailsList) {
             Campaign campaign = buildCampaignFromDetails(customerId, campaignDetails);
             CampaignOperation operation = CampaignOperation.newBuilder()
@@ -81,9 +86,11 @@ public class CampaignServiceImpl implements CampaignService {
                     .setUpdateMask(FieldMasks.allSetFieldsOf(campaign))
                     .build();
 
+            // add newly created operation to list
             campaignOperations.add(operation);
         }
 
+        // perform update on all campaigns
         campaignRepository.updateCampaigns(customerId, campaignOperations);
     }
 
@@ -136,14 +143,10 @@ public class CampaignServiceImpl implements CampaignService {
                 AdvertisingChannelTypeEnum.AdvertisingChannelType.valueOf(campaignDetails.getAdvertisingChannelType());
 
         // if needed, create the budget within the client account and set the resource name
-        String budgetResourceName = "";
-        if (campaignDetails.getBudgetDetails().getResourceName() == null ||
-                campaignDetails.getBudgetDetails().getResourceName().isEmpty()) {
-            budgetResourceName = campaignRepository
-                    .createSingleCampaignBudget(customerId, campaignDetails.getBudgetDetails());
-        } else {
-            budgetResourceName = campaignDetails.getBudgetDetails().getResourceName();
-        }
+        if (campaignDetails.getBudgetResourceName() == null ||
+                campaignDetails.getBudgetResourceName().isEmpty())
+            campaignDetails.setBudgetResourceName(campaignRepository
+                    .createSingleCampaignBudget(customerId, campaignDetails.getBudgetDetails()));
 
         // create and return a campaign object with the above settings
         return Campaign.newBuilder()
@@ -153,10 +156,45 @@ public class CampaignServiceImpl implements CampaignService {
                 .setEndDate(campaignDetails.getEndDate())
                 .setName(campaignDetails.getCampaignName())
                 .setGeoTargetTypeSetting(geoTargetTypeSetting)
-                .setCampaignBudget(budgetResourceName)
+                .setCampaignBudget(campaignDetails.getBudgetResourceName())
                 .setManualCpc(manualCpc)
                 .setNetworkSettings(networkSettings)
                 .setAdvertisingChannelType(advertisingChannelType)
                 .build();
+    }
+
+    /**
+     * Create a list of complete campaign details models.
+     *
+     * @param customerId          the customer id of the client account
+     * @param baseCampaignDetails a list of campaign details models sans BudgetDetails
+     * @return a list of complete CampaignDetails
+     */
+    private List<CampaignDetails> buildCompleteCampaignDetailsList(long customerId, List<CampaignDetails> baseCampaignDetails) {
+        List<CampaignDetails> completeCampaignDetailsList = new ArrayList<>();
+        List<BudgetDetails> budgetDetailsList;
+
+        try {
+            // fetch the campaign budget details from the repository
+            budgetDetailsList = campaignRepository.getCampaignBudgetDetails(customerId);
+        } catch (GetResourceException e) {
+            throw new RuntimeException(e);
+        }
+
+        // associate each campaign with a budget by resource name
+        for (CampaignDetails campaignDetails : baseCampaignDetails) {
+            for (BudgetDetails budgetDetails : budgetDetailsList) {
+                // set budgetDetails in campaignDetails model if matched
+                if (campaignDetails.getBudgetResourceName().equals(budgetDetails.getResourceName())) {
+                    campaignDetails.setBudgetDetails(budgetDetails);
+
+                    // add updated campaign details model to completed list
+                    completeCampaignDetailsList.add(campaignDetails);
+                    break;
+                }
+            }
+        }
+
+        return completeCampaignDetailsList;
     }
 }

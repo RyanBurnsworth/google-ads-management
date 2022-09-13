@@ -5,8 +5,8 @@ import com.addyai.exceptions.CreateResourceException;
 import com.addyai.exceptions.DeleteResourceException;
 import com.addyai.exceptions.GetResourceException;
 import com.addyai.exceptions.UpdateResourceException;
-import com.addyai.models.CampaignDetails;
 import com.addyai.models.BudgetDetails;
+import com.addyai.models.CampaignDetails;
 import com.addyai.repos.campaigns.CampaignRepository;
 import com.addyai.repos.requests.StreamRequest;
 import com.addyai.repos.requests.impl.StreamRequestImpl;
@@ -146,13 +146,13 @@ public class CampaignRepositoryImpl implements CampaignRepository {
     /**
      * Create a campaign budget within a client's account
      *
-     * @param customerId  the customer id for the client account
+     * @param customerId    the customer id for the client account
      * @param budgetDetails the details of the budget
      * @return campaign budget's resource name
      */
     @Override
     public String createSingleCampaignBudget(final long customerId,
-                                       final BudgetDetails budgetDetails) {
+                                             final BudgetDetails budgetDetails) {
 
         // convert budget to micros
         long budgetValue = budgetDetails.getDailyBudgetAmount() * 1000000L;
@@ -178,5 +178,20 @@ public class CampaignRepositoryImpl implements CampaignRepository {
         MutateCampaignBudgetResult campaignBudgetResult = budgetsResponse.getResults(0);
 
         return campaignBudgetResult.getResourceName();
+    }
+
+    @Override
+    public List<BudgetDetails> getCampaignBudgetDetails(long customerId) throws GetResourceException {
+        try {
+            String query = GAQLUtils.getCampaignBudgetQuery();
+
+            SearchGoogleAdsStreamRequest request = requestBuilder.buildStreamRequest(customerId, query);
+
+            ServerStream<SearchGoogleAdsStreamResponse> response = requestBuilder.callStreamRequest(request);
+
+            return GAQLUtils.convertStreamResponseToBudgetDetails(response);
+        } catch (Exception e) {
+            throw new GetResourceException(GET_RES_EXCEPTION_MSG + customerId);
+        }
     }
 }

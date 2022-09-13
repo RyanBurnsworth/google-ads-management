@@ -12,7 +12,7 @@ public interface CampaignService {
 
     void addCampaignsToAccount(long customerId, List<CampaignDetails> campaignDetailsList) throws CreateResourceException;
 
-    List<CampaignDetails> getCampaignDetailsForAccount(long customerId) throws GetResourceException;
+    List<CampaignDetails> findAllCampaignDetails(long customerId) throws GetResourceException;
 
     void updateCampaign(long customerId, List<CampaignDetails> campaignDetails) throws UpdateResourceException;
 

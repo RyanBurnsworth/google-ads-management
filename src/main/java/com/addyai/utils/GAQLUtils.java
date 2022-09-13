@@ -1,5 +1,6 @@
 package com.addyai.utils;
 
+import com.addyai.models.BudgetDetails;
 import com.addyai.models.CampaignDetails;
 import com.google.ads.googleads.v11.services.GoogleAdsRow;
 import com.google.ads.googleads.v11.services.SearchGoogleAdsStreamResponse;
@@ -22,6 +23,7 @@ public class GAQLUtils {
                 " campaign.optimization_score," +
                 " campaign.start_date," +
                 " campaign.end_date," +
+                " campaign.campaign_budget, " +
                 " campaign.network_settings.target_content_network," +
                 " campaign.network_settings.target_google_search," +
                 " campaign.network_settings.target_partner_search_network," +
@@ -31,14 +33,14 @@ public class GAQLUtils {
 
     public static String getCampaignBudgetQuery() {
         return "SELECT" +
-                "  campaign_budget.amount_micros," +
-                "  campaign_budget.resource_name," +
-                "  campaign_budget.recommended_budget_amount_micros," +
-                "  campaign_budget.explicitly_shared," +
-                "  campaign_budget.delivery_method," +
-                "  campaign_budget.name," +
-                "  campaign_budget.id" +
-                "FROM campaign_budget  ";
+                " campaign_budget.status, " +
+                " campaign_budget.amount_micros," +
+                " campaign_budget.explicitly_shared," +
+                " campaign_budget.delivery_method," +
+                " campaign_budget.resource_name," +
+                " campaign_budget.name," +
+                " campaign_budget.id" +
+                " FROM campaign_budget";
     }
 
     public static List<CampaignDetails> convertStreamResponseToCampaignDetailsList(ServerStream<SearchGoogleAdsStreamResponse> streamResponse) {
@@ -59,9 +61,8 @@ public class GAQLUtils {
                 details.setEndDate(googleAdsRow.getCampaign().getEndDate());
                 details.setTargetingSearchNetwork(googleAdsRow.getCampaign().getNetworkSettings().getTargetSearchNetwork());
                 details.setTargetingContentNetwork(googleAdsRow.getCampaign().getNetworkSettings().getTargetContentNetwork());
-                details.setTargetingGoogleSearch(googleAdsRow.getCampaign().getNetworkSettings().getTargetGoogleSearch());
                 details.setTargetingPartnerSearchNetwork(googleAdsRow.getCampaign().getNetworkSettings().getTargetPartnerSearchNetwork());
-
+                details.setBudgetResourceName(googleAdsRow.getCampaign().getCampaignBudget());
                 campaignDetailsList.add(details);
             }
         }
@@ -69,4 +70,23 @@ public class GAQLUtils {
         return campaignDetailsList;
     }
 
+    public static List<BudgetDetails> convertStreamResponseToBudgetDetails(ServerStream<SearchGoogleAdsStreamResponse> streamResponse) {
+        List<BudgetDetails> budgetDetailsList = new ArrayList<>();
+
+        for (SearchGoogleAdsStreamResponse response : streamResponse) {
+            for (GoogleAdsRow googleAdsRow : response.getResultsList()) {
+                BudgetDetails budgetDetails = new BudgetDetails();
+                budgetDetails.setBudgetId(googleAdsRow.getCampaignBudget().getId());
+                budgetDetails.setDailyBudgetAmount(Math.round(googleAdsRow.getCampaignBudget().getAmountMicros() / 1000000));
+                budgetDetails.setName(googleAdsRow.getCampaignBudget().getName());
+                budgetDetails.setResourceName(googleAdsRow.getCampaignBudget().getResourceName());
+                budgetDetails.setDeliveryMethod(googleAdsRow.getCampaignBudget().getDeliveryMethodValue());
+                budgetDetails.setShared(googleAdsRow.getCampaignBudget().getExplicitlyShared());
+                budgetDetails.setStatus(googleAdsRow.getCampaignBudget().getStatusValue());
+
+                budgetDetailsList.add(budgetDetails);
+            }
+        }
+        return budgetDetailsList;
+    }
 }

@@ -20,4 +20,6 @@ public interface CampaignRepository {
     void addCampaigns(long customerId, List<CampaignOperation> campaignOperations) throws CreateResourceException;
 
     String createSingleCampaignBudget(long customerId, BudgetDetails budgetDetails);
+
+    List<BudgetDetails> getCampaignBudgetDetails(long customerId) throws GetResourceException;
 }
