@@ -194,4 +194,24 @@ public class CampaignRepositoryImpl implements CampaignRepository {
             throw new GetResourceException(GET_RES_EXCEPTION_MSG + customerId);
         }
     }
+
+    @Override
+    public void updateCampaignBudgets(long customerId, List<CampaignBudgetOperation> campaignBudgetOperations) throws UpdateResourceException {
+        try {
+            CampaignBudgetServiceClient campaignBudgetServiceClient = GoogleAdsManagementApplication.getGoogleAdsClient()
+                    .getLatestVersion().createCampaignBudgetServiceClient();
+
+            // At this time we are going to assume the response is OK if no exception is thrown
+            MutateCampaignBudgetsResponse response = campaignBudgetServiceClient
+                    .mutateCampaignBudgets(Long.toString(customerId), campaignBudgetOperations);
+        } catch (Exception e) {
+            // TODO: Log error here for reference
+            throw new UpdateResourceException(UPDATE_RES_EXCEPTION_MSG + customerId);
+        }
+    }
+
+    @Override
+    public void deleteCampaignBudgets(long customerId, List<Long> campaignBudgetIds) throws DeleteResourceException {
+
+    }
 }

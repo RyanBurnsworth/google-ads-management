@@ -4,6 +4,7 @@ import com.addyai.exceptions.CreateResourceException;
 import com.addyai.exceptions.DeleteResourceException;
 import com.addyai.exceptions.GetResourceException;
 import com.addyai.exceptions.UpdateResourceException;
+import com.addyai.models.BudgetDetails;
 import com.addyai.models.CampaignDetails;
 
 import java.util.List;
@@ -17,4 +18,8 @@ public interface CampaignService {
     void updateCampaign(long customerId, List<CampaignDetails> campaignDetails) throws UpdateResourceException;
 
     void deleteCampaigns(long customerId, List<Long> campaignIds) throws DeleteResourceException;
+
+    void updateCampaignBudgets(long customerId, List<BudgetDetails> budgetDetails) throws UpdateResourceException;
+
+    void deleteCampaignBudgets(long customerId, List<BudgetDetails> budgetDetails) throws DeleteResourceException;
 }

@@ -1,37 +1,21 @@
 package com.addyai.rest;
 
-import com.addyai.exceptions.CreateResourceException;
-import com.addyai.exceptions.GetResourceException;
 import com.addyai.models.CampaignDetails;
-import com.addyai.services.campaign.CampaignService;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
 
 import java.util.List;
 
-@RestController
-@RequestMapping("/api/v1/{customerId}/campaign/")
-public class CampaignController {
-    private final CampaignService campaignService;
+public interface CampaignController {
+    ResponseEntity<List<CampaignDetails>> fetchAllClientCampaigns(@PathVariable String customerId);
 
-    public CampaignController(CampaignService campaignService) {
-        this.campaignService = campaignService;
-    }
+    ResponseEntity<Void> createCampaigns(@PathVariable String customerId,
+                                         @RequestBody List<CampaignDetails> campaignDetails);
 
-    @GetMapping("details")
-    List<CampaignDetails> getCampaignDetails(@PathVariable String customerId) {
-        try {
-            return campaignService.findAllCampaignDetails(Long.parseLong(customerId));
-        } catch (GetResourceException e) {
-            throw new RuntimeException(e);
-        }
-    }
+    ResponseEntity<Void> updateCampaigns(@PathVariable String customerId,
+                                        @RequestBody List<CampaignDetails> campaignDetails);
 
-    @PostMapping("create")
-    void createCampaigns(@PathVariable String customerId, @RequestBody List<CampaignDetails> campaignDetails) {
-        try {
-            campaignService.addCampaignsToAccount(Long.parseLong(customerId), campaignDetails);
-        } catch (CreateResourceException e) {
-            throw new RuntimeException(e);
-        }
-    }
+    ResponseEntity<Void> deleteCampaigns(@PathVariable String customerId,
+                                         @RequestBody List<Long> campaignIds);
 }

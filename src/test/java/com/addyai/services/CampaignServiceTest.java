@@ -1,6 +1,6 @@
 package com.addyai.services;
 
-import com.addyai.services.campaign.CampaignServiceImpl;
+import com.addyai.services.campaign.impl.CampaignServiceImpl;
 import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest(classes = CampaignServiceImpl.class)

@@ -1,4 +1,4 @@
-package com.addyai.services.campaign;
+package com.addyai.services.campaign.impl;
 
 import com.addyai.exceptions.CreateResourceException;
 import com.addyai.exceptions.DeleteResourceException;
@@ -7,6 +7,7 @@ import com.addyai.exceptions.UpdateResourceException;
 import com.addyai.models.BudgetDetails;
 import com.addyai.models.CampaignDetails;
 import com.addyai.repos.campaigns.CampaignRepository;
+import com.addyai.services.campaign.CampaignService;
 import com.google.ads.googleads.lib.utils.FieldMasks;
 import com.google.ads.googleads.v11.common.ManualCpc;
 import com.google.ads.googleads.v11.enums.AdvertisingChannelTypeEnum;
@@ -14,6 +15,8 @@ import com.google.ads.googleads.v11.enums.CampaignStatusEnum;
 import com.google.ads.googleads.v11.enums.NegativeGeoTargetTypeEnum;
 import com.google.ads.googleads.v11.enums.PositiveGeoTargetTypeEnum;
 import com.google.ads.googleads.v11.resources.Campaign;
+import com.google.ads.googleads.v11.resources.CampaignBudget;
+import com.google.ads.googleads.v11.services.CampaignBudgetOperation;
 import com.google.ads.googleads.v11.services.CampaignOperation;
 import org.springframework.stereotype.Service;
 
@@ -52,7 +55,7 @@ public class CampaignServiceImpl implements CampaignService {
             campaignOperations.add(op);
         }
 
-        // add all of the campaign to the client account
+        // add campaigns to the client account
         campaignRepository.addCampaigns(customerId, campaignOperations);
     }
 
@@ -104,6 +107,45 @@ public class CampaignServiceImpl implements CampaignService {
     @Override
     public void deleteCampaigns(long customerId, List<Long> campaignIds) throws DeleteResourceException {
         campaignRepository.deleteCampaigns(customerId, campaignIds);
+    }
+
+    /**
+     * Update campaign budgets within a client's account
+     *
+     * @param customerId    the customer id of the client account
+     * @param budgetDetails a list of budget details to be updated
+     * @throws UpdateResourceException
+     */
+    @Override
+    public void updateCampaignBudgets(long customerId, List<BudgetDetails> budgetDetails) throws UpdateResourceException {
+        List<CampaignBudgetOperation> campaignBudgetOperations = new ArrayList<>();
+
+        // create an UPDATE campaign operation for each campaign
+        for (BudgetDetails budgetDetail : budgetDetails) {
+            CampaignBudget campaignBudget = buildCampaignBudgetFromDetails(budgetDetail);
+            CampaignBudgetOperation operation = CampaignBudgetOperation.newBuilder()
+                    .setUpdate(campaignBudget)
+                    .setUpdateMask(FieldMasks.allSetFieldsOf(campaignBudget))
+                    .build();
+
+            // add newly created operation to list
+            campaignBudgetOperations.add(operation);
+        }
+
+        // perform update on all campaigns
+        campaignRepository.updateCampaignBudgets(customerId, campaignBudgetOperations);
+    }
+
+    /**
+     * Delete a campaign budget from a client's account
+     *
+     * @param customerId    the customer id of the client account
+     * @param budgetDetails a list of budgets to be deleted
+     * @throws DeleteResourceException
+     */
+    @Override
+    public void deleteCampaignBudgets(long customerId, List<BudgetDetails> budgetDetails) throws DeleteResourceException {
+
     }
 
     /**
@@ -196,5 +238,14 @@ public class CampaignServiceImpl implements CampaignService {
         }
 
         return completeCampaignDetailsList;
+    }
+
+    private CampaignBudget buildCampaignBudgetFromDetails(BudgetDetails budgetDetails) {
+        return CampaignBudget.newBuilder()
+                .setName(budgetDetails.getName())
+                .setStatusValue(budgetDetails.getStatus())
+                .setAmountMicros(budgetDetails.getDailyBudgetAmount() * 1000000L)
+                .setDeliveryMethodValue(budgetDetails.getDeliveryMethod())
+                .build();
     }
 }

@@ -4,8 +4,9 @@ import com.addyai.exceptions.CreateResourceException;
 import com.addyai.exceptions.DeleteResourceException;
 import com.addyai.exceptions.GetResourceException;
 import com.addyai.exceptions.UpdateResourceException;
-import com.addyai.models.CampaignDetails;
 import com.addyai.models.BudgetDetails;
+import com.addyai.models.CampaignDetails;
+import com.google.ads.googleads.v11.services.CampaignBudgetOperation;
 import com.google.ads.googleads.v11.services.CampaignOperation;
 
 import java.util.List;
@@ -22,4 +23,8 @@ public interface CampaignRepository {
     String createSingleCampaignBudget(long customerId, BudgetDetails budgetDetails);
 
     List<BudgetDetails> getCampaignBudgetDetails(long customerId) throws GetResourceException;
+
+    void updateCampaignBudgets(long customerId, List<CampaignBudgetOperation> campaignBudgetOperations) throws UpdateResourceException;
+
+    void deleteCampaignBudgets(long customerId, List<Long> campaignBudgetIds) throws DeleteResourceException;
 }
