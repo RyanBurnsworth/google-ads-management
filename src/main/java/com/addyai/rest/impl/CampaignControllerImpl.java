@@ -30,7 +30,7 @@ public class CampaignControllerImpl implements CampaignController {
     public ResponseEntity<Void> createCampaigns(@PathVariable String customerId,
                                                 @RequestBody List<CampaignDetails> campaignDetails) throws Exception {
         campaignService.addCampaignsToAccount(Long.parseLong(customerId), campaignDetails);
-        return new ResponseEntity<>(HttpStatus.OK);
+        return new ResponseEntity<>(HttpStatus.CREATED);
     }
 
     @Override
@@ -38,7 +38,7 @@ public class CampaignControllerImpl implements CampaignController {
     public ResponseEntity<Void> updateCampaigns(@PathVariable String customerId,
                                                 @RequestBody List<CampaignDetails> campaignDetails) throws Exception {
         campaignService.updateCampaign(Long.parseLong(customerId), campaignDetails);
-        return new ResponseEntity<>(HttpStatus.OK);
+        return new ResponseEntity<>(HttpStatus.ACCEPTED);
     }
 
     @Override
@@ -46,6 +46,6 @@ public class CampaignControllerImpl implements CampaignController {
     public ResponseEntity<Void> deleteCampaigns(@PathVariable String customerId,
                                                 @RequestBody List<Long> campaignIds) throws Exception {
         campaignService.deleteCampaigns(Long.parseLong(customerId), campaignIds);
-        return new ResponseEntity<>(HttpStatus.OK);
+        return new ResponseEntity<>(HttpStatus.ACCEPTED);
     }
 }

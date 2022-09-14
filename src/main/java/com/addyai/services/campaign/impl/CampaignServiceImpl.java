@@ -1,9 +1,12 @@
 package com.addyai.services.campaign.impl;
 
+import com.addyai.error_handling.ValidationErrorResponse;
+import com.addyai.error_handling.exceptions.InvalidRequestException;
 import com.addyai.models.BudgetDetails;
 import com.addyai.models.CampaignDetails;
 import com.addyai.repos.campaigns.CampaignRepository;
 import com.addyai.services.campaign.CampaignService;
+import com.addyai.utils.EntityValidator;
 import com.google.ads.googleads.lib.utils.FieldMasks;
 import com.google.ads.googleads.v11.common.ManualCpc;
 import com.google.ads.googleads.v11.enums.AdvertisingChannelTypeEnum;
@@ -39,6 +42,9 @@ public class CampaignServiceImpl implements CampaignService {
         List<CampaignOperation> campaignOperations = new ArrayList<>();
 
         for (CampaignDetails campaignDetails : campaignDetailsList) {
+            // validate campaign details before proceeding
+            validateCampaignDetails(campaignDetails);
+
             // create a Google Ads campaign object from campaign details
             Campaign campaign = buildCampaignFromDetails(customerId, campaignDetails);
 
@@ -116,6 +122,9 @@ public class CampaignServiceImpl implements CampaignService {
 
         // create an UPDATE campaign operation for each campaign
         for (BudgetDetails budgetDetail : budgetDetails) {
+            // validate budget details before proceeding
+            validateCampaignBudgetDetails(budgetDetail);
+
             CampaignBudget campaignBudget = buildCampaignBudgetFromDetails(budgetDetail);
             CampaignBudgetOperation operation = CampaignBudgetOperation.newBuilder()
                     .setUpdate(campaignBudget)
@@ -205,16 +214,12 @@ public class CampaignServiceImpl implements CampaignService {
      * @param baseCampaignDetails a list of campaign details models sans BudgetDetails
      * @return a list of complete CampaignDetails
      */
-    private List<CampaignDetails> buildCompleteCampaignDetailsList(long customerId, List<CampaignDetails> baseCampaignDetails) {
+    private List<CampaignDetails> buildCompleteCampaignDetailsList(long customerId, List<CampaignDetails> baseCampaignDetails) throws Exception {
         List<CampaignDetails> completeCampaignDetailsList = new ArrayList<>();
         List<BudgetDetails> budgetDetailsList;
 
-        try {
-            // fetch the campaign budget details from the repository
-            budgetDetailsList = campaignRepository.getCampaignBudgetDetails(customerId);
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
+        // fetch the campaign budget details from the repository
+        budgetDetailsList = campaignRepository.getCampaignBudgetDetails(customerId);
 
         // associate each campaign with a budget by resource name
         for (CampaignDetails campaignDetails : baseCampaignDetails) {
@@ -240,5 +245,24 @@ public class CampaignServiceImpl implements CampaignService {
                 .setAmountMicros(budgetDetails.getDailyBudgetAmount() * 1000000L)
                 .setDeliveryMethodValue(budgetDetails.getDeliveryMethod())
                 .build();
+    }
+
+    private void validateCampaignDetails(CampaignDetails campaignDetails) {
+        // validate campaign details
+        ValidationErrorResponse validationErrorResponse = EntityValidator.isCampaignDetailsValid(campaignDetails);
+        if (validationErrorResponse != null)
+            throw new InvalidRequestException(validationErrorResponse.getErrorType(),
+                    validationErrorResponse.getErrorCode(),
+                    validationErrorResponse.getErrorMessage());
+    }
+
+    private void validateCampaignBudgetDetails(BudgetDetails budgetDetails) {
+        ValidationErrorResponse validationErrorResponse = EntityValidator.isBudgetDetailsValid(budgetDetails);
+        // validate budget details
+        validationErrorResponse = EntityValidator.isBudgetDetailsValid(budgetDetails);
+        if (validationErrorResponse != null)
+            throw new InvalidRequestException(validationErrorResponse.getErrorType(),
+                    validationErrorResponse.getErrorCode(),
+                    validationErrorResponse.getErrorMessage());
     }
 }

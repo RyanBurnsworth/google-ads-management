@@ -7,13 +7,13 @@ public class CampaignDetails {
 
     private String campaignName = "";
 
-    private String status = "";
+    private String status = "PAUSED";
 
     private String advertisingChannelType = ADVERTISING_TYPE_SEARCH;
 
-    private int positiveGeoTargetType = 0;
+    private int positiveGeoTargetType = 7;
 
-    private int negativeGeoTargetType = 0;
+    private int negativeGeoTargetType = 5;
 
     private boolean isEnhancedCpcEnabled = false;
 
@@ -21,7 +21,7 @@ public class CampaignDetails {
 
     private String endDate = "";
 
-    private boolean isTargetingSearchNetwork = false;
+    private boolean isTargetingSearchNetwork = true;
 
     private boolean isTargetingContentNetwork = false;
 

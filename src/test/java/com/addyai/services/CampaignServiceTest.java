@@ -1,220 +1,258 @@
 package com.addyai.services;
 
+import com.addyai.error_handling.exceptions.InvalidRequestException;
+import com.addyai.error_handling.exceptions.ServiceFailureException;
+import com.addyai.models.BudgetDetails;
+import com.addyai.models.CampaignDetails;
+import com.addyai.repos.campaigns.CampaignRepository;
+import com.addyai.services.campaign.CampaignService;
 import com.addyai.services.campaign.impl.CampaignServiceImpl;
+import com.google.ads.googleads.v11.common.ManualCpc;
+import com.google.ads.googleads.v11.enums.AdvertisingChannelTypeEnum;
+import com.google.ads.googleads.v11.enums.CampaignStatusEnum;
+import com.google.ads.googleads.v11.enums.NegativeGeoTargetTypeEnum;
+import com.google.ads.googleads.v11.enums.PositiveGeoTargetTypeEnum;
+import com.google.ads.googleads.v11.resources.Campaign;
+import com.google.ads.googleads.v11.services.CampaignOperation;
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.Mockito.*;
 
 @SpringBootTest(classes = CampaignServiceImpl.class)
 public class CampaignServiceTest {
-/*    private static final long MOCK_CUSTOMER_ID = 929910010L;
-    private static final long MOCK_CAMPAIGN_ID = 1L;
-    private static final String MOCK_CAMPAIGN_NAME = "Mock Campaign Details";
+    private static final long CUSTOMER_ID = 1L;
 
     @Autowired
     private CampaignService campaignService;
-
     @MockBean
     private CampaignRepository campaignRepository;
 
-    *//*
-        Test ability to fetch campaign details from a given account
-     *//*
     @Test
-    void testGetCampaignDetailsForTestAccount() throws GetResourceException {
-        when(campaignRepository.getCampaignDetails(MOCK_CUSTOMER_ID)).thenReturn(getMockCampaignDetailsList());
-        List<CampaignDetails> campaignDetails = campaignService.getCampaignDetailsForAccount(MOCK_CUSTOMER_ID);
+    void testAddingCampaignsToClientAccount() throws Exception {
+        List<CampaignOperation> operations = getMockCampaignOperations(getMockCampaignDetailsList().get(0));
+        doNothing().when(campaignRepository).addCampaigns(CUSTOMER_ID, operations);
 
-        assertEquals(campaignDetails.get(0).getCampaignId(), 1L);
+        campaignService.addCampaignsToAccount(CUSTOMER_ID, getMockCampaignDetailsList());
+        verify(campaignRepository, times(1)).addCampaigns(CUSTOMER_ID, operations);
     }
 
-    *//*
-        Test that when a customer account has 0 campaigns we receive an empty list of campaign details
-     *//*
     @Test
-    void testGetCampaignDetailsForTestAccountWithZeroCampaigns() throws GetResourceException {
-        when(campaignRepository.getCampaignDetails(MOCK_CUSTOMER_ID)).thenReturn(new ArrayList<>());
-        List<CampaignDetails> campaignDetails = campaignService.getCampaignDetailsForAccount(MOCK_CUSTOMER_ID);
+    void testAddingCampaignsThrowsInvalidRequestException() throws Exception {
+        List<CampaignOperation> operations = getMockCampaignOperations(getMockCampaignDetailsList().get(0));
+        doThrow(InvalidRequestException.class).when(campaignRepository).addCampaigns(CUSTOMER_ID, operations);
 
-        assertEquals(0, campaignDetails.size());
+        assertThrows(InvalidRequestException.class,
+                () -> campaignService.addCampaignsToAccount(CUSTOMER_ID, getMockCampaignDetailsList()));
     }
 
-    *//*
-        Test when an exception occurs during fetching of campaign details, the exception bubbles up to the service
-     *//*
     @Test
-    void testGetCampaignDetailsThrowsGetResourceException() throws GetResourceException {
-        when(campaignRepository.getCampaignDetails(MOCK_CUSTOMER_ID))
-                .thenThrow(new GetResourceException(GET_RES_EXCEPTION_MSG + MOCK_CUSTOMER_ID));
+    void testAddingCampaignsThrowsServiceFailureException() throws Exception {
+        List<CampaignOperation> operations = getMockCampaignOperations(getMockCampaignDetailsList().get(0));
+        doThrow(ServiceFailureException.class).when(campaignRepository).addCampaigns(CUSTOMER_ID, operations);
 
-        Throwable throwable = assertThrows(GetResourceException.class,
-                () -> campaignService.getCampaignDetailsForAccount(MOCK_CUSTOMER_ID));
-
-        assertEquals(GET_RES_EXCEPTION_MSG + MOCK_CUSTOMER_ID,
-                throwable.getMessage());
+        assertThrows(ServiceFailureException.class,
+                () -> campaignService.addCampaignsToAccount(CUSTOMER_ID, getMockCampaignDetailsList()));
     }
 
-    *//*
-        Test updating campaigns in a customer account. If no exception is thrown, we assume success
-     *//*
     @Test
-    void testUpdateCampaign() throws UpdateResourceException {
-        List<CampaignDetails> campaignDetailsList = getMockCampaignDetailsList();
-        doNothing().when(campaignRepository)
-                .updateCampaigns(MOCK_CUSTOMER_ID, getMockCampaignUpdateOperationList(campaignDetailsList));
+    void testFindAllCampaignsFromClientAccount() throws Exception {
+        // setup mock data
+        List<CampaignDetails> mockCampaignDetailsList = getMockCampaignDetailsList();
+        List<BudgetDetails> mockBudgetDetailsList = getMockBudgetDetailsList();
+        CampaignDetails mockCampaignDetails = mockCampaignDetailsList.get(0);
+        BudgetDetails mockBudgetDetails = mockBudgetDetailsList.get(0);
 
-        campaignService.updateCampaign(MOCK_CUSTOMER_ID, campaignDetailsList);
+        // set mock budget details object inside mock campaign details object
+        mockCampaignDetails.setBudgetDetails(mockBudgetDetails);
+
+        when(campaignRepository.getCampaignDetails(CUSTOMER_ID)).thenReturn(mockCampaignDetailsList);
+        when(campaignRepository.getCampaignBudgetDetails(CUSTOMER_ID)).thenReturn(getMockBudgetDetailsList());
+
+        List<CampaignDetails> campaignDetailsList = campaignService.findAllCampaignDetails(CUSTOMER_ID);
+        CampaignDetails campaignDetails = campaignDetailsList.get(0);
+
+        verify(campaignRepository, times(1)).getCampaignDetails(CUSTOMER_ID);
+        verify(campaignRepository, times(1)).getCampaignBudgetDetails(CUSTOMER_ID);
+
+        assertEquals("Test campaign", campaignDetails.getCampaignName());
+        assertEquals("Test Budget", campaignDetails.getBudgetDetails().getResourceName());
     }
 
-    *//*
-        Test deleting campaigns in a customer account. If no exception is thrown, we assume success
-     *//*
     @Test
-    void testDeleteCampaigns() throws DeleteResourceException {
-        List<Long> campaignIds = new ArrayList<>();
-        campaignIds.add(1L);
-        campaignIds.add(2L);
+    void testFindAllCampaignsThrowsInvalidRequestExceptionWhileFetchingCampaignDetails() throws Exception {
+        // setup mock data
+        List<CampaignDetails> mockCampaignDetailsList = getMockCampaignDetailsList();
+        List<BudgetDetails> mockBudgetDetailsList = getMockBudgetDetailsList();
+        CampaignDetails mockCampaignDetails = mockCampaignDetailsList.get(0);
+        BudgetDetails mockBudgetDetails = mockBudgetDetailsList.get(0);
 
-        doNothing().when(campaignRepository).deleteCampaigns(MOCK_CUSTOMER_ID, campaignIds);
+        // set mock budget details object inside mock campaign details object
+        mockCampaignDetails.setBudgetDetails(mockBudgetDetails);
 
-        campaignService.deleteCampaigns(MOCK_CUSTOMER_ID, campaignIds);
+        when(campaignRepository.getCampaignDetails(CUSTOMER_ID)).thenThrow(InvalidRequestException.class);
+
+        assertThrows(InvalidRequestException.class,
+                () -> campaignService.findAllCampaignDetails(CUSTOMER_ID));
     }
 
-    *//*
-        Test when an exception occurs during updating of campaign details, the exception bubbles up to the service
-     *//*
     @Test
-    void testUpdateCampaignThrowsUpdateResourceException() throws UpdateResourceException {
-        List<CampaignDetails> campaignDetailsList = getMockCampaignDetailsList();
-        doThrow(UpdateResourceException.class).when(campaignRepository)
-                .updateCampaigns(MOCK_CUSTOMER_ID, getMockCampaignUpdateOperationList(campaignDetailsList));
+    void testFindAllCampaignsThrowsServiceFailureExceptionWhileFetchingCampaignBudgetDetails() throws Exception {
+        // setup mock data
+        List<CampaignDetails> mockCampaignDetailsList = getMockCampaignDetailsList();
+        List<BudgetDetails> mockBudgetDetailsList = getMockBudgetDetailsList();
+        CampaignDetails mockCampaignDetails = mockCampaignDetailsList.get(0);
+        BudgetDetails mockBudgetDetails = mockBudgetDetailsList.get(0);
 
-        assertThrows(UpdateResourceException.class,
-                () -> campaignService.updateCampaign(MOCK_CUSTOMER_ID, campaignDetailsList));
+        // set mock budget details object inside mock campaign details object
+        mockCampaignDetails.setBudgetDetails(mockBudgetDetails);
+
+        when(campaignRepository.getCampaignDetails(CUSTOMER_ID)).thenReturn(mockCampaignDetailsList);
+        when(campaignRepository.getCampaignBudgetDetails(CUSTOMER_ID)).thenThrow(ServiceFailureException.class);
+
+        assertThrows(ServiceFailureException.class,
+                () -> campaignService.findAllCampaignDetails(CUSTOMER_ID));
     }
 
-    *//*
-        Test when an exception occurs during deleting of campaigns, the exception bubbles up to the service
-     *//*
     @Test
-    void testDeleteCampaignThrowsDeleteResourceException() throws DeleteResourceException {
-        List<Long> campaignIds = new ArrayList<>();
-        campaignIds.add(1L);
-        campaignIds.add(2L);
+    void testCreatingCampaignWithEmptyCampaignNameThrowsInvalidRequestException() throws InvalidRequestException {
+        String expectedErrorMessage = "Error Code: Missing Campaign Name Error Type: Invalid Campaign Details Error Message: Campaign name cannot be blank";
 
-        doThrow(DeleteResourceException.class).when(campaignRepository).deleteCampaigns(MOCK_CUSTOMER_ID, campaignIds);
+        List<CampaignDetails> campaignDetailsList = new ArrayList<>();
+        CampaignDetails campaignDetails = new CampaignDetails();
 
-        assertThrows(DeleteResourceException.class,
-                () -> campaignService.deleteCampaigns(MOCK_CUSTOMER_ID, campaignIds));
-    }
+        campaignDetailsList.add(campaignDetails);
 
-    *//*
-        Test adding campaigns to a client account
-     *//*
-    @Test
-    void testAddingCampaignsToClientAccount() throws CreateResourceException {
-        List<CampaignOperation> campaignOperations = getMockCampaignCreateOperationList(getMockCampaignDetailsList());
+        Throwable throwable = assertThrows(InvalidRequestException.class,
+                () -> campaignService.addCampaignsToAccount(CUSTOMER_ID, campaignDetailsList));
 
-        doNothing().when(campaignRepository).addCampaigns(MOCK_CUSTOMER_ID, campaignOperations);
-        campaignService.addCampaignsToAccount(MOCK_CUSTOMER_ID, getMockCampaignDetailsList());
-    }
-
-    *//*
-        Test when an exception occurs during adding campaigns, the exception bubbles up to the service
-     *//*
-    @Test
-    void testAddingCampaignsWhenExceptionThrown() throws CreateResourceException {
-        List<CampaignOperation> campaignOperations = getMockCampaignCreateOperationList(getMockCampaignDetailsList());
-
-        doThrow(CreateResourceException.class).when(campaignRepository).addCampaigns(MOCK_CUSTOMER_ID, campaignOperations);
-
-        assertThrows(CreateResourceException.class,
-                () -> campaignService.addCampaignsToAccount(MOCK_CUSTOMER_ID, getMockCampaignDetailsList()));
+        assertEquals(expectedErrorMessage, throwable.getMessage());
     }
 
     private List<CampaignDetails> getMockCampaignDetailsList() {
-        List<CampaignDetails> campaignDetails = new ArrayList<>();
+        List<CampaignDetails> campaignDetailsList = new ArrayList<>();
 
-        CampaignDetails mockCampaignDetails = new CampaignDetails();
-        mockCampaignDetails.setCampaignId(MOCK_CAMPAIGN_ID);
-        mockCampaignDetails.setCampaignName(MOCK_CAMPAIGN_NAME);
-        mockCampaignDetails.setBudget("10000");
-        mockCampaignDetails.setEndDate("10/10/25");
-        mockCampaignDetails.setStartDate("10/10/22");
-        mockCampaignDetails.setEnhancedCpcEnabled(true);
-        mockCampaignDetails.setTargetingGoogleSearch(true);
-        mockCampaignDetails.setTargetingContentNetwork(true);
-        mockCampaignDetails.setTargetingPartnerSearchNetwork(true);
-        mockCampaignDetails.setTargetingSearchNetwork(true);
-        mockCampaignDetails.setAdvertisingChannelType(AdvertisingChannelTypeEnum.AdvertisingChannelType.SEARCH);
-        mockCampaignDetails.setBiddingStrategy(BiddingStrategy.newBuilder().build().toString());
-        mockCampaignDetails.setPositiveGeoTargetType(PositiveGeoTargetTypeEnum.PositiveGeoTargetType.PRESENCE);
-        mockCampaignDetails.setNegativeGeoTargetType(NegativeGeoTargetTypeEnum.NegativeGeoTargetType.UNKNOWN);
-        mockCampaignDetails.setStatus(CampaignStatusEnum.CampaignStatus.ENABLED);
+        CampaignDetails campaignDetails = new CampaignDetails();
+        campaignDetails.setBudgetDetails(null);
+        campaignDetails.setCampaignId(1);
+        campaignDetails.setCampaignName("Test campaign");
+        campaignDetails.setBudgetResourceName("Test Budget");
+        campaignDetails.setStatus("ENABLED");
 
-        campaignDetails.add(mockCampaignDetails);
-        return campaignDetails;
+        campaignDetailsList.add(campaignDetails);
+
+        return campaignDetailsList;
     }
 
-    private List<CampaignOperation> getMockCampaignUpdateOperationList(List<CampaignDetails> campaignDetailsList) {
+    private List<CampaignOperation> getMockCampaignOperations(CampaignDetails campaignDetails) {
         List<CampaignOperation> campaignOperations = new ArrayList<>();
 
-        for (CampaignDetails campaignDetails : campaignDetailsList) {
-            Campaign campaign = extractCampaignFromDetails(campaignDetails);
+        // create a Google Ads campaign object from campaign details
+        Campaign campaign = buildCampaignFromDetails(campaignDetails);
 
-            CampaignOperation operation = CampaignOperation.newBuilder()
-                    .setUpdate(campaign)
-                    .setUpdateMask(FieldMasks.allSetFieldsOf(campaign))
-                    .build();
+        // create a CREATE campaign operation
+        CampaignOperation op = CampaignOperation.newBuilder()
+                .setCreate(campaign)
+                .build();
 
-            campaignOperations.add(operation);
-        }
+        // add to campaign operations list
+        campaignOperations.add(op);
+
         return campaignOperations;
     }
 
-    private List<CampaignOperation> getMockCampaignCreateOperationList(List<CampaignDetails> campaignDetailsList) {
-        List<CampaignOperation> campaignOperations = new ArrayList<>();
-
-        for (CampaignDetails campaignDetails : campaignDetailsList) {
-            Campaign campaign = extractCampaignFromDetails(campaignDetails);
-
-            CampaignOperation operation = CampaignOperation.newBuilder()
-                    .setCreate(campaign)
-                    .build();
-
-            campaignOperations.add(operation);
-        }
-        return campaignOperations;
-    }
-
-    private Campaign extractCampaignFromDetails(CampaignDetails campaignDetails) {
+    /**
+     * Create a campaign object using a CampaignDetails object
+     *
+     * @param campaignDetails the details of the campaign to be created
+     * @return campaign object based on campaign details provided
+     */
+    private Campaign buildCampaignFromDetails(CampaignDetails campaignDetails) {
+        // create a Manual cpc object with or without enhanced CPC
         ManualCpc manualCpc = ManualCpc.newBuilder()
                 .setEnhancedCpcEnabled(campaignDetails.isEnhancedCpcEnabled())
                 .build();
 
+        // create a GeoTargetTypeSetting using the negative and positive targets
         Campaign.GeoTargetTypeSetting geoTargetTypeSetting = Campaign.GeoTargetTypeSetting.newBuilder()
-                .setNegativeGeoTargetType(campaignDetails.getNegativeGeoTargetType())
-                .setPositiveGeoTargetType(campaignDetails.getPositiveGeoTargetType())
+                .setNegativeGeoTargetType(NegativeGeoTargetTypeEnum.NegativeGeoTargetType
+                        .forNumber(campaignDetails.getNegativeGeoTargetType()))
+                .setPositiveGeoTargetType(PositiveGeoTargetTypeEnum.PositiveGeoTargetType
+                        .forNumber(campaignDetails.getPositiveGeoTargetType()))
                 .build();
 
         // extract network settings into its own object
         Campaign.NetworkSettings networkSettings = Campaign.NetworkSettings.newBuilder()
                 .setTargetContentNetwork(campaignDetails.isTargetingContentNetwork())
                 .setTargetSearchNetwork(campaignDetails.isTargetingSearchNetwork())
-                .setTargetGoogleSearch(campaignDetails.isTargetingGoogleSearch())
                 .setTargetPartnerSearchNetwork(campaignDetails.isTargetingPartnerSearchNetwork())
                 .build();
 
+        // create the campaign status object
+        CampaignStatusEnum.CampaignStatus status =
+                CampaignStatusEnum.CampaignStatus.valueOf(campaignDetails.getStatus());
+
+        //create the advertising channel type object
+        AdvertisingChannelTypeEnum.AdvertisingChannelType advertisingChannelType =
+                AdvertisingChannelTypeEnum.AdvertisingChannelType.valueOf(campaignDetails.getAdvertisingChannelType());
+
+        // create and return a campaign object with the above settings
         return Campaign.newBuilder()
-                .setManualCpc(manualCpc)
-                .setStatus(campaignDetails.getStatus())
+                .setStatus(status)
                 .setId(campaignDetails.getCampaignId())
                 .setStartDate(campaignDetails.getStartDate())
                 .setEndDate(campaignDetails.getEndDate())
                 .setName(campaignDetails.getCampaignName())
                 .setGeoTargetTypeSetting(geoTargetTypeSetting)
-                .setCampaignBudget(campaignDetails.getBudget())
-                .setBiddingStrategy(campaignDetails.getBiddingStrategy())
+                .setCampaignBudget(campaignDetails.getBudgetResourceName())
+                .setManualCpc(manualCpc)
                 .setNetworkSettings(networkSettings)
-                .setAdvertisingChannelType(campaignDetails.getAdvertisingChannelType())
+                .setAdvertisingChannelType(advertisingChannelType)
                 .build();
-    }*/
+    }
+
+    /**
+     * Create a list of complete campaign details models.
+     *
+     * @param customerId          the customer id of the client account
+     * @param baseCampaignDetails a list of campaign details models sans BudgetDetails
+     * @return a list of complete CampaignDetails
+     */
+    private List<CampaignDetails> buildCompleteCampaignDetailsList(long customerId, List<CampaignDetails> baseCampaignDetails) {
+        List<CampaignDetails> completeCampaignDetailsList = new ArrayList<>();
+        List<BudgetDetails> budgetDetailsList = getMockBudgetDetailsList();
+
+        // associate each campaign with a budget by resource name
+        for (CampaignDetails campaignDetails : baseCampaignDetails) {
+            for (BudgetDetails budgetDetails : budgetDetailsList) {
+                // set budgetDetails in campaignDetails model if matched
+                if (campaignDetails.getBudgetResourceName().equals(budgetDetails.getResourceName())) {
+                    campaignDetails.setBudgetDetails(budgetDetails);
+
+                    // add updated campaign details model to completed list
+                    completeCampaignDetailsList.add(campaignDetails);
+                    break;
+                }
+            }
+        }
+
+        return completeCampaignDetailsList;
+    }
+
+    private List<BudgetDetails> getMockBudgetDetailsList() {
+        List<BudgetDetails> budgetDetailsList = new ArrayList<>();
+
+        BudgetDetails budgetDetails = new BudgetDetails();
+        budgetDetails.setResourceName("Test Budget");
+
+        budgetDetailsList.add(budgetDetails);
+        return budgetDetailsList;
+    }
 }

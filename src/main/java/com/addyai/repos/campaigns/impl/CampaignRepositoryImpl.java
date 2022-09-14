@@ -2,11 +2,14 @@ package com.addyai.repos.campaigns.impl;
 
 import com.addyai.GoogleAdsManagementApplication;
 import com.addyai.error_handling.ApiExceptionResolver;
+import com.addyai.error_handling.ValidationErrorResponse;
+import com.addyai.error_handling.exceptions.InvalidRequestException;
 import com.addyai.models.BudgetDetails;
 import com.addyai.models.CampaignDetails;
 import com.addyai.repos.campaigns.CampaignRepository;
 import com.addyai.repos.requests.StreamRequest;
 import com.addyai.repos.requests.impl.StreamRequestImpl;
+import com.addyai.utils.EntityValidator;
 import com.addyai.utils.GAQLUtils;
 import com.google.ads.googleads.v11.enums.BudgetDeliveryMethodEnum;
 import com.google.ads.googleads.v11.enums.BudgetStatusEnum;
@@ -149,7 +152,15 @@ public class CampaignRepositoryImpl implements CampaignRepository {
     @Override
     public String createSingleCampaignBudget(final long customerId,
                                              final BudgetDetails budgetDetails) throws Exception {
-        MutateCampaignBudgetResult campaignBudgetResult = null;
+        MutateCampaignBudgetResult campaignBudgetResult;
+
+        // validate budget details before proceeding
+        ValidationErrorResponse validationErrorResponse = EntityValidator.isBudgetDetailsValid(budgetDetails);
+
+        if (validationErrorResponse != null)
+            throw new InvalidRequestException(validationErrorResponse.getErrorType(),
+                    validationErrorResponse.getErrorCode(),
+                    validationErrorResponse.getErrorMessage());
 
         try {
             // convert budget to micros
