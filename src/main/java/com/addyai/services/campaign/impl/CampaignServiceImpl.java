@@ -1,9 +1,5 @@
 package com.addyai.services.campaign.impl;
 
-import com.addyai.exceptions.CreateResourceException;
-import com.addyai.exceptions.DeleteResourceException;
-import com.addyai.exceptions.GetResourceException;
-import com.addyai.exceptions.UpdateResourceException;
 import com.addyai.models.BudgetDetails;
 import com.addyai.models.CampaignDetails;
 import com.addyai.repos.campaigns.CampaignRepository;
@@ -36,10 +32,10 @@ public class CampaignServiceImpl implements CampaignService {
      *
      * @param customerId          the customer id of the client account
      * @param campaignDetailsList the campaign details to be used in campaign creation
-     * @throws CreateResourceException
+     * @throws Exception
      */
     @Override
-    public void addCampaignsToAccount(long customerId, List<CampaignDetails> campaignDetailsList) throws CreateResourceException {
+    public void addCampaignsToAccount(long customerId, List<CampaignDetails> campaignDetailsList) throws Exception {
         List<CampaignOperation> campaignOperations = new ArrayList<>();
 
         for (CampaignDetails campaignDetails : campaignDetailsList) {
@@ -64,10 +60,10 @@ public class CampaignServiceImpl implements CampaignService {
      *
      * @param customerId the customer id of the client account
      * @return a list of complete campaign details containing all campaigns in a client's account
-     * @throws GetResourceException
+     * @throws Exception
      */
     @Override
-    public List<CampaignDetails> findAllCampaignDetails(long customerId) throws GetResourceException {
+    public List<CampaignDetails> findAllCampaignDetails(long customerId) throws Exception {
         return buildCompleteCampaignDetailsList(customerId, campaignRepository.getCampaignDetails(customerId));
     }
 
@@ -75,10 +71,10 @@ public class CampaignServiceImpl implements CampaignService {
      * Update a campaign in a Google Ads account
      *
      * @param campaignDetailsList a list of updated campaignDetails
-     * @throws UpdateResourceException
+     * @throws Exception
      */
     @Override
-    public void updateCampaign(long customerId, List<CampaignDetails> campaignDetailsList) throws UpdateResourceException {
+    public void updateCampaign(long customerId, List<CampaignDetails> campaignDetailsList) throws Exception {
         List<CampaignOperation> campaignOperations = new ArrayList<>();
 
         // create an UPDATE campaign operation for each campaign
@@ -102,10 +98,9 @@ public class CampaignServiceImpl implements CampaignService {
      *
      * @param customerId  the customer id of the client account
      * @param campaignIds the ids of the campaigns to be deleted
-     * @throws DeleteResourceException
      */
     @Override
-    public void deleteCampaigns(long customerId, List<Long> campaignIds) throws DeleteResourceException {
+    public void deleteCampaigns(long customerId, List<Long> campaignIds) throws Exception {
         campaignRepository.deleteCampaigns(customerId, campaignIds);
     }
 
@@ -114,10 +109,9 @@ public class CampaignServiceImpl implements CampaignService {
      *
      * @param customerId    the customer id of the client account
      * @param budgetDetails a list of budget details to be updated
-     * @throws UpdateResourceException
      */
     @Override
-    public void updateCampaignBudgets(long customerId, List<BudgetDetails> budgetDetails) throws UpdateResourceException {
+    public void updateCampaignBudgets(long customerId, List<BudgetDetails> budgetDetails) throws Exception {
         List<CampaignBudgetOperation> campaignBudgetOperations = new ArrayList<>();
 
         // create an UPDATE campaign operation for each campaign
@@ -141,10 +135,9 @@ public class CampaignServiceImpl implements CampaignService {
      *
      * @param customerId    the customer id of the client account
      * @param budgetDetails a list of budgets to be deleted
-     * @throws DeleteResourceException
      */
     @Override
-    public void deleteCampaignBudgets(long customerId, List<BudgetDetails> budgetDetails) throws DeleteResourceException {
+    public void deleteCampaignBudgets(long customerId, List<BudgetDetails> budgetDetails) {
 
     }
 
@@ -155,7 +148,7 @@ public class CampaignServiceImpl implements CampaignService {
      * @param campaignDetails the details of the campaign to be created
      * @return campaign object based on campaign details provided
      */
-    private Campaign buildCampaignFromDetails(long customerId, CampaignDetails campaignDetails) {
+    private Campaign buildCampaignFromDetails(long customerId, CampaignDetails campaignDetails) throws Exception {
         // create a Manual cpc object with or without enhanced CPC
         ManualCpc manualCpc = ManualCpc.newBuilder()
                 .setEnhancedCpcEnabled(campaignDetails.isEnhancedCpcEnabled())
@@ -219,7 +212,7 @@ public class CampaignServiceImpl implements CampaignService {
         try {
             // fetch the campaign budget details from the repository
             budgetDetailsList = campaignRepository.getCampaignBudgetDetails(customerId);
-        } catch (GetResourceException e) {
+        } catch (Exception e) {
             throw new RuntimeException(e);
         }
 

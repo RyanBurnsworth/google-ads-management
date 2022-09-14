@@ -1,9 +1,5 @@
 package com.addyai.services.campaign;
 
-import com.addyai.exceptions.CreateResourceException;
-import com.addyai.exceptions.DeleteResourceException;
-import com.addyai.exceptions.GetResourceException;
-import com.addyai.exceptions.UpdateResourceException;
 import com.addyai.models.BudgetDetails;
 import com.addyai.models.CampaignDetails;
 
@@ -11,15 +7,15 @@ import java.util.List;
 
 public interface CampaignService {
 
-    void addCampaignsToAccount(long customerId, List<CampaignDetails> campaignDetailsList) throws CreateResourceException;
+    void addCampaignsToAccount(long customerId, List<CampaignDetails> campaignDetailsList) throws Exception;
 
-    List<CampaignDetails> findAllCampaignDetails(long customerId) throws GetResourceException;
+    List<CampaignDetails> findAllCampaignDetails(long customerId) throws Exception;
 
-    void updateCampaign(long customerId, List<CampaignDetails> campaignDetails) throws UpdateResourceException;
+    void updateCampaign(long customerId, List<CampaignDetails> campaignDetails) throws Exception;
 
-    void deleteCampaigns(long customerId, List<Long> campaignIds) throws DeleteResourceException;
+    void deleteCampaigns(long customerId, List<Long> campaignIds) throws Exception;
 
-    void updateCampaignBudgets(long customerId, List<BudgetDetails> budgetDetails) throws UpdateResourceException;
+    void updateCampaignBudgets(long customerId, List<BudgetDetails> budgetDetails) throws Exception;
 
-    void deleteCampaignBudgets(long customerId, List<BudgetDetails> budgetDetails) throws DeleteResourceException;
+    void deleteCampaignBudgets(long customerId, List<BudgetDetails> budgetDetails);
 }

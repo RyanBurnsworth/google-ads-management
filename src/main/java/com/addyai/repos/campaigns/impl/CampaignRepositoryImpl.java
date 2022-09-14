@@ -1,10 +1,7 @@
 package com.addyai.repos.campaigns.impl;
 
 import com.addyai.GoogleAdsManagementApplication;
-import com.addyai.exceptions.CreateResourceException;
-import com.addyai.exceptions.DeleteResourceException;
-import com.addyai.exceptions.GetResourceException;
-import com.addyai.exceptions.UpdateResourceException;
+import com.addyai.error_handling.ApiExceptionResolver;
 import com.addyai.models.BudgetDetails;
 import com.addyai.models.CampaignDetails;
 import com.addyai.repos.campaigns.CampaignRepository;
@@ -23,7 +20,7 @@ import org.springframework.stereotype.Repository;
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.addyai.utils.Constants.*;
+import static com.addyai.utils.Constants.GET_RES_EXCEPTION_MSG;
 
 @Repository
 public class CampaignRepositoryImpl implements CampaignRepository {
@@ -45,10 +42,10 @@ public class CampaignRepositoryImpl implements CampaignRepository {
      *
      * @param customerId the customer id of the account
      * @return list of campaign details
-     * @throws GetResourceException
+     * @throws Exception
      */
     @Override
-    public List<CampaignDetails> getCampaignDetails(long customerId) throws GetResourceException {
+    public List<CampaignDetails> getCampaignDetails(long customerId) throws Exception {
         List<CampaignDetails> campaignDetailsList;
 
         try {
@@ -62,7 +59,7 @@ public class CampaignRepositoryImpl implements CampaignRepository {
 
             return campaignDetailsList;
         } catch (Exception e) {
-            throw new GetResourceException(GET_RES_EXCEPTION_MSG + customerId);
+            throw ApiExceptionResolver.doResolveException(e);
         }
     }
 
@@ -71,11 +68,11 @@ public class CampaignRepositoryImpl implements CampaignRepository {
      *
      * @param customerId         the customerId of the account to update
      * @param campaignOperations the list of campaign operations to be performed on the account
-     * @throws UpdateResourceException
+     * @throws Exception
      */
     @Override
     public void updateCampaigns(long customerId,
-                                List<CampaignOperation> campaignOperations) throws UpdateResourceException {
+                                List<CampaignOperation> campaignOperations) throws Exception {
         try {
             CampaignServiceClient campaignServiceClient = GoogleAdsManagementApplication.getGoogleAdsClient()
                     .getLatestVersion().createCampaignServiceClient();
@@ -84,8 +81,7 @@ public class CampaignRepositoryImpl implements CampaignRepository {
             MutateCampaignsResponse response = campaignServiceClient
                     .mutateCampaigns(Long.toString(customerId), campaignOperations);
         } catch (Exception e) {
-            // TODO: Log error here for reference
-            throw new UpdateResourceException(UPDATE_RES_EXCEPTION_MSG + customerId);
+            throw ApiExceptionResolver.doResolveException(e);
         }
     }
 
@@ -94,10 +90,10 @@ public class CampaignRepositoryImpl implements CampaignRepository {
      *
      * @param customerId  the customer id of the client account
      * @param campaignIds the ids of the campaigns to delete
-     * @throws DeleteResourceException
+     * @throws Exception
      */
     @Override
-    public void deleteCampaigns(long customerId, List<Long> campaignIds) throws DeleteResourceException {
+    public void deleteCampaigns(long customerId, List<Long> campaignIds) throws Exception {
         List<CampaignOperation> campaignOperations = new ArrayList<>();
 
         try {
@@ -119,7 +115,7 @@ public class CampaignRepositoryImpl implements CampaignRepository {
                     campaignServiceClient.mutateCampaigns(
                             Long.toString(customerId), campaignOperations);
         } catch (Exception e) {
-            throw new DeleteResourceException(DELETE_RES_EXCEPTION_MSG + customerId);
+            throw ApiExceptionResolver.doResolveException(e);
         }
     }
 
@@ -128,10 +124,10 @@ public class CampaignRepositoryImpl implements CampaignRepository {
      *
      * @param customerId         the id of the customer account
      * @param campaignOperations a list of [CampaignOperation] for processing
-     * @throws CreateResourceException
+     * @throws Exception
      */
     @Override
-    public void addCampaigns(long customerId, List<CampaignOperation> campaignOperations) throws CreateResourceException {
+    public void addCampaigns(long customerId, List<CampaignOperation> campaignOperations) throws Exception {
         try {
             CampaignServiceClient campaignServiceClient = GoogleAdsManagementApplication.getGoogleAdsClient()
                     .getLatestVersion().createCampaignServiceClient();
@@ -139,7 +135,7 @@ public class CampaignRepositoryImpl implements CampaignRepository {
             MutateCampaignsResponse response =
                     campaignServiceClient.mutateCampaigns(Long.toString(customerId), campaignOperations);
         } catch (Exception e) {
-            throw new CreateResourceException(ADD_RES_EXCEPTION_MSG + e);
+            throw ApiExceptionResolver.doResolveException(e);
         }
     }
 
@@ -152,36 +148,40 @@ public class CampaignRepositoryImpl implements CampaignRepository {
      */
     @Override
     public String createSingleCampaignBudget(final long customerId,
-                                             final BudgetDetails budgetDetails) {
+                                             final BudgetDetails budgetDetails) throws Exception {
+        MutateCampaignBudgetResult campaignBudgetResult = null;
 
-        // convert budget to micros
-        long budgetValue = budgetDetails.getDailyBudgetAmount() * 1000000L;
+        try {
+            // convert budget to micros
+            long budgetValue = budgetDetails.getDailyBudgetAmount() * 1000000L;
 
-        CampaignBudgetServiceClient campaignBudgetServiceClient = GoogleAdsManagementApplication.getGoogleAdsClient()
-                .getLatestVersion().createCampaignBudgetServiceClient();
+            CampaignBudgetServiceClient campaignBudgetServiceClient = GoogleAdsManagementApplication.getGoogleAdsClient()
+                    .getLatestVersion().createCampaignBudgetServiceClient();
 
-        CampaignBudget budget = CampaignBudget.newBuilder()
-                .setName(budgetDetails.getName())
-                .setAmountMicros(budgetValue)
-                .setStatus(BudgetStatusEnum.BudgetStatus.forNumber(budgetDetails.getStatus()))
-                .setDeliveryMethod(BudgetDeliveryMethodEnum.BudgetDeliveryMethod.forNumber(budgetDetails.getDeliveryMethod()))
-                .setExplicitlyShared(budgetDetails.isShared())
-                .build();
+            CampaignBudget budget = CampaignBudget.newBuilder()
+                    .setName(budgetDetails.getName())
+                    .setAmountMicros(budgetValue)
+                    .setStatus(BudgetStatusEnum.BudgetStatus.forNumber(budgetDetails.getStatus()))
+                    .setDeliveryMethod(BudgetDeliveryMethodEnum.BudgetDeliveryMethod.forNumber(budgetDetails.getDeliveryMethod()))
+                    .setExplicitlyShared(budgetDetails.isShared())
+                    .build();
 
-        CampaignBudgetOperation operation = CampaignBudgetOperation.newBuilder()
-                .setCreate(budget)
-                .build();
+            CampaignBudgetOperation operation = CampaignBudgetOperation.newBuilder()
+                    .setCreate(budget)
+                    .build();
 
-        MutateCampaignBudgetsResponse budgetsResponse = campaignBudgetServiceClient.mutateCampaignBudgets(
-                Long.toString(customerId), Lists.newArrayList(operation));
+            MutateCampaignBudgetsResponse budgetsResponse = campaignBudgetServiceClient.mutateCampaignBudgets(
+                    Long.toString(customerId), Lists.newArrayList(operation));
 
-        MutateCampaignBudgetResult campaignBudgetResult = budgetsResponse.getResults(0);
-
+            campaignBudgetResult = budgetsResponse.getResults(0);
+        } catch (Exception exception) {
+            throw ApiExceptionResolver.doResolveException(exception);
+        }
         return campaignBudgetResult.getResourceName();
     }
 
     @Override
-    public List<BudgetDetails> getCampaignBudgetDetails(long customerId) throws GetResourceException {
+    public List<BudgetDetails> getCampaignBudgetDetails(long customerId) throws Exception {
         try {
             String query = GAQLUtils.getCampaignBudgetQuery();
 
@@ -191,12 +191,12 @@ public class CampaignRepositoryImpl implements CampaignRepository {
 
             return GAQLUtils.convertStreamResponseToBudgetDetails(response);
         } catch (Exception e) {
-            throw new GetResourceException(GET_RES_EXCEPTION_MSG + customerId);
+            throw ApiExceptionResolver.doResolveException(e);
         }
     }
 
     @Override
-    public void updateCampaignBudgets(long customerId, List<CampaignBudgetOperation> campaignBudgetOperations) throws UpdateResourceException {
+    public void updateCampaignBudgets(long customerId, List<CampaignBudgetOperation> campaignBudgetOperations) throws Exception {
         try {
             CampaignBudgetServiceClient campaignBudgetServiceClient = GoogleAdsManagementApplication.getGoogleAdsClient()
                     .getLatestVersion().createCampaignBudgetServiceClient();
@@ -205,13 +205,12 @@ public class CampaignRepositoryImpl implements CampaignRepository {
             MutateCampaignBudgetsResponse response = campaignBudgetServiceClient
                     .mutateCampaignBudgets(Long.toString(customerId), campaignBudgetOperations);
         } catch (Exception e) {
-            // TODO: Log error here for reference
-            throw new UpdateResourceException(UPDATE_RES_EXCEPTION_MSG + customerId);
+            throw ApiExceptionResolver.doResolveException(e);
         }
     }
 
     @Override
-    public void deleteCampaignBudgets(long customerId, List<Long> campaignBudgetIds) throws DeleteResourceException {
+    public void deleteCampaignBudgets(long customerId, List<Long> campaignBudgetIds) {
 
     }
 }
