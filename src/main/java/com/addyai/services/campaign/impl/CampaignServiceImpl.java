@@ -125,7 +125,7 @@ public class CampaignServiceImpl implements CampaignService {
             // validate budget details before proceeding
             validateCampaignBudgetDetails(budgetDetail);
 
-            CampaignBudget campaignBudget = buildCampaignBudgetFromDetails(budgetDetail);
+            CampaignBudget campaignBudget = buildUpdatedCampaignBudgetFromDetails(budgetDetail);
             CampaignBudgetOperation operation = CampaignBudgetOperation.newBuilder()
                     .setUpdate(campaignBudget)
                     .setUpdateMask(FieldMasks.allSetFieldsOf(campaignBudget))
@@ -137,17 +137,6 @@ public class CampaignServiceImpl implements CampaignService {
 
         // perform update on all campaigns
         campaignRepository.updateCampaignBudgets(customerId, campaignBudgetOperations);
-    }
-
-    /**
-     * Delete a campaign budget from a client's account
-     *
-     * @param customerId    the customer id of the client account
-     * @param budgetDetails a list of [BudgetDetails] to be deleted
-     */
-    @Override
-    public void deleteCampaignBudgets(long customerId, List<BudgetDetails> budgetDetails) {
-
     }
 
     /**
@@ -275,14 +264,14 @@ public class CampaignServiceImpl implements CampaignService {
     }
 
     /**
-     * Create a [CampaignBudgetObject] using [BudgetDetails]
+     * Build a [CampaignBudgetObject] using [BudgetDetails] for use in updating campaign budgets
      *
      * @param budgetDetails the budget details to use in creating a campaign budget
      * @return [CampaignBudget]
      */
-    private CampaignBudget buildCampaignBudgetFromDetails(BudgetDetails budgetDetails) {
+    private CampaignBudget buildUpdatedCampaignBudgetFromDetails(BudgetDetails budgetDetails) {
         return CampaignBudget.newBuilder()
-                .setName(budgetDetails.getName())
+                .setResourceName(budgetDetails.getResourceName())
                 .setStatusValue(budgetDetails.getStatus())
                 .setAmountMicros(budgetDetails.getDailyBudgetAmount() * 1000000L)
                 .setDeliveryMethodValue(budgetDetails.getDeliveryMethod())

@@ -1,5 +1,6 @@
 package com.addyai.rest;
 
+import com.addyai.models.BudgetDetails;
 import com.addyai.models.CampaignDetails;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -14,8 +15,11 @@ public interface CampaignController {
                                          @RequestBody List<CampaignDetails> campaignDetails) throws Exception;
 
     ResponseEntity<Void> updateCampaigns(@PathVariable String customerId,
-                                        @RequestBody List<CampaignDetails> campaignDetails) throws Exception;
+                                         @RequestBody List<CampaignDetails> campaignDetails) throws Exception;
 
     ResponseEntity<Void> deleteCampaigns(@PathVariable String customerId,
                                          @RequestBody List<Long> campaignIds) throws Exception;
+
+    ResponseEntity<Void> updateCampaignBudgets(@PathVariable String customerId,
+                                               @RequestBody List<BudgetDetails> budgetDetails) throws Exception;
 }

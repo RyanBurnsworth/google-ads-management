@@ -16,6 +16,4 @@ public interface CampaignService {
     void deleteCampaigns(long customerId, List<Long> campaignIds) throws Exception;
 
     void updateCampaignBudgets(long customerId, List<BudgetDetails> budgetDetails) throws Exception;
-
-    void deleteCampaignBudgets(long customerId, List<BudgetDetails> budgetDetails);
 }

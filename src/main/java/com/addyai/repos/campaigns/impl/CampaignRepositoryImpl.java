@@ -219,9 +219,4 @@ public class CampaignRepositoryImpl implements CampaignRepository {
             throw ApiExceptionResolver.doResolveException(e);
         }
     }
-
-    @Override
-    public void deleteCampaignBudgets(long customerId, List<Long> campaignBudgetIds) {
-
-    }
 }

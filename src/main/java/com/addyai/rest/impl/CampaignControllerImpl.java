@@ -1,5 +1,6 @@
 package com.addyai.rest.impl;
 
+import com.addyai.models.BudgetDetails;
 import com.addyai.models.CampaignDetails;
 import com.addyai.rest.CampaignController;
 import com.addyai.services.campaign.CampaignService;
@@ -10,7 +11,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/v1/{customerId}/campaign/")
+@RequestMapping("/api/v1/{customerId}/campaign")
 public class CampaignControllerImpl implements CampaignController {
     private final CampaignService campaignService;
 
@@ -26,7 +27,7 @@ public class CampaignControllerImpl implements CampaignController {
     }
 
     @Override
-    @PostMapping("create")
+    @PostMapping("/create")
     public ResponseEntity<Void> createCampaigns(@PathVariable String customerId,
                                                 @RequestBody List<CampaignDetails> campaignDetails) throws Exception {
         campaignService.addCampaignsToAccount(Long.parseLong(customerId), campaignDetails);
@@ -34,7 +35,7 @@ public class CampaignControllerImpl implements CampaignController {
     }
 
     @Override
-    @PutMapping("update")
+    @PutMapping("/update")
     public ResponseEntity<Void> updateCampaigns(@PathVariable String customerId,
                                                 @RequestBody List<CampaignDetails> campaignDetails) throws Exception {
         campaignService.updateCampaign(Long.parseLong(customerId), campaignDetails);
@@ -42,10 +43,17 @@ public class CampaignControllerImpl implements CampaignController {
     }
 
     @Override
-    @PostMapping("remove")
+    @PostMapping("/remove")
     public ResponseEntity<Void> deleteCampaigns(@PathVariable String customerId,
                                                 @RequestBody List<Long> campaignIds) throws Exception {
         campaignService.deleteCampaigns(Long.parseLong(customerId), campaignIds);
+        return new ResponseEntity<>(HttpStatus.ACCEPTED);
+    }
+
+    @Override
+    @PostMapping("/budget/update")
+    public ResponseEntity<Void> updateCampaignBudgets(String customerId, List<BudgetDetails> budgetDetails) throws Exception {
+        campaignService.updateCampaignBudgets(Long.parseLong(customerId), budgetDetails);
         return new ResponseEntity<>(HttpStatus.ACCEPTED);
     }
 }

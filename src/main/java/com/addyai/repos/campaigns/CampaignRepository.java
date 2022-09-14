@@ -21,6 +21,4 @@ public interface CampaignRepository {
     List<BudgetDetails> getCampaignBudgetDetails(long customerId) throws Exception;
 
     void updateCampaignBudgets(long customerId, List<CampaignBudgetOperation> campaignBudgetOperations) throws Exception;
-
-    void deleteCampaignBudgets(long customerId, List<Long> campaignBudgetIds);
 }
