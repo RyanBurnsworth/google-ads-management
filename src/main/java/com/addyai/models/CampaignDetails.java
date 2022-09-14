@@ -7,6 +7,8 @@ public class CampaignDetails {
 
     private String campaignName = "";
 
+    private String campaignResourceName = "";
+
     private String status = "PAUSED";
 
     private String advertisingChannelType = ADVERTISING_TYPE_SEARCH;
@@ -45,6 +47,14 @@ public class CampaignDetails {
 
     public void setCampaignName(String campaignName) {
         this.campaignName = campaignName;
+    }
+
+    public String getCampaignResourceName() {
+        return campaignResourceName;
+    }
+
+    public void setCampaignResourceName(String campaignResourceName) {
+        this.campaignResourceName = campaignResourceName;
     }
 
     public String getStatus() {

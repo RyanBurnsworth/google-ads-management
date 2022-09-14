@@ -13,6 +13,7 @@ public class GAQLUtils {
     public static String getCampaignDetailsQuery() {
         return "SELECT campaign.id," +
                 " campaign.name," +
+                " campaign.resource_name, " +
                 " campaign.status," +
                 " campaign.advertising_channel_type," +
                 " campaign.campaign_budget," +
@@ -52,6 +53,7 @@ public class GAQLUtils {
 
                 details.setCampaignId(googleAdsRow.getCampaign().getId());
                 details.setCampaignName(googleAdsRow.getCampaign().getName());
+                details.setCampaignResourceName(googleAdsRow.getCampaign().getResourceName());
                 details.setStatus(googleAdsRow.getCampaign().getStatus().toString());
                 details.setAdvertisingChannelType(googleAdsRow.getCampaign().getAdvertisingChannelType().toString());
                 details.setPositiveGeoTargetType(googleAdsRow.getCampaign().getGeoTargetTypeSetting().getPositiveGeoTargetTypeValue());

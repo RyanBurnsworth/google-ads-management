@@ -34,7 +34,7 @@ public class CampaignServiceImpl implements CampaignService {
      * Add campaigns to a client's account
      *
      * @param customerId          the customer id of the client account
-     * @param campaignDetailsList the campaign details to be used in campaign creation
+     * @param campaignDetailsList [CampaignDetails] to be used in campaign creation
      * @throws Exception
      */
     @Override
@@ -76,7 +76,7 @@ public class CampaignServiceImpl implements CampaignService {
     /**
      * Update a campaign in a Google Ads account
      *
-     * @param campaignDetailsList a list of updated campaignDetails
+     * @param campaignDetailsList a list of updated [CampaignDetails]
      * @throws Exception
      */
     @Override
@@ -85,7 +85,7 @@ public class CampaignServiceImpl implements CampaignService {
 
         // create an UPDATE campaign operation for each campaign
         for (CampaignDetails campaignDetails : campaignDetailsList) {
-            Campaign campaign = buildCampaignFromDetails(customerId, campaignDetails);
+            Campaign campaign = buildUpdatableCampaignFromDetails(campaignDetails);
             CampaignOperation operation = CampaignOperation.newBuilder()
                     .setUpdate(campaign)
                     .setUpdateMask(FieldMasks.allSetFieldsOf(campaign))
@@ -114,7 +114,7 @@ public class CampaignServiceImpl implements CampaignService {
      * Update campaign budgets within a client's account
      *
      * @param customerId    the customer id of the client account
-     * @param budgetDetails a list of budget details to be updated
+     * @param budgetDetails a list of [BudgetDetails] to be updated
      */
     @Override
     public void updateCampaignBudgets(long customerId, List<BudgetDetails> budgetDetails) throws Exception {
@@ -143,7 +143,7 @@ public class CampaignServiceImpl implements CampaignService {
      * Delete a campaign budget from a client's account
      *
      * @param customerId    the customer id of the client account
-     * @param budgetDetails a list of budgets to be deleted
+     * @param budgetDetails a list of [BudgetDetails] to be deleted
      */
     @Override
     public void deleteCampaignBudgets(long customerId, List<BudgetDetails> budgetDetails) {
@@ -151,32 +151,27 @@ public class CampaignServiceImpl implements CampaignService {
     }
 
     /**
-     * Create a campaign object using a CampaignDetails object
+     * Generate a campaign object using a CampaignDetails object (for use in creating new campaigns)
      *
      * @param customerId      the customer id of the client account
-     * @param campaignDetails the details of the campaign to be created
-     * @return campaign object based on campaign details provided
+     * @param campaignDetails [CampaignDetails] to be parsed into a [Campaign]
+     * @return [Campaign] parsed from [CampaignDetails] provided
      */
     private Campaign buildCampaignFromDetails(long customerId, CampaignDetails campaignDetails) throws Exception {
         // create a Manual cpc object with or without enhanced CPC
-        ManualCpc manualCpc = ManualCpc.newBuilder()
-                .setEnhancedCpcEnabled(campaignDetails.isEnhancedCpcEnabled())
-                .build();
+        ManualCpc manualCpc = buildManualCpc(campaignDetails.isEnhancedCpcEnabled());
 
         // create a GeoTargetTypeSetting using the negative and positive targets
-        Campaign.GeoTargetTypeSetting geoTargetTypeSetting = Campaign.GeoTargetTypeSetting.newBuilder()
-                .setNegativeGeoTargetType(NegativeGeoTargetTypeEnum.NegativeGeoTargetType
-                        .forNumber(campaignDetails.getNegativeGeoTargetType()))
-                .setPositiveGeoTargetType(PositiveGeoTargetTypeEnum.PositiveGeoTargetType
-                        .forNumber(campaignDetails.getPositiveGeoTargetType()))
-                .build();
+        Campaign.GeoTargetTypeSetting geoTargetTypeSetting = buildGeoTargetTypeSettings(
+                campaignDetails.getPositiveGeoTargetType(),
+                campaignDetails.getNegativeGeoTargetType());
 
         // extract network settings into its own object
-        Campaign.NetworkSettings networkSettings = Campaign.NetworkSettings.newBuilder()
-                .setTargetContentNetwork(campaignDetails.isTargetingContentNetwork())
-                .setTargetSearchNetwork(campaignDetails.isTargetingSearchNetwork())
-                .setTargetPartnerSearchNetwork(campaignDetails.isTargetingPartnerSearchNetwork())
-                .build();
+        Campaign.NetworkSettings networkSettings = buildNetworkSettings(
+                campaignDetails.isTargetingContentNetwork(),
+                campaignDetails.isTargetingPartnerSearchNetwork(),
+                campaignDetails.isTargetingSearchNetwork()
+        );
 
         // create the campaign status object
         CampaignStatusEnum.CampaignStatus status =
@@ -208,11 +203,52 @@ public class CampaignServiceImpl implements CampaignService {
     }
 
     /**
+     * Generate a campaign object using a CampaignDetails object (for use in updating existing campaigns)
+     *
+     * @param campaignDetails [CampaignDetails] to be parsed into a [Campaign]
+     * @return [Campaign] parsed from [CampaignDetails] provided
+     */
+    private Campaign buildUpdatableCampaignFromDetails(CampaignDetails campaignDetails) {
+        // create a Manual cpc object with or without enhanced CPC
+        ManualCpc manualCpc = buildManualCpc(campaignDetails.isEnhancedCpcEnabled());
+
+        // create a GeoTargetTypeSetting using the negative and positive targets
+        Campaign.GeoTargetTypeSetting geoTargetTypeSetting = buildGeoTargetTypeSettings(
+                campaignDetails.getPositiveGeoTargetType(),
+                campaignDetails.getNegativeGeoTargetType());
+
+        // extract network settings into its own object
+        Campaign.NetworkSettings networkSettings = buildNetworkSettings(
+                campaignDetails.isTargetingContentNetwork(),
+                campaignDetails.isTargetingPartnerSearchNetwork(),
+                campaignDetails.isTargetingSearchNetwork()
+        );
+
+        // create the campaign status object
+        CampaignStatusEnum.CampaignStatus status =
+                CampaignStatusEnum.CampaignStatus.valueOf(campaignDetails.getStatus());
+
+        // create and return a campaign object with the above settings
+        return Campaign.newBuilder()
+                .setStatus(status)
+                .setId(campaignDetails.getCampaignId())
+                .setStartDate(campaignDetails.getStartDate())
+                .setEndDate(campaignDetails.getEndDate())
+                .setName(campaignDetails.getCampaignName())
+                .setResourceName(campaignDetails.getCampaignResourceName()) // needed for updating
+                .setGeoTargetTypeSetting(geoTargetTypeSetting)
+                .setCampaignBudget(campaignDetails.getBudgetResourceName())
+                .setManualCpc(manualCpc)
+                .setNetworkSettings(networkSettings)
+                .build();
+    }
+
+    /**
      * Create a list of complete campaign details models.
      *
      * @param customerId          the customer id of the client account
-     * @param baseCampaignDetails a list of campaign details models sans BudgetDetails
-     * @return a list of complete CampaignDetails
+     * @param baseCampaignDetails a list of [CampaignDetails] models sans BudgetDetails
+     * @return a list of complete [CampaignDetails]
      */
     private List<CampaignDetails> buildCompleteCampaignDetailsList(long customerId, List<CampaignDetails> baseCampaignDetails) throws Exception {
         List<CampaignDetails> completeCampaignDetailsList = new ArrayList<>();
@@ -238,6 +274,12 @@ public class CampaignServiceImpl implements CampaignService {
         return completeCampaignDetailsList;
     }
 
+    /**
+     * Create a [CampaignBudgetObject] using [BudgetDetails]
+     *
+     * @param budgetDetails the budget details to use in creating a campaign budget
+     * @return [CampaignBudget]
+     */
     private CampaignBudget buildCampaignBudgetFromDetails(BudgetDetails budgetDetails) {
         return CampaignBudget.newBuilder()
                 .setName(budgetDetails.getName())
@@ -247,6 +289,12 @@ public class CampaignServiceImpl implements CampaignService {
                 .build();
     }
 
+    /**
+     * Validate campaign details before pushing to Google Ads API
+     * If validation fails throw InvalidRequestException
+     *
+     * @param campaignDetails [CampaignDetails] to be validated
+     */
     private void validateCampaignDetails(CampaignDetails campaignDetails) {
         // validate campaign details
         ValidationErrorResponse validationErrorResponse = EntityValidator.isCampaignDetailsValid(campaignDetails);
@@ -256,6 +304,12 @@ public class CampaignServiceImpl implements CampaignService {
                     validationErrorResponse.getErrorMessage());
     }
 
+    /**
+     * Validate budget details before pushing to Google Ads API
+     * If validation fails throw InvalidRequestException
+     *
+     * @param budgetDetails [BudgetDetails] to be validated
+     */
     private void validateCampaignBudgetDetails(BudgetDetails budgetDetails) {
         ValidationErrorResponse validationErrorResponse = EntityValidator.isBudgetDetailsValid(budgetDetails);
         // validate budget details
@@ -264,5 +318,54 @@ public class CampaignServiceImpl implements CampaignService {
             throw new InvalidRequestException(validationErrorResponse.getErrorType(),
                     validationErrorResponse.getErrorCode(),
                     validationErrorResponse.getErrorMessage());
+    }
+
+    /**
+     * Build a ManualCpc object for use in creating/updating campaigns
+     *
+     * @param isEnhancedCpcEnabled is the campaign supporting enhanced CPC
+     * @return a completed [ManualCpc]
+     */
+    private ManualCpc buildManualCpc(boolean isEnhancedCpcEnabled) {
+        return ManualCpc.newBuilder()
+                .setEnhancedCpcEnabled(isEnhancedCpcEnabled)
+                .build();
+    }
+
+    /**
+     * Build a GeoTargetTypeSettings object for use in creating/updating campaigns
+     *
+     * @param positiveGeoTargetType the positive GeoTargetType code
+     * @param negativeGeoTargetType the negative GeoTargetType code
+     * @return completed [Campaign.GeoTargetTypeSetting]
+     */
+    private Campaign.GeoTargetTypeSetting buildGeoTargetTypeSettings(int positiveGeoTargetType,
+                                                                     int negativeGeoTargetType) {
+        return Campaign.GeoTargetTypeSetting.newBuilder()
+                .setNegativeGeoTargetType(NegativeGeoTargetTypeEnum.NegativeGeoTargetType
+                        .forNumber(negativeGeoTargetType))
+                .setPositiveGeoTargetType(PositiveGeoTargetTypeEnum.PositiveGeoTargetType
+                        .forNumber(positiveGeoTargetType))
+                .build();
+    }
+
+    /**
+     * Build a Networking Settings object for use in creating/updating campaigns
+     *
+     * @param isTargetingContentNetwork       is this campaign targeting the content network
+     * @param isTargetingPartnerSearchNetwork is this campaign targeting the partner search network
+     * @param isTargetingSearchNetwork        is this campaign tareting search networking
+     * @return completed [Campaign.NetworkSettings]
+     */
+    private Campaign.NetworkSettings buildNetworkSettings(
+            boolean isTargetingContentNetwork,
+            boolean isTargetingPartnerSearchNetwork,
+            boolean isTargetingSearchNetwork
+    ) {
+        return Campaign.NetworkSettings.newBuilder()
+                .setTargetContentNetwork(isTargetingContentNetwork)
+                .setTargetSearchNetwork(isTargetingSearchNetwork)
+                .setTargetPartnerSearchNetwork(isTargetingPartnerSearchNetwork)
+                .build();
     }
 }
