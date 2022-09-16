@@ -2,28 +2,18 @@ package com.addyai.repos.campaigns.impl;
 
 import com.addyai.GoogleAdsManagementApplication;
 import com.addyai.error_handling.ApiExceptionResolver;
-import com.addyai.error_handling.ValidationErrorResponse;
-import com.addyai.error_handling.exceptions.InvalidRequestException;
-import com.addyai.models.BudgetDetails;
 import com.addyai.models.CampaignDetails;
 import com.addyai.repos.campaigns.CampaignRepository;
 import com.addyai.repos.requests.StreamRequest;
 import com.addyai.repos.requests.impl.StreamRequestImpl;
-import com.addyai.utils.EntityValidator;
 import com.addyai.utils.GAQLUtils;
-import com.google.ads.googleads.v11.enums.BudgetDeliveryMethodEnum;
-import com.google.ads.googleads.v11.enums.BudgetStatusEnum;
-import com.google.ads.googleads.v11.resources.CampaignBudget;
 import com.google.ads.googleads.v11.services.*;
 import com.google.ads.googleads.v11.utils.ResourceNames;
 import com.google.api.gax.rpc.ServerStream;
-import com.google.common.collect.Lists;
 import org.springframework.stereotype.Repository;
 
 import java.util.ArrayList;
 import java.util.List;
-
-import static com.addyai.utils.Constants.GET_RES_EXCEPTION_MSG;
 
 @Repository
 public class CampaignRepositoryImpl implements CampaignRepository {
@@ -48,14 +38,13 @@ public class CampaignRepositoryImpl implements CampaignRepository {
      * @throws Exception
      */
     @Override
-    public List<CampaignDetails> getCampaignDetails(long customerId) throws Exception {
+    public List<CampaignDetails> fetchAllCampaignDetails(long customerId) throws Exception {
         List<CampaignDetails> campaignDetailsList;
 
         try {
             String query = GAQLUtils.getCampaignDetailsQuery();
 
             SearchGoogleAdsStreamRequest request = requestBuilder.buildStreamRequest(customerId, query);
-
             ServerStream<SearchGoogleAdsStreamResponse> response = requestBuilder.callStreamRequest(request);
 
             campaignDetailsList = GAQLUtils.convertStreamResponseToCampaignDetailsList(response);
@@ -137,84 +126,6 @@ public class CampaignRepositoryImpl implements CampaignRepository {
 
             MutateCampaignsResponse response =
                     campaignServiceClient.mutateCampaigns(Long.toString(customerId), campaignOperations);
-        } catch (Exception e) {
-            throw ApiExceptionResolver.doResolveException(e);
-        }
-    }
-
-    /**
-     * Create a campaign budget within a client's account
-     *
-     * @param customerId    the customer id for the client account
-     * @param budgetDetails the details of the budget
-     * @return campaign budget's resource name
-     */
-    @Override
-    public String createSingleCampaignBudget(final long customerId,
-                                             final BudgetDetails budgetDetails) throws Exception {
-        MutateCampaignBudgetResult campaignBudgetResult;
-
-        // validate budget details before proceeding
-        ValidationErrorResponse validationErrorResponse = EntityValidator.isBudgetDetailsValid(budgetDetails);
-
-        if (validationErrorResponse != null)
-            throw new InvalidRequestException(validationErrorResponse.getErrorType(),
-                    validationErrorResponse.getErrorCode(),
-                    validationErrorResponse.getErrorMessage());
-
-        try {
-            // convert budget to micros
-            long budgetValue = budgetDetails.getDailyBudgetAmount() * 1000000L;
-
-            CampaignBudgetServiceClient campaignBudgetServiceClient = GoogleAdsManagementApplication.getGoogleAdsClient()
-                    .getLatestVersion().createCampaignBudgetServiceClient();
-
-            CampaignBudget budget = CampaignBudget.newBuilder()
-                    .setName(budgetDetails.getName())
-                    .setAmountMicros(budgetValue)
-                    .setStatus(BudgetStatusEnum.BudgetStatus.forNumber(budgetDetails.getStatus()))
-                    .setDeliveryMethod(BudgetDeliveryMethodEnum.BudgetDeliveryMethod.forNumber(budgetDetails.getDeliveryMethod()))
-                    .setExplicitlyShared(budgetDetails.isShared())
-                    .build();
-
-            CampaignBudgetOperation operation = CampaignBudgetOperation.newBuilder()
-                    .setCreate(budget)
-                    .build();
-
-            MutateCampaignBudgetsResponse budgetsResponse = campaignBudgetServiceClient.mutateCampaignBudgets(
-                    Long.toString(customerId), Lists.newArrayList(operation));
-
-            campaignBudgetResult = budgetsResponse.getResults(0);
-        } catch (Exception exception) {
-            throw ApiExceptionResolver.doResolveException(exception);
-        }
-        return campaignBudgetResult.getResourceName();
-    }
-
-    @Override
-    public List<BudgetDetails> getCampaignBudgetDetails(long customerId) throws Exception {
-        try {
-            String query = GAQLUtils.getCampaignBudgetQuery();
-
-            SearchGoogleAdsStreamRequest request = requestBuilder.buildStreamRequest(customerId, query);
-
-            ServerStream<SearchGoogleAdsStreamResponse> response = requestBuilder.callStreamRequest(request);
-
-            return GAQLUtils.convertStreamResponseToBudgetDetails(response);
-        } catch (Exception e) {
-            throw ApiExceptionResolver.doResolveException(e);
-        }
-    }
-
-    @Override
-    public void updateCampaignBudgets(long customerId, List<CampaignBudgetOperation> campaignBudgetOperations) throws Exception {
-        try {
-            CampaignBudgetServiceClient campaignBudgetServiceClient = GoogleAdsManagementApplication.getGoogleAdsClient()
-                    .getLatestVersion().createCampaignBudgetServiceClient();
-
-            // At this time we are going to assume the response is OK if no exception is thrown
-            MutateCampaignBudgetsResponse response = campaignBudgetServiceClient
-                    .mutateCampaignBudgets(Long.toString(customerId), campaignBudgetOperations);
         } catch (Exception e) {
             throw ApiExceptionResolver.doResolveException(e);
         }

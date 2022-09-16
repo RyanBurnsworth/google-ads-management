@@ -52,8 +52,8 @@ public class CampaignControllerImpl implements CampaignController {
 
     @Override
     @PostMapping("/budget/update")
-    public ResponseEntity<Void> updateCampaignBudgets(String customerId, List<BudgetDetails> budgetDetails) throws Exception {
-        campaignService.updateCampaignBudgets(Long.parseLong(customerId), budgetDetails);
+    public ResponseEntity<Void> updateCampaignBudgets(String customerId, List<CampaignDetails> campaignDetails) throws Exception {
+        campaignService.updateCampaignBudgets(Long.parseLong(customerId), campaignDetails);
         return new ResponseEntity<>(HttpStatus.ACCEPTED);
     }
 }

@@ -5,6 +5,7 @@ import com.addyai.error_handling.exceptions.ServiceFailureException;
 import com.addyai.models.BudgetDetails;
 import com.addyai.models.CampaignDetails;
 import com.addyai.repos.campaigns.CampaignRepository;
+import com.addyai.repos.campaigns.budget.CampaignBudgetRepository;
 import com.addyai.services.campaign.CampaignService;
 import com.addyai.services.campaign.impl.CampaignServiceImpl;
 import com.google.ads.googleads.v11.common.ManualCpc;
@@ -34,6 +35,9 @@ public class CampaignServiceTest {
     private CampaignService campaignService;
     @MockBean
     private CampaignRepository campaignRepository;
+
+    @MockBean
+    private CampaignBudgetRepository campaignBudgetRepository;
 
     @Test
     void testAddingCampaignsToClientAccount() throws Exception {
@@ -73,14 +77,14 @@ public class CampaignServiceTest {
         // set mock budget details object inside mock campaign details object
         mockCampaignDetails.setBudgetDetails(mockBudgetDetails);
 
-        when(campaignRepository.getCampaignDetails(CUSTOMER_ID)).thenReturn(mockCampaignDetailsList);
-        when(campaignRepository.getCampaignBudgetDetails(CUSTOMER_ID)).thenReturn(getMockBudgetDetailsList());
+        when(campaignRepository.fetchAllCampaignDetails(CUSTOMER_ID)).thenReturn(mockCampaignDetailsList);
+        when(campaignBudgetRepository.fetchAllCampaignBudgetDetails(CUSTOMER_ID)).thenReturn(getMockBudgetDetailsList());
 
         List<CampaignDetails> campaignDetailsList = campaignService.findAllCampaignDetails(CUSTOMER_ID);
         CampaignDetails campaignDetails = campaignDetailsList.get(0);
 
-        verify(campaignRepository, times(1)).getCampaignDetails(CUSTOMER_ID);
-        verify(campaignRepository, times(1)).getCampaignBudgetDetails(CUSTOMER_ID);
+        verify(campaignRepository, times(1)).fetchAllCampaignDetails(CUSTOMER_ID);
+        verify(campaignBudgetRepository, times(1)).fetchAllCampaignBudgetDetails(CUSTOMER_ID);
 
         assertEquals("Test campaign", campaignDetails.getCampaignName());
         assertEquals("Test Budget", campaignDetails.getBudgetDetails().getResourceName());
@@ -97,7 +101,7 @@ public class CampaignServiceTest {
         // set mock budget details object inside mock campaign details object
         mockCampaignDetails.setBudgetDetails(mockBudgetDetails);
 
-        when(campaignRepository.getCampaignDetails(CUSTOMER_ID)).thenThrow(InvalidRequestException.class);
+        when(campaignRepository.fetchAllCampaignDetails(CUSTOMER_ID)).thenThrow(InvalidRequestException.class);
 
         assertThrows(InvalidRequestException.class,
                 () -> campaignService.findAllCampaignDetails(CUSTOMER_ID));
@@ -114,8 +118,8 @@ public class CampaignServiceTest {
         // set mock budget details object inside mock campaign details object
         mockCampaignDetails.setBudgetDetails(mockBudgetDetails);
 
-        when(campaignRepository.getCampaignDetails(CUSTOMER_ID)).thenReturn(mockCampaignDetailsList);
-        when(campaignRepository.getCampaignBudgetDetails(CUSTOMER_ID)).thenThrow(ServiceFailureException.class);
+        when(campaignRepository.fetchAllCampaignDetails(CUSTOMER_ID)).thenReturn(mockCampaignDetailsList);
+        when(campaignBudgetRepository.fetchAllCampaignBudgetDetails(CUSTOMER_ID)).thenThrow(ServiceFailureException.class);
 
         assertThrows(ServiceFailureException.class,
                 () -> campaignService.findAllCampaignDetails(CUSTOMER_ID));

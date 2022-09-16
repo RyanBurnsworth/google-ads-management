@@ -3,7 +3,7 @@ package com.addyai.models.campaign_criterion;
 import com.google.ads.googleads.v11.enums.CampaignCriterionStatusEnum;
 import com.google.ads.googleads.v11.enums.CriterionTypeEnum;
 
-public class CampaignCriteria {
+public abstract class CampaignCriteria {
     public long campaignCriterionId = 0L;
 
     private long campaignId = 0L;

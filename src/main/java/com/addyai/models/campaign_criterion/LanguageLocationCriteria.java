@@ -26,51 +26,6 @@ public class LanguageLocationCriteria extends CampaignCriteria {
     }
 
     @Override
-    public long getCampaignCriterionId() {
-        return super.getCampaignCriterionId();
-    }
-
-    @Override
-    public void setCampaignCriterionId(long campaignCriterionId) {
-        super.setCampaignCriterionId(campaignCriterionId);
-    }
-
-    @Override
-    public long getCampaignId() {
-        return super.getCampaignId();
-    }
-
-    @Override
-    public void setCampaignId(long campaignId) {
-        super.setCampaignId(campaignId);
-    }
-
-    @Override
-    public String getCampaignName() {
-        return super.getCampaignName();
-    }
-
-    @Override
-    public void setCampaignName(String campaignName) {
-        super.setCampaignName(campaignName);
-    }
-
-    @Override
-    public boolean isNegative() {
-        return super.isNegative();
-    }
-
-    @Override
-    public void setNegative(boolean negative) {
-        super.setNegative(negative);
-    }
-
-    @Override
-    public float getBidModifier() {
-        return super.getBidModifier();
-    }
-
-    @Override
     public void setBidModifier(float bidModifier) {
         super.setBidModifier(bidModifier);
     }
