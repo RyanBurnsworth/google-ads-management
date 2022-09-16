@@ -1,19 +1,15 @@
 package com.addyai.services;
 
 import com.addyai.error_handling.exceptions.InvalidRequestException;
-import com.addyai.error_handling.exceptions.ServiceFailureException;
 import com.addyai.models.BudgetDetails;
 import com.addyai.models.CampaignDetails;
 import com.addyai.repos.campaigns.CampaignRepository;
 import com.addyai.repos.campaigns.budget.CampaignBudgetRepository;
 import com.addyai.services.campaign.CampaignService;
 import com.addyai.services.campaign.impl.CampaignServiceImpl;
-import com.google.ads.googleads.v11.common.ManualCpc;
-import com.google.ads.googleads.v11.enums.AdvertisingChannelTypeEnum;
-import com.google.ads.googleads.v11.enums.CampaignStatusEnum;
-import com.google.ads.googleads.v11.enums.NegativeGeoTargetTypeEnum;
-import com.google.ads.googleads.v11.enums.PositiveGeoTargetTypeEnum;
+import com.addyai.utils.CampaignUtils;
 import com.google.ads.googleads.v11.resources.Campaign;
+import com.google.ads.googleads.v11.services.CampaignBudgetOperation;
 import com.google.ads.googleads.v11.services.CampaignOperation;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,10 +17,10 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
 import static org.mockito.Mockito.*;
 
 @SpringBootTest(classes = CampaignServiceImpl.class)
@@ -35,228 +31,284 @@ public class CampaignServiceTest {
     private CampaignService campaignService;
     @MockBean
     private CampaignRepository campaignRepository;
-
     @MockBean
     private CampaignBudgetRepository campaignBudgetRepository;
 
+    /*
+        Test successfully adding campaigns that have budget details that match an existing budget in the client's account.
+        This requires that the BudgetDetails object within the CampaignDetails object have the same delivery_method,
+        budgetValue and isShared values as an existing budgetDetails object.
+     */
     @Test
-    void testAddingCampaignsToClientAccount() throws Exception {
-        List<CampaignOperation> operations = getMockCampaignOperations(getMockCampaignDetailsList().get(0));
-        doNothing().when(campaignRepository).addCampaigns(CUSTOMER_ID, operations);
+    void testSuccessfullyAddingSingleCampaignThatMatchesWithExistingBudget() throws Exception {
+        CampaignUtils campaignUtils = new CampaignUtils();
 
-        campaignService.addCampaignsToAccount(CUSTOMER_ID, getMockCampaignDetailsList());
-        verify(campaignRepository, times(1)).addCampaigns(CUSTOMER_ID, operations);
+        when(campaignBudgetRepository.fetchAllCampaignBudgetDetails(CUSTOMER_ID))
+                .thenReturn(getListOfMultipleBudgetDetails());
+
+        Campaign campaign = campaignUtils
+                .buildCampaignFromDetails(getCompletedCampaignDetails(), true);
+
+        List<CampaignOperation> campaignOperations = new ArrayList<>();
+        CampaignOperation operation = CampaignOperation.newBuilder()
+                .setCreate(campaign)
+                .build();
+
+        campaignOperations.add(operation);
+
+        campaignService.addCampaignsToAccount(CUSTOMER_ID,
+                Collections.singletonList(getCampaignDetailsWithExistingBudget()));
+
+        verify(campaignRepository, times(1)).addCampaigns(CUSTOMER_ID, campaignOperations);
+    }
+
+    /*
+        Test successfully adding a campaign to the client account that DOES NOT have an existing budget set.
+        This requires that the budgetResourceName is empty but the campaign details object is complete with
+        values not found in the getListOfMultipleBudgetDetails list object.
+     */
+    @Test
+    void testSuccessfullyAddingSingleCampaignWithoutExistingBudget() throws Exception {
+        CampaignUtils campaignUtils = new CampaignUtils();
+        when(campaignBudgetRepository.fetchAllCampaignBudgetDetails(CUSTOMER_ID))
+                .thenReturn(getListOfMultipleBudgetDetails());
+
+        // create campaignBudgetOperations list for the new budget to be created
+        List<CampaignBudgetOperation> campaignBudgetOperations =
+                campaignUtils.buildCampaignBudgetOperationList(Collections.singletonList(
+                        getCampaignDetailsWithoutExistingBudget().getBudgetDetails()), true);
+
+        // when the budget is created return the same budget details object
+        when(campaignBudgetRepository.createOrUpdateBudgets(CUSTOMER_ID, campaignBudgetOperations))
+                .thenReturn(Collections.singletonList(getNonExistentBudgetDetails()));
+
+        // set the budget resource name in the campaign details
+        CampaignDetails updatedCampaignDetails = getCampaignDetailsWithoutExistingBudget();
+        updatedCampaignDetails.setBudgetResourceName(getNonExistentBudgetDetails().getResourceName());
+
+        // create a campaign using the details
+        Campaign campaign = campaignUtils.buildCampaignFromDetails(updatedCampaignDetails, true);
+
+        // create the CREATE operations list
+        List<CampaignOperation> campaignOperations = new ArrayList<>();
+        CampaignOperation operation = CampaignOperation.newBuilder()
+                .setCreate(campaign)
+                .build();
+
+        campaignOperations.add(operation);
+
+        // add campaigns to the account
+        campaignService.addCampaignsToAccount(CUSTOMER_ID,
+                Collections.singletonList(getCampaignDetailsWithoutExistingBudget()));
+
+        verify(campaignRepository, times(1)).addCampaigns(CUSTOMER_ID, campaignOperations);
     }
 
     @Test
-    void testAddingCampaignsThrowsInvalidRequestException() throws Exception {
-        List<CampaignOperation> operations = getMockCampaignOperations(getMockCampaignDetailsList().get(0));
-        doThrow(InvalidRequestException.class).when(campaignRepository).addCampaigns(CUSTOMER_ID, operations);
+    void testEmptyCampaignNameThrowsInvalidRequestException() {
+        CampaignDetails campaignDetails = getCampaignDetailsWithExistingBudget();
+        campaignDetails.setCampaignName("");
 
-        assertThrows(InvalidRequestException.class,
-                () -> campaignService.addCampaignsToAccount(CUSTOMER_ID, getMockCampaignDetailsList()));
+        assertThatThrownBy(() -> campaignService.addCampaignsToAccount(CUSTOMER_ID, Collections.singletonList(campaignDetails)))
+                .isInstanceOf(InvalidRequestException.class);
     }
 
     @Test
-    void testAddingCampaignsThrowsServiceFailureException() throws Exception {
-        List<CampaignOperation> operations = getMockCampaignOperations(getMockCampaignDetailsList().get(0));
-        doThrow(ServiceFailureException.class).when(campaignRepository).addCampaigns(CUSTOMER_ID, operations);
+    void testZeroBudgetValueThrowsInvalidRequestException() {
+        CampaignDetails campaignDetails = getCampaignDetailsWithExistingBudget();
+        campaignDetails.getBudgetDetails().setDailyBudgetAmount(0);
 
-        assertThrows(ServiceFailureException.class,
-                () -> campaignService.addCampaignsToAccount(CUSTOMER_ID, getMockCampaignDetailsList()));
+        assertThatThrownBy(() -> campaignService.addCampaignsToAccount(CUSTOMER_ID, Collections.singletonList(campaignDetails)))
+                .isInstanceOf(InvalidRequestException.class);
     }
 
-    @Test
-    void testFindAllCampaignsFromClientAccount() throws Exception {
-        // setup mock data
-        List<CampaignDetails> mockCampaignDetailsList = getMockCampaignDetailsList();
-        List<BudgetDetails> mockBudgetDetailsList = getMockBudgetDetailsList();
-        CampaignDetails mockCampaignDetails = mockCampaignDetailsList.get(0);
-        BudgetDetails mockBudgetDetails = mockBudgetDetailsList.get(0);
+    /*
+        Get mock object methods
+     */
 
-        // set mock budget details object inside mock campaign details object
-        mockCampaignDetails.setBudgetDetails(mockBudgetDetails);
-
-        when(campaignRepository.fetchAllCampaignDetails(CUSTOMER_ID)).thenReturn(mockCampaignDetailsList);
-        when(campaignBudgetRepository.fetchAllCampaignBudgetDetails(CUSTOMER_ID)).thenReturn(getMockBudgetDetailsList());
-
-        List<CampaignDetails> campaignDetailsList = campaignService.findAllCampaignDetails(CUSTOMER_ID);
-        CampaignDetails campaignDetails = campaignDetailsList.get(0);
-
-        verify(campaignRepository, times(1)).fetchAllCampaignDetails(CUSTOMER_ID);
-        verify(campaignBudgetRepository, times(1)).fetchAllCampaignBudgetDetails(CUSTOMER_ID);
-
-        assertEquals("Test campaign", campaignDetails.getCampaignName());
-        assertEquals("Test Budget", campaignDetails.getBudgetDetails().getResourceName());
-    }
-
-    @Test
-    void testFindAllCampaignsThrowsInvalidRequestExceptionWhileFetchingCampaignDetails() throws Exception {
-        // setup mock data
-        List<CampaignDetails> mockCampaignDetailsList = getMockCampaignDetailsList();
-        List<BudgetDetails> mockBudgetDetailsList = getMockBudgetDetailsList();
-        CampaignDetails mockCampaignDetails = mockCampaignDetailsList.get(0);
-        BudgetDetails mockBudgetDetails = mockBudgetDetailsList.get(0);
-
-        // set mock budget details object inside mock campaign details object
-        mockCampaignDetails.setBudgetDetails(mockBudgetDetails);
-
-        when(campaignRepository.fetchAllCampaignDetails(CUSTOMER_ID)).thenThrow(InvalidRequestException.class);
-
-        assertThrows(InvalidRequestException.class,
-                () -> campaignService.findAllCampaignDetails(CUSTOMER_ID));
-    }
-
-    @Test
-    void testFindAllCampaignsThrowsServiceFailureExceptionWhileFetchingCampaignBudgetDetails() throws Exception {
-        // setup mock data
-        List<CampaignDetails> mockCampaignDetailsList = getMockCampaignDetailsList();
-        List<BudgetDetails> mockBudgetDetailsList = getMockBudgetDetailsList();
-        CampaignDetails mockCampaignDetails = mockCampaignDetailsList.get(0);
-        BudgetDetails mockBudgetDetails = mockBudgetDetailsList.get(0);
-
-        // set mock budget details object inside mock campaign details object
-        mockCampaignDetails.setBudgetDetails(mockBudgetDetails);
-
-        when(campaignRepository.fetchAllCampaignDetails(CUSTOMER_ID)).thenReturn(mockCampaignDetailsList);
-        when(campaignBudgetRepository.fetchAllCampaignBudgetDetails(CUSTOMER_ID)).thenThrow(ServiceFailureException.class);
-
-        assertThrows(ServiceFailureException.class,
-                () -> campaignService.findAllCampaignDetails(CUSTOMER_ID));
-    }
-
-    @Test
-    void testCreatingCampaignWithEmptyCampaignNameThrowsInvalidRequestException() throws InvalidRequestException {
-        String expectedErrorMessage = "Error Code: Missing Campaign Name Error Type: Invalid Campaign Details Error Message: Campaign name cannot be blank";
-
-        List<CampaignDetails> campaignDetailsList = new ArrayList<>();
+    /*
+        Get a mock campaign details object that contains a BudgetDetails object that exists already
+        Returns a single CampaignDetails object
+     */
+    private CampaignDetails getCampaignDetailsWithExistingBudget() {
         CampaignDetails campaignDetails = new CampaignDetails();
-
-        campaignDetailsList.add(campaignDetails);
-
-        Throwable throwable = assertThrows(InvalidRequestException.class,
-                () -> campaignService.addCampaignsToAccount(CUSTOMER_ID, campaignDetailsList));
-
-        assertEquals(expectedErrorMessage, throwable.getMessage());
-    }
-
-    private List<CampaignDetails> getMockCampaignDetailsList() {
-        List<CampaignDetails> campaignDetailsList = new ArrayList<>();
-
-        CampaignDetails campaignDetails = new CampaignDetails();
-        campaignDetails.setBudgetDetails(null);
-        campaignDetails.setCampaignId(1);
-        campaignDetails.setCampaignName("Test campaign");
-        campaignDetails.setBudgetResourceName("Test Budget");
+        campaignDetails.setCampaignId(0L);
+        campaignDetails.setCampaignName("Test Campaign 1");
+        campaignDetails.setBudgetResourceName("");
         campaignDetails.setStatus("ENABLED");
+        campaignDetails.setStartDate("2022-09-31");
+        campaignDetails.setEndDate("2022-10-01");
+        campaignDetails.setEnhancedCpcEnabled(false);
+        campaignDetails.setTargetingPartnerSearchNetwork(false);
+        campaignDetails.setTargetingSearchNetwork(true);
+        campaignDetails.setTargetingContentNetwork(false);
+        campaignDetails.setAdvertisingChannelType("SEARCH");
+        campaignDetails.setPositiveGeoTargetType(7);
+        campaignDetails.setNegativeGeoTargetType(5);
+        campaignDetails.setCampaignResourceName("customers/9059845250/campaigns/18343627878");
+        campaignDetails.setBudgetDetails(getExistingBudgetDetails());
+        return campaignDetails;
+    }
+
+    /*
+        Get a mock campaign details object that does not have an existing budget resource set
+        Returns a list with a single CampaignDetails object
+     */
+    private CampaignDetails getCampaignDetailsWithoutExistingBudget() {
+        CampaignDetails campaignDetails = new CampaignDetails();
+        campaignDetails.setCampaignId(0L);
+        campaignDetails.setCampaignName("Test Campaign 2");
+        campaignDetails.setBudgetResourceName(""); // empty budget resource name
+        campaignDetails.setStatus("ENABLED");
+        campaignDetails.setStartDate("2022-11-31");
+        campaignDetails.setEndDate("2022-12-01");
+        campaignDetails.setEnhancedCpcEnabled(false);
+        campaignDetails.setTargetingPartnerSearchNetwork(false);
+        campaignDetails.setTargetingSearchNetwork(true);
+        campaignDetails.setTargetingContentNetwork(false);
+        campaignDetails.setAdvertisingChannelType("DISPLAY");
+        campaignDetails.setPositiveGeoTargetType(7);
+        campaignDetails.setNegativeGeoTargetType(5);
+        campaignDetails.setCampaignResourceName("customers/9059845250/campaigns/18343627878");
+        campaignDetails.setBudgetDetails(getNonExistentBudgetDetails());
+
+        return campaignDetails;
+    }
+
+    /*
+        Get a list of campaign details objects. One has an existing budget and one does not
+        Return a list with a 2 CampaignDetails objects
+     */
+    private List<CampaignDetails> getMultipleCampaignDetailsList() {
+        List<CampaignDetails> campaignDetailsList = new ArrayList<>();
+
+        CampaignDetails campaignDetails = new CampaignDetails();
+        campaignDetails.setCampaignId(0L);
+        campaignDetails.setCampaignName("Test Campaign 1");
+        campaignDetails.setBudgetResourceName("");
+        campaignDetails.setStatus("ENABLED");
+        campaignDetails.setStartDate("2022-09-31");
+        campaignDetails.setEndDate("2022-10-01");
+        campaignDetails.setEnhancedCpcEnabled(false);
+        campaignDetails.setTargetingPartnerSearchNetwork(false);
+        campaignDetails.setTargetingSearchNetwork(true);
+        campaignDetails.setTargetingContentNetwork(false);
+        campaignDetails.setAdvertisingChannelType("SEARCH");
+        campaignDetails.setPositiveGeoTargetType(7);
+        campaignDetails.setNegativeGeoTargetType(5);
+        campaignDetails.setCampaignResourceName("");
+        campaignDetails.setBudgetDetails(getExistingBudgetDetails());
+
+        CampaignDetails campaignDetails2 = new CampaignDetails();
+        campaignDetails2.setCampaignId(0L);
+        campaignDetails2.setCampaignName("Test Campaign 2");
+        campaignDetails2.setBudgetResourceName(""); // empty budget resource name
+        campaignDetails2.setStatus("ENABLED");
+        campaignDetails2.setStartDate("2022-11-31");
+        campaignDetails2.setEndDate("2022-12-01");
+        campaignDetails2.setEnhancedCpcEnabled(false);
+        campaignDetails2.setTargetingPartnerSearchNetwork(false);
+        campaignDetails2.setTargetingSearchNetwork(true);
+        campaignDetails2.setTargetingContentNetwork(false);
+        campaignDetails2.setAdvertisingChannelType("DISPLAY");
+        campaignDetails2.setPositiveGeoTargetType(7);
+        campaignDetails2.setNegativeGeoTargetType(5);
+        campaignDetails2.setCampaignResourceName("");
+        campaignDetails2.setBudgetDetails(getNonExistentBudgetDetails());
 
         campaignDetailsList.add(campaignDetails);
+        campaignDetailsList.add(campaignDetails2);
 
         return campaignDetailsList;
     }
 
-    private List<CampaignOperation> getMockCampaignOperations(CampaignDetails campaignDetails) {
-        List<CampaignOperation> campaignOperations = new ArrayList<>();
-
-        // create a Google Ads campaign object from campaign details
-        Campaign campaign = buildCampaignFromDetails(campaignDetails);
-
-        // create a CREATE campaign operation
-        CampaignOperation op = CampaignOperation.newBuilder()
-                .setCreate(campaign)
-                .build();
-
-        // add to campaign operations list
-        campaignOperations.add(op);
-
-        return campaignOperations;
+    private CampaignDetails getCompletedCampaignDetails() {
+        CampaignDetails campaignDetails = new CampaignDetails();
+        campaignDetails.setCampaignId(0L);
+        campaignDetails.setCampaignName("Test Campaign 1");
+        campaignDetails.setBudgetResourceName("customers/9059845250/campaignBudgets/18343627878");
+        campaignDetails.setStatus("ENABLED");
+        campaignDetails.setStartDate("2022-09-31");
+        campaignDetails.setEndDate("2022-10-01");
+        campaignDetails.setEnhancedCpcEnabled(false);
+        campaignDetails.setTargetingPartnerSearchNetwork(false);
+        campaignDetails.setTargetingSearchNetwork(true);
+        campaignDetails.setTargetingContentNetwork(false);
+        campaignDetails.setAdvertisingChannelType("SEARCH");
+        campaignDetails.setPositiveGeoTargetType(7);
+        campaignDetails.setNegativeGeoTargetType(5);
+        campaignDetails.setCampaignResourceName("customers/9059845250/campaigns/18343627811");
+        campaignDetails.setBudgetDetails(getExistingBudgetDetails());
+        return campaignDetails;
     }
 
-    /**
-     * Create a campaign object using a CampaignDetails object
-     *
-     * @param campaignDetails the details of the campaign to be created
-     * @return campaign object based on campaign details provided
+    /*
+        Get a budget details object that exists in the list of multiple budget details
+        Returns a single BudgetDetails object
      */
-    private Campaign buildCampaignFromDetails(CampaignDetails campaignDetails) {
-        // create a Manual cpc object with or without enhanced CPC
-        ManualCpc manualCpc = ManualCpc.newBuilder()
-                .setEnhancedCpcEnabled(campaignDetails.isEnhancedCpcEnabled())
-                .build();
+    private BudgetDetails getExistingBudgetDetails() {
+        BudgetDetails budgetDetails = new BudgetDetails();
+        budgetDetails.setResourceName("customers/9059845250/campaignBudgets/18343627878");
+        budgetDetails.setBudgetId(0L);
+        budgetDetails.setShared(true);
+        budgetDetails.setDailyBudgetAmount(100);
+        budgetDetails.setDeliveryMethod(2);
+        budgetDetails.setStatus(2);
 
-        // create a GeoTargetTypeSetting using the negative and positive targets
-        Campaign.GeoTargetTypeSetting geoTargetTypeSetting = Campaign.GeoTargetTypeSetting.newBuilder()
-                .setNegativeGeoTargetType(NegativeGeoTargetTypeEnum.NegativeGeoTargetType
-                        .forNumber(campaignDetails.getNegativeGeoTargetType()))
-                .setPositiveGeoTargetType(PositiveGeoTargetTypeEnum.PositiveGeoTargetType
-                        .forNumber(campaignDetails.getPositiveGeoTargetType()))
-                .build();
-
-        // extract network settings into its own object
-        Campaign.NetworkSettings networkSettings = Campaign.NetworkSettings.newBuilder()
-                .setTargetContentNetwork(campaignDetails.isTargetingContentNetwork())
-                .setTargetSearchNetwork(campaignDetails.isTargetingSearchNetwork())
-                .setTargetPartnerSearchNetwork(campaignDetails.isTargetingPartnerSearchNetwork())
-                .build();
-
-        // create the campaign status object
-        CampaignStatusEnum.CampaignStatus status =
-                CampaignStatusEnum.CampaignStatus.valueOf(campaignDetails.getStatus());
-
-        //create the advertising channel type object
-        AdvertisingChannelTypeEnum.AdvertisingChannelType advertisingChannelType =
-                AdvertisingChannelTypeEnum.AdvertisingChannelType.valueOf(campaignDetails.getAdvertisingChannelType());
-
-        // create and return a campaign object with the above settings
-        return Campaign.newBuilder()
-                .setStatus(status)
-                .setId(campaignDetails.getCampaignId())
-                .setStartDate(campaignDetails.getStartDate())
-                .setEndDate(campaignDetails.getEndDate())
-                .setName(campaignDetails.getCampaignName())
-                .setGeoTargetTypeSetting(geoTargetTypeSetting)
-                .setCampaignBudget(campaignDetails.getBudgetResourceName())
-                .setManualCpc(manualCpc)
-                .setNetworkSettings(networkSettings)
-                .setAdvertisingChannelType(advertisingChannelType)
-                .build();
+        return budgetDetails;
     }
 
-    /**
-     * Create a list of complete campaign details models.
-     *
-     * @param customerId          the customer id of the client account
-     * @param baseCampaignDetails a list of campaign details models sans BudgetDetails
-     * @return a list of complete CampaignDetails
+    /*
+        Get a budget details object that exists in the list of multiple budget details
+        Returns a single BudgetDetails object
      */
-    private List<CampaignDetails> buildCompleteCampaignDetailsList(long customerId, List<CampaignDetails> baseCampaignDetails) {
-        List<CampaignDetails> completeCampaignDetailsList = new ArrayList<>();
-        List<BudgetDetails> budgetDetailsList = getMockBudgetDetailsList();
+    private BudgetDetails getNonExistentBudgetDetails() {
+        BudgetDetails budgetDetails = new BudgetDetails();
+        budgetDetails.setResourceName("customers/9059845250/campaignBudgets/18343627811");
+        budgetDetails.setBudgetId(0L);
+        budgetDetails.setShared(false);
+        budgetDetails.setDailyBudgetAmount(3100);
+        budgetDetails.setDeliveryMethod(2);
+        budgetDetails.setStatus(2);
 
-        // associate each campaign with a budget by resource name
-        for (CampaignDetails campaignDetails : baseCampaignDetails) {
-            for (BudgetDetails budgetDetails : budgetDetailsList) {
-                // set budgetDetails in campaignDetails model if matched
-                if (campaignDetails.getBudgetResourceName().equals(budgetDetails.getResourceName())) {
-                    campaignDetails.setBudgetDetails(budgetDetails);
-
-                    // add updated campaign details model to completed list
-                    completeCampaignDetailsList.add(campaignDetails);
-                    break;
-                }
-            }
-        }
-
-        return completeCampaignDetailsList;
+        return budgetDetails;
     }
 
-    private List<BudgetDetails> getMockBudgetDetailsList() {
+    /*
+        Get a mock budget details object
+        Returns a list with multiple BudgetDetails object
+     */
+    private List<BudgetDetails> getListOfMultipleBudgetDetails() {
         List<BudgetDetails> budgetDetailsList = new ArrayList<>();
 
         BudgetDetails budgetDetails = new BudgetDetails();
-        budgetDetails.setResourceName("Test Budget");
+        budgetDetails.setResourceName("customers/9059845250/campaignBudgets/18343627878");
+        budgetDetails.setBudgetId(0L);
+        budgetDetails.setShared(true);
+        budgetDetails.setDailyBudgetAmount(100);
+        budgetDetails.setDeliveryMethod(2);
+        budgetDetails.setStatus(2);
+
+        BudgetDetails budgetDetails2 = new BudgetDetails();
+        budgetDetails2.setResourceName("customers/9059845250/campaignBudgets/18343654871");
+        budgetDetails2.setBudgetId(1L);
+        budgetDetails2.setShared(false);
+        budgetDetails2.setDailyBudgetAmount(250);
+        budgetDetails.setDeliveryMethod(1);
+        budgetDetails2.setStatus(2);
+
+        BudgetDetails budgetDetails3 = new BudgetDetails();
+        budgetDetails3.setResourceName("customers/9059845250/campaigns/18793627832");
+        budgetDetails3.setBudgetId(2L);
+        budgetDetails3.setShared(true);
+        budgetDetails3.setDailyBudgetAmount(500);
+        budgetDetails.setDeliveryMethod(2);
+        budgetDetails3.setStatus(1);
 
         budgetDetailsList.add(budgetDetails);
+        budgetDetailsList.add(budgetDetails2);
+        budgetDetailsList.add(budgetDetails3);
+
         return budgetDetailsList;
     }
 }

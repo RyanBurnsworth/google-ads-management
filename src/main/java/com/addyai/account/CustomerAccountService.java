@@ -31,12 +31,9 @@ public class CustomerAccountService {
                     customerService.listAccessibleCustomers(
                             ListAccessibleCustomersRequest.newBuilder().build());
 
-            System.out.printf("Total results: %d%n", response.getResourceNamesCount());
-
             for (String customerResourceName : response.getResourceNamesList()) {
                 String customerId = stripToAccountId(customerResourceName);
                 accountIdList.add(customerId);
-                System.out.printf("Customer resource name: %s%n", customerResourceName);
             }
         }
         return accountIdList;
