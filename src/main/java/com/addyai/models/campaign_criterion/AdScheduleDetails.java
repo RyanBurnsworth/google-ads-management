@@ -1,4 +1,4 @@
-package com.addyai.models.campaign_criterion.ext;
+package com.addyai.models.campaign_criterion;
 
 import com.addyai.models.campaign_criterion.CampaignCriterionDetails;
 

@@ -1,9 +1,5 @@
 package com.addyai.models.campaign_criterion;
 
-import com.addyai.models.campaign_criterion.ext.AdScheduleDetails;
-import com.addyai.models.campaign_criterion.ext.KeywordDetails;
-import com.addyai.models.campaign_criterion.ext.LanguageDetails;
-import com.addyai.models.campaign_criterion.ext.ProximityDetails;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 
@@ -12,7 +8,9 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
         @JsonSubTypes.Type(value = KeywordDetails.class, name = "keyword"),
         @JsonSubTypes.Type(value = AdScheduleDetails.class, name = "ad_schedule"),
         @JsonSubTypes.Type(value = ProximityDetails.class, name = "proximity"),
-        @JsonSubTypes.Type(value = LanguageDetails.class, name = "language")
+        @JsonSubTypes.Type(value = LanguageDetails.class, name = "language"),
+        @JsonSubTypes.Type(value = LocationDetails.class, name = "location"),
+        @JsonSubTypes.Type(value = DeviceDetails.class, name = "device")
 })
 public abstract class CampaignCriterionDetails {
     public long campaignCriterionId = 0L;

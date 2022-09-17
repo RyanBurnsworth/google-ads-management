@@ -4,8 +4,7 @@ import com.addyai.error_handling.ValidationErrorResponse;
 import com.addyai.error_handling.exceptions.InvalidRequestException;
 import com.addyai.models.BudgetDetails;
 import com.addyai.models.CampaignDetails;
-import com.addyai.models.campaign_criterion.CampaignCriterionDetails;
-import com.addyai.models.campaign_criterion.ext.*;
+import com.addyai.models.campaign_criterion.*;
 import com.google.ads.googleads.lib.utils.FieldMasks;
 import com.google.ads.googleads.v11.common.*;
 import com.google.ads.googleads.v11.enums.*;
@@ -139,7 +138,6 @@ public class CampaignUtils {
         return campaignBudgetOperations;
     }
 
-
     /**
      * Build a list of CampaignCriterionOperation to be used for creating or updating campaign criterion.
      * The campaign to be updated is specified by it's campaignResourceName
@@ -165,22 +163,18 @@ public class CampaignUtils {
                                 ((AdScheduleDetails) campaignCriterionDetails).getDayOfWeek()))
                         .setStartHour(((AdScheduleDetails) campaignCriterionDetails).getStartHour())
                         .setEndHour(((AdScheduleDetails) campaignCriterionDetails).getEndHour())
-                        .setStartMinute(MinuteOfHourEnum.MinuteOfHour.forNumber(
-                                ((AdScheduleDetails) campaignCriterionDetails).getStartMinute()))
-                        .setEndMinute(MinuteOfHourEnum.MinuteOfHour.forNumber(
-                                ((AdScheduleDetails) campaignCriterionDetails).getEndMinute()))
+                        .setStartMinuteValue(((AdScheduleDetails) campaignCriterionDetails).getStartMinute())
+                        .setEndMinuteValue(((AdScheduleDetails) campaignCriterionDetails).getEndMinute())
                         .build();
 
                 campaignCriterion = CampaignCriterion.newBuilder()
                         .setAdSchedule(adScheduleInfo)
                         .setCampaign(campaignCriterionDetails.getCampaignResourceName())
                         .setBidModifier(campaignCriterionDetails.getBidModifier())
-                        .setNegative(campaignCriterionDetails.isNegative())
                         .build();
             } else if (campaignCriterionDetails instanceof KeywordDetails) {
                 KeywordInfo keywordInfo = KeywordInfo.newBuilder()
-                        .setMatchType(KeywordMatchTypeEnum.KeywordMatchType.forNumber(
-                                ((KeywordDetails) campaignCriterionDetails).getKeywordMatchType()))
+                        .setMatchTypeValue(((KeywordDetails) campaignCriterionDetails).getKeywordMatchType())
                         .setText(((KeywordDetails) campaignCriterionDetails).getKeywordText())
                         .build();
 
@@ -199,8 +193,19 @@ public class CampaignUtils {
                         .setLanguage(languageInfo)
                         .setCampaign(campaignCriterionDetails.getCampaignResourceName())
                         .setNegative(campaignCriterionDetails.isNegative())
-                        .setBidModifier(campaignCriterionDetails.getBidModifier())
                         .build();
+
+            } else if (campaignCriterionDetails instanceof DeviceDetails) {
+                DeviceInfo deviceInfo = DeviceInfo.newBuilder()
+                        .setTypeValue(((DeviceDetails) campaignCriterionDetails).getDeviceType())
+                        .build();
+
+                campaignCriterion = CampaignCriterion.newBuilder()
+                        .setDevice(deviceInfo)
+                        .setBidModifier(campaignCriterionDetails.getBidModifier())
+                        .setCampaign(campaignCriterionDetails.getCampaignResourceName())
+                        .build();
+
             } else if (campaignCriterionDetails instanceof LocationDetails) {
                 LocationInfo locationInfo = LocationInfo.newBuilder()
                         .setGeoTargetConstant(((LocationDetails) campaignCriterionDetails).getGeoTargetingConstant())

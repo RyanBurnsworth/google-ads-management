@@ -1,5 +1,7 @@
 package com.addyai.utils;
 
+import com.google.ads.googleads.v11.enums.*;
+
 public class Constants {
     public static final long MICRO_FACTOR = 1000000L;
     public static final String ADVERTISING_TYPE_SEARCH = "SEARCH";
@@ -8,5 +10,71 @@ public class Constants {
     public static final String UNKNOWN_SERVICE_ERROR = "UNKNOWN_SERVICE_ERROR";
     public static final String RECORD_NOT_FOUND = "RECORD_NOT_FOUND";
     public static final String MISSING_PARAMS = "Missing Parameters";
+
+    public static final int POSITIVE_GEO_TARGET_TYPE_PRESENCE_OR_INTEREST
+            = PositiveGeoTargetTypeEnum.PositiveGeoTargetType.PRESENCE_OR_INTEREST_VALUE;
+    public static final int POSITIVE_GEO_TARGET_TYPE_SEARCH_INTEREST
+            = PositiveGeoTargetTypeEnum.PositiveGeoTargetType.SEARCH_INTEREST_VALUE;
+    public static final int POSITIVE_GEO_TARGET_TYPE_PRESENCE
+            = PositiveGeoTargetTypeEnum.PositiveGeoTargetType.PRESENCE_VALUE;
+
+    public static final int NEGATIVE_GEO_TARGET_TYPE_PRESENCE_OR_INTEREST
+            = NegativeGeoTargetTypeEnum.NegativeGeoTargetType.PRESENCE_OR_INTEREST_VALUE;
+    public static final int NEGATIVE_GEO_TARGET_TYPE_PRESENCE
+            = NegativeGeoTargetTypeEnum.NegativeGeoTargetType.PRESENCE_VALUE;
+
+    public static final int CRITERION_TYPE_KEYWORD
+            = CriterionTypeEnum.CriterionType.KEYWORD_VALUE;
+    public static final int CRITERION_TYPE_AD_SCHEDULE
+            = CriterionTypeEnum.CriterionType.AD_SCHEDULE_VALUE;
+    public static final int CRITERION_TYPE_DEVICE
+            = CriterionTypeEnum.CriterionType.DEVICE_VALUE;
+    public static final int CRITERION_TYPE_LOCATION
+            = CriterionTypeEnum.CriterionType.LOCATION_VALUE;
+    public static final int CRITERION_TYPE_LANGUAGE
+            = CriterionTypeEnum.CriterionType.LANGUAGE_VALUE;
+    public static final int CRITERION_TYPE_PROXIMITY
+            = CriterionTypeEnum.CriterionType.PROXIMITY_VALUE;
+
+    public static final int CRITERION_STATUS_ENABLED
+            = CampaignCriterionStatusEnum.CampaignCriterionStatus.ENABLED_VALUE;
+    public static final int CRITERION_STATUS_PAUSED
+            = CampaignCriterionStatusEnum.CampaignCriterionStatus.PAUSED_VALUE;
+    public static final int CRITERION_STATUS_REMOVED
+            = CampaignCriterionStatusEnum.CampaignCriterionStatus.REMOVED_VALUE;
+
+    public static final int KEYWORD_MATCH_TYPE_BROAD
+            = KeywordMatchTypeEnum.KeywordMatchType.BROAD_VALUE;
+    public static final int KEYWORD_MATCH_TYPE_EXACT
+            = KeywordMatchTypeEnum.KeywordMatchType.EXACT_VALUE;
+    public static final int KEYWORD_MATCH_TYPE_PHRASE
+            = KeywordMatchTypeEnum.KeywordMatchType.PHRASE_VALUE;
+
+    public static final int BUDGET_DELIVERY_METHOD_STANDARD
+            = BudgetDeliveryMethodEnum.BudgetDeliveryMethod.STANDARD_VALUE;
+    public static final int BUDGET_DELIVERY_METHOD_ACCELERATED
+            = BudgetDeliveryMethodEnum.BudgetDeliveryMethod.ACCELERATED_VALUE;
+
+    public static final int BUDGET_STATUS_ENABLED
+            = BudgetStatusEnum.BudgetStatus.ENABLED_VALUE;
+    public static final int BUDGET_STATUS_REMOVED
+            = BudgetStatusEnum.BudgetStatus.REMOVED_VALUE;
+
+    public static final int DEVICE_TYPE_DESKTOP = DeviceEnum.Device.DESKTOP_VALUE;
+    public static final int DEVICE_TYPE_MOBILE = DeviceEnum.Device.MOBILE_VALUE;
+    public static final int DEVICE_TYPE_TABLET = DeviceEnum.Device.TABLET_VALUE;
+
+    public static final int DAY_OF_WEEK_SUNDAY = DayOfWeekEnum.DayOfWeek.SUNDAY_VALUE;
+    public static final int DAY_OF_WEEK_MONDAY = DayOfWeekEnum.DayOfWeek.MONDAY_VALUE;
+    public static final int DAY_OF_WEEK_TUESDAY = DayOfWeekEnum.DayOfWeek.TUESDAY_VALUE;
+    public static final int DAY_OF_WEEK_WEDNESDAY = DayOfWeekEnum.DayOfWeek.WEDNESDAY_VALUE;
+    public static final int DAY_OF_WEEK_THURSDAY = DayOfWeekEnum.DayOfWeek.THURSDAY_VALUE;
+    public static final int DAY_OF_WEEK_FRIDAY = DayOfWeekEnum.DayOfWeek.FRIDAY_VALUE;
+    public static final int DAY_OF_WEEK_SATURDAY = DayOfWeekEnum.DayOfWeek.SATURDAY_VALUE;
+
+    public static final int MINUTE_OF_HOUR_ZERO = MinuteOfHourEnum.MinuteOfHour.ZERO_VALUE;
+    public static final int MINUTE_OF_HOUR_FIFTEEN = MinuteOfHourEnum.MinuteOfHour.FIFTEEN_VALUE;
+    public static final int MINUTE_OF_HOUR_THIRTY = MinuteOfHourEnum.MinuteOfHour.THIRTY_VALUE;
+    public static final int MINUTE_OF_HOUR_FORTY_FIVE = MinuteOfHourEnum.MinuteOfHour.FORTY_FIVE_VALUE;
 
 }
