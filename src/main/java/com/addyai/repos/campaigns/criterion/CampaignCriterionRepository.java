@@ -9,5 +9,5 @@ public interface CampaignCriterionRepository {
 
     List<CampaignCriterionDetails> getCampaignCriterionDetails(long customerId, String campaignResourceName);
 
-    void addCampaignCriterion(long customerId, List<CampaignCriterionOperation> campaignCriterionOperationList);
+    void addCampaignCriterion(long customerId, List<CampaignCriterionOperation> campaignCriterionOperationList) throws Exception;
 }

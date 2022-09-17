@@ -12,6 +12,7 @@ public interface CampaignController {
 
     ResponseEntity<CampaignDetails> fetchCampaignDetailsByName(@PathVariable String customerId,
                                                                @PathVariable String campaignName) throws Exception;
+
     ResponseEntity<Void> createCampaigns(@PathVariable String customerId,
                                          @RequestBody List<CampaignDetails> campaignDetails) throws Exception;
 

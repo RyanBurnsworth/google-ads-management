@@ -1,5 +1,6 @@
-package com.addyai.models.campaign_criterion;
+package com.addyai.models.campaign_criterion.ext;
 
+import com.addyai.models.campaign_criterion.CampaignCriterionDetails;
 import com.google.ads.googleads.v11.enums.ProximityRadiusUnitsEnum;
 
 public class ProximityDetails extends CampaignCriterionDetails {

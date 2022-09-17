@@ -1,8 +1,19 @@
 package com.addyai.models.campaign_criterion;
 
-import com.google.ads.googleads.v11.enums.CampaignCriterionStatusEnum;
-import com.google.ads.googleads.v11.enums.CriterionTypeEnum;
+import com.addyai.models.campaign_criterion.ext.AdScheduleDetails;
+import com.addyai.models.campaign_criterion.ext.KeywordDetails;
+import com.addyai.models.campaign_criterion.ext.LanguageDetails;
+import com.addyai.models.campaign_criterion.ext.ProximityDetails;
+import com.fasterxml.jackson.annotation.JsonSubTypes;
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
 
+@JsonTypeInfo(use = JsonTypeInfo.Id.NAME, property = "type")
+@JsonSubTypes({
+        @JsonSubTypes.Type(value = KeywordDetails.class, name = "keyword"),
+        @JsonSubTypes.Type(value = AdScheduleDetails.class, name = "ad_schedule"),
+        @JsonSubTypes.Type(value = ProximityDetails.class, name = "proximity"),
+        @JsonSubTypes.Type(value = LanguageDetails.class, name = "language")
+})
 public abstract class CampaignCriterionDetails {
     public long campaignCriterionId = 0L;
 
@@ -14,9 +25,9 @@ public abstract class CampaignCriterionDetails {
 
     private float bidModifier = 0.0f;
 
-    private CriterionTypeEnum.CriterionType criterionType = CriterionTypeEnum.CriterionType.UNKNOWN;
+    private int criterionType = 1;
 
-    private CampaignCriterionStatusEnum.CampaignCriterionStatus status = CampaignCriterionStatusEnum.CampaignCriterionStatus.ENABLED;
+    private int status = 2;
 
     public long getCampaignCriterionId() {
         return campaignCriterionId;
@@ -58,19 +69,19 @@ public abstract class CampaignCriterionDetails {
         this.bidModifier = bidModifier;
     }
 
-    public CriterionTypeEnum.CriterionType getCriterionType() {
+    public int getCriterionType() {
         return criterionType;
     }
 
-    public void setCriterionType(CriterionTypeEnum.CriterionType criterionType) {
+    public void setCriterionType(int criterionType) {
         this.criterionType = criterionType;
     }
 
-    public CampaignCriterionStatusEnum.CampaignCriterionStatus getStatus() {
+    public int getStatus() {
         return status;
     }
 
-    public void setStatus(CampaignCriterionStatusEnum.CampaignCriterionStatus status) {
+    public void setStatus(int status) {
         this.status = status;
     }
 }

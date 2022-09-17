@@ -4,7 +4,8 @@ import com.addyai.error_handling.ValidationErrorResponse;
 import com.addyai.error_handling.exceptions.InvalidRequestException;
 import com.addyai.models.BudgetDetails;
 import com.addyai.models.CampaignDetails;
-import com.addyai.models.campaign_criterion.*;
+import com.addyai.models.campaign_criterion.CampaignCriterionDetails;
+import com.addyai.models.campaign_criterion.ext.*;
 import com.google.ads.googleads.lib.utils.FieldMasks;
 import com.google.ads.googleads.v11.common.*;
 import com.google.ads.googleads.v11.enums.*;
@@ -144,7 +145,7 @@ public class CampaignUtils {
      * The campaign to be updated is specified by it's campaignResourceName
      *
      * @param campaignCriterionDetailsList a list of [CampaignCriterionDetails]
-     * @param shouldCreate      true if it should create, false if it should update
+     * @param shouldCreate                 true if it should create, false if it should update
      * @return list of [CampaignCriterionOperations] to be performed on the specified campaign
      */
     public List<CampaignCriterionOperation> buildCampaignCriterionOperationList(
@@ -160,11 +161,14 @@ public class CampaignUtils {
             if (campaignCriterionDetails instanceof AdScheduleDetails) {
                 // create ad schedule info
                 AdScheduleInfo adScheduleInfo = AdScheduleInfo.newBuilder()
-                        .setDayOfWeek(((AdScheduleDetails) campaignCriterionDetails).getDayOfWeek())
+                        .setDayOfWeek(DayOfWeekEnum.DayOfWeek.forNumber(
+                                ((AdScheduleDetails) campaignCriterionDetails).getDayOfWeek()))
                         .setStartHour(((AdScheduleDetails) campaignCriterionDetails).getStartHour())
                         .setEndHour(((AdScheduleDetails) campaignCriterionDetails).getEndHour())
-                        .setStartMinute(((AdScheduleDetails) campaignCriterionDetails).getStartMinute())
-                        .setEndMinute(((AdScheduleDetails) campaignCriterionDetails).getEndMinute())
+                        .setStartMinute(MinuteOfHourEnum.MinuteOfHour.forNumber(
+                                ((AdScheduleDetails) campaignCriterionDetails).getStartMinute()))
+                        .setEndMinute(MinuteOfHourEnum.MinuteOfHour.forNumber(
+                                ((AdScheduleDetails) campaignCriterionDetails).getEndMinute()))
                         .build();
 
                 campaignCriterion = CampaignCriterion.newBuilder()
@@ -175,7 +179,8 @@ public class CampaignUtils {
                         .build();
             } else if (campaignCriterionDetails instanceof KeywordDetails) {
                 KeywordInfo keywordInfo = KeywordInfo.newBuilder()
-                        .setMatchType(((KeywordDetails) campaignCriterionDetails).getKeywordMatchType())
+                        .setMatchType(KeywordMatchTypeEnum.KeywordMatchType.forNumber(
+                                ((KeywordDetails) campaignCriterionDetails).getKeywordMatchType()))
                         .setText(((KeywordDetails) campaignCriterionDetails).getKeywordText())
                         .build();
 
@@ -183,20 +188,25 @@ public class CampaignUtils {
                         .setKeyword(keywordInfo)
                         .setCampaign(campaignCriterionDetails.getCampaignResourceName())
                         .setNegative(campaignCriterionDetails.isNegative())
-                        .setBidModifier(campaignCriterionDetails.getBidModifier())
                         .build();
 
-            } else if (campaignCriterionDetails instanceof LanguageLocationDetails) {
+            } else if (campaignCriterionDetails instanceof LanguageDetails) {
                 LanguageInfo languageInfo = LanguageInfo.newBuilder()
-                        .setLanguageConstant(((LanguageLocationDetails) campaignCriterionDetails).getLanguageCode())
-                        .build();
-
-                LocationInfo locationInfo = LocationInfo.newBuilder()
-                        .setGeoTargetConstant(((LanguageLocationDetails) campaignCriterionDetails).getGeoTargetingConstant())
+                        .setLanguageConstant(((LanguageDetails) campaignCriterionDetails).getLanguageCode())
                         .build();
 
                 campaignCriterion = CampaignCriterion.newBuilder()
                         .setLanguage(languageInfo)
+                        .setCampaign(campaignCriterionDetails.getCampaignResourceName())
+                        .setNegative(campaignCriterionDetails.isNegative())
+                        .setBidModifier(campaignCriterionDetails.getBidModifier())
+                        .build();
+            } else if (campaignCriterionDetails instanceof LocationDetails) {
+                LocationInfo locationInfo = LocationInfo.newBuilder()
+                        .setGeoTargetConstant(((LocationDetails) campaignCriterionDetails).getGeoTargetingConstant())
+                        .build();
+
+                campaignCriterion = CampaignCriterion.newBuilder()
                         .setLocation(locationInfo)
                         .setCampaign(campaignCriterionDetails.getCampaignResourceName())
                         .setNegative(campaignCriterionDetails.isNegative())
