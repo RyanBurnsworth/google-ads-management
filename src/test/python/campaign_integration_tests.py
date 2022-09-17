@@ -129,7 +129,7 @@ def test_update_campaigns_on_test_account(campaign_details_1_name, campaign_deta
 
     # retrieve campaign objects to parse the campaign resource name and budget resource name from
     campaign_1 = _get_single_campaign_details(campaign_details_1_name)
-    campaign_2= _get_single_campaign_details(campaign_details_2_name)
+    campaign_2 = _get_single_campaign_details(campaign_details_2_name)
 
     # set the campaign resource names for both campaign details objects
     campaign_details_1["campaignResourceName"] = campaign_1["campaignResourceName"]
@@ -172,6 +172,39 @@ def test_update_campaigns_on_test_account(campaign_details_1_name, campaign_deta
         print(Fore.GREEN + 'SUCCESS')
     else:
         _find_exact_comparison_failure_reason(actual_campaign_details_1, campaign_details_1)
+        print(Fore.RED + 'FAILED!')
+
+"""
+    Delete campaigns from client account
+"""
+def test_delete_campaigns(campaign_details_1_name, campaign_details_2_name):   
+    print(Fore.YELLOW + "[*] Testing Deleting Campaigns on Test Account")
+    
+    # retrieve campaign objects to parse the campaign resource name and budget resource name from
+    campaign_1 = _get_single_campaign_details(campaign_details_1_name)
+    campaign_2 = _get_single_campaign_details(campaign_details_2_name)
+
+    campaign_1_id = campaign_1["campaignId"]
+    campaign_2_id = campaign_2["campaignId"]
+
+    campaign_id_list = [campaign_1_id, campaign_2_id]
+
+    # perform a POST request on the /campaign/remove endpoint to update the 2 campaigns
+    url = BASE_URL + TEST_CLIENT_ACCOUNT_ID + "/campaign/remove"
+    data = json.dumps(campaign_id_list)
+    headers = {'Content-type': 'application/json', 'Accept': 'text/plain'}
+
+    # perform the request to the endpoint
+    resp = requests.post(url, data=data, headers=headers)
+    
+    # retrieve the newly deleted campaign objects statuses
+    campaign_1_status = _get_single_campaign_details(campaign_details_1_name)["status"]
+    campaign_2_status = _get_single_campaign_details(campaign_details_2_name)["status"]
+
+    # verify that the status_code is 400 and both campaigns have been removed
+    if resp.status_code == 202 and campaign_1_status == "REMOVED" and campaign_2_status == "REMOVED":
+        print(Fore.GREEN + 'SUCCESS')
+    else:
         print(Fore.RED + 'FAILED!')
 
 """
@@ -247,9 +280,6 @@ def _get_single_campaign_details(campaignName):
     # convert response body to json array
     json_response_body = resp.json()
     return json_response_body
-
-
-
 
 campaign_details_1_name = "Test Campaign 1 " + str(randint(100,500000))
 campaign_details_2_name = "Test Campaign 2 " + str(randint(100,500000))
@@ -355,3 +385,5 @@ test_failed_get_all_campaign_details_invalid_customer_id()
 test_create_campaigns_on_test_account(campaign_details_1_name, campaign_details_2_name, campaign_details_1, campaign_details_2)
 
 test_update_campaigns_on_test_account(campaign_details_1_name, campaign_details_2_name, campaign_details_1_updated, campaign_details_2_updated)
+
+test_delete_campaigns(campaign_details_1_name, campaign_details_2_name)
