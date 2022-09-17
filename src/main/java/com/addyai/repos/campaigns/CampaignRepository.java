@@ -8,6 +8,8 @@ import java.util.List;
 public interface CampaignRepository {
     List<CampaignDetails> fetchAllCampaignDetails(long customerId) throws Exception;
 
+    CampaignDetails fetchCampaignDetailsByName(long customerId, String campaignName) throws Exception;
+
     void updateCampaigns(long customerId, List<CampaignOperation> campaignOperations) throws Exception;
 
     void deleteCampaigns(long customerId, List<Long> campaignOperations) throws Exception;

@@ -56,6 +56,34 @@ public class CampaignRepositoryImpl implements CampaignRepository {
     }
 
     /**
+     * Get a campaign details object by campaign name
+     *
+     * @param customerId the customer id of the account
+     * @param campaignName the name of the campaign to be fetched
+     * @return list of campaign details
+     * @throws Exception
+     */
+    @Override
+    public CampaignDetails fetchCampaignDetailsByName(long customerId, String campaignName) throws Exception {
+        List<CampaignDetails> campaignDetailsList;
+
+        try {
+            String query = GAQLUtils.getCampaignDetailsByNameQuery(campaignName);
+
+            SearchGoogleAdsStreamRequest request = requestBuilder.buildStreamRequest(customerId, query);
+            ServerStream<SearchGoogleAdsStreamResponse> response = requestBuilder.callStreamRequest(request);
+
+            campaignDetailsList = GAQLUtils.convertStreamResponseToCampaignDetailsList(response);
+            if (campaignDetailsList.size() > 0)
+                return campaignDetailsList.get(0);
+            else
+                return new CampaignDetails(); // TODO throw NOT FOUND ERROR
+        } catch (Exception e) {
+            throw ApiExceptionResolver.doResolveException(e);
+        }
+    }
+
+    /**
      * Update a list of campaigns within a given customer account
      *
      * @param customerId         the customerId of the account to update

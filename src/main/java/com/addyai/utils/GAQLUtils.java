@@ -9,6 +9,8 @@ import com.google.api.gax.rpc.ServerStream;
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.addyai.utils.Constants.MICRO_FACTOR;
+
 public class GAQLUtils {
     public static String getCampaignDetailsQuery() {
         return "SELECT campaign.id," +
@@ -30,6 +32,28 @@ public class GAQLUtils {
                 " campaign.network_settings.target_partner_search_network," +
                 " campaign.network_settings.target_search_network" +
                 " FROM campaign ORDER BY campaign.id";
+    }
+
+    public static String getCampaignDetailsByNameQuery(String name) {
+        return "SELECT campaign.id," +
+                " campaign.name," +
+                " campaign.resource_name, " +
+                " campaign.status," +
+                " campaign.advertising_channel_type," +
+                " campaign.campaign_budget," +
+                " campaign.bidding_strategy," +
+                " campaign.geo_target_type_setting.positive_geo_target_type," +
+                " campaign.geo_target_type_setting.negative_geo_target_type," +
+                " campaign.manual_cpc.enhanced_cpc_enabled," +
+                " campaign.optimization_score," +
+                " campaign.start_date," +
+                " campaign.end_date," +
+                " campaign.campaign_budget, " +
+                " campaign.network_settings.target_content_network," +
+                " campaign.network_settings.target_google_search," +
+                " campaign.network_settings.target_partner_search_network," +
+                " campaign.network_settings.target_search_network" +
+                " FROM campaign WHERE campaign.name = '" + name + "' ORDER BY campaign.id";
     }
 
     public static String getCampaignBudgetQuery() {
@@ -79,7 +103,7 @@ public class GAQLUtils {
             for (GoogleAdsRow googleAdsRow : response.getResultsList()) {
                 BudgetDetails budgetDetails = new BudgetDetails();
                 budgetDetails.setBudgetId(googleAdsRow.getCampaignBudget().getId());
-                budgetDetails.setDailyBudgetAmount(Math.round(googleAdsRow.getCampaignBudget().getAmountMicros() / 1000000));
+                budgetDetails.setDailyBudgetAmount(Math.round((float) googleAdsRow.getCampaignBudget().getAmountMicros() / MICRO_FACTOR));
                 budgetDetails.setName(googleAdsRow.getCampaignBudget().getName());
                 budgetDetails.setResourceName(googleAdsRow.getCampaignBudget().getResourceName());
                 budgetDetails.setDeliveryMethod(googleAdsRow.getCampaignBudget().getDeliveryMethodValue());

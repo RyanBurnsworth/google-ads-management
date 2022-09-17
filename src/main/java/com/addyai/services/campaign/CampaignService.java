@@ -11,6 +11,8 @@ public interface CampaignService {
 
     List<CampaignDetails> findAllCampaignDetails(long customerId) throws Exception;
 
+    CampaignDetails findCampaignDetailsByName(long customerId, String campaignName) throws Exception;
+
     void updateCampaign(long customerId, List<CampaignDetails> campaignDetails) throws Exception;
 
     void deleteCampaigns(long customerId, List<Long> campaignIds) throws Exception;

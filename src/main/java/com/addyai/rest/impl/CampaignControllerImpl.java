@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/v1/{customerId}/campaign")
+@RequestMapping("/api/v1/{customerId}/campaign/")
 public class CampaignControllerImpl implements CampaignController {
     private final CampaignService campaignService;
 
@@ -21,8 +21,18 @@ public class CampaignControllerImpl implements CampaignController {
 
     @Override
     @GetMapping("details")
-    public ResponseEntity<List<CampaignDetails>> fetchAllClientCampaigns(@PathVariable String customerId) throws Exception {
+    public ResponseEntity<List<CampaignDetails>> fetchAllCampaignDetails(@PathVariable String customerId) throws Exception {
         List<CampaignDetails> campaignDetails = campaignService.findAllCampaignDetails(Long.parseLong(customerId));
+        return new ResponseEntity<>(campaignDetails, HttpStatus.OK);
+    }
+
+    @Override
+    @GetMapping("{campaignName}/details")
+    public ResponseEntity<CampaignDetails> fetchCampaignDetailsByName(@PathVariable String customerId,
+                                                                      @PathVariable String campaignName) throws Exception {
+        CampaignDetails campaignDetails = campaignService
+                .findCampaignDetailsByName(Long.parseLong(customerId), campaignName);
+
         return new ResponseEntity<>(campaignDetails, HttpStatus.OK);
     }
 

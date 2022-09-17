@@ -218,27 +218,6 @@ public class CampaignUtils {
     }
 
     /**
-     * Get the resource name for an existing budget, if none exists return an empty string
-     *
-     * @param budgetDetails      the budget details to be matched
-     * @param existingBudgetList a list of existing budget details from client account
-     * @return the campaign budget resource name of an existing budget or an empty string if no budget is found
-     */
-    public String getResourceNameForExistingBudget(BudgetDetails budgetDetails, List<BudgetDetails> existingBudgetList) {
-        // check for an existing budget that has the same budget value, delivery method and shared values
-        for (BudgetDetails existingBudget : existingBudgetList) {
-
-            if (existingBudget.getDailyBudgetAmount() == budgetDetails.getDailyBudgetAmount() &&
-                    existingBudget.isShared() == budgetDetails.isShared() &&
-                    existingBudget.getDeliveryMethod() == budgetDetails.getDeliveryMethod()) {
-                return existingBudget.getResourceName();
-            }
-        }
-        // return an empty string if no budget currently exists
-        return "";
-    }
-
-    /**
      * Retrieve a single [BudgetDetails] based on a resource name
      *
      * @param resourceName      the resource name of the campaign budget
@@ -248,6 +227,22 @@ public class CampaignUtils {
     public BudgetDetails findBudgetDetailsByResourceName(String resourceName, List<BudgetDetails> budgetDetailsList) {
         for (BudgetDetails budgetDetails : budgetDetailsList) {
             if (budgetDetails.getResourceName().equals(resourceName))
+                return budgetDetails;
+        }
+
+        return null;
+    }
+
+    /**
+     * Retrieve a single [BudgetDetails] based on a budget name
+     *
+     * @param budgetName      the name of the campaign budget
+     * @param budgetDetailsList a list of existing budgetDetails from the client account
+     * @return [BudgetDetails] that matched the budget name given
+     */
+    public BudgetDetails findBudgetDetailsByName(String budgetName, List<BudgetDetails> budgetDetailsList) {
+        for (BudgetDetails budgetDetails : budgetDetailsList) {
+            if (budgetDetails.getName().equals(budgetName))
                 return budgetDetails;
         }
 

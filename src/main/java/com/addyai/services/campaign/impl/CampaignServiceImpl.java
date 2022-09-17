@@ -42,9 +42,6 @@ public class CampaignServiceImpl implements CampaignService {
     public void addCampaignsToAccount(long customerId, List<CampaignDetails> campaignDetailsList) throws Exception {
         List<CampaignOperation> campaignOperations = new ArrayList<>();
 
-        // fetch all campaign budget details from the client account
-        List<BudgetDetails> existingBudgets = campaignBudgetRepository.fetchAllCampaignBudgetDetails(customerId);
-
         for (CampaignDetails campaignDetails : campaignDetailsList) {
             // validate campaign details before proceeding
             campaignUtils.validateCampaignDetails(campaignDetails);
@@ -52,28 +49,18 @@ public class CampaignServiceImpl implements CampaignService {
             // validate the campaign budget details and assign budget resource to campaign
             campaignUtils.validateCampaignBudgetDetails(campaignDetails.getBudgetDetails());
 
-            // get the resource name of an existing budget in the client's account
-            String resourceName = campaignUtils
-                    .getResourceNameForExistingBudget(campaignDetails.getBudgetDetails(), existingBudgets);
+            // create a campaign budget operation only for this single budget
+            List<BudgetDetails> singleBudgetDetailsList = Collections.singletonList(campaignDetails.getBudgetDetails());
+            List<CampaignBudgetOperation> campaignBudgetOperations =
+                    campaignUtils.buildCampaignBudgetOperationList(singleBudgetDetailsList, true);
 
-            // if the resource name is empty, create a campaign budget resource on the client account
-            if (resourceName.isEmpty()) {
-                // create a campaign budget operation only for this single budget
-                List<BudgetDetails> singleBudgetDetailsList = Collections.singletonList(campaignDetails.getBudgetDetails());
-                List<CampaignBudgetOperation> campaignBudgetOperations =
-                        campaignUtils.buildCampaignBudgetOperationList(singleBudgetDetailsList, true);
+            // create this budget on the client's account
+            List<BudgetDetails> createdBudgets =
+                    campaignBudgetRepository.createOrUpdateBudgets(customerId, campaignBudgetOperations);
 
-                // create this budget on the client's account
-                List<BudgetDetails> createdBudgets =
-                        campaignBudgetRepository.createOrUpdateBudgets(customerId, campaignBudgetOperations);
-
-                // associated the newly created budget with campaign
-                BudgetDetails createdBudget = createdBudgets.get(0);
-                campaignDetails.setBudgetResourceName(createdBudget.getResourceName());
-            } else {
-                // if resourceName is not empty, set this as the budgetResourceName in the campaignDetails
-                campaignDetails.setBudgetResourceName(resourceName);
-            }
+            // associated the newly created budget with campaign
+            BudgetDetails createdBudget = createdBudgets.get(0);
+            campaignDetails.setBudgetResourceName(createdBudget.getResourceName());
 
             // create a Google Ads campaign object from campaign details
             Campaign campaign = campaignUtils.buildCampaignFromDetails(campaignDetails, true);
@@ -113,6 +100,31 @@ public class CampaignServiceImpl implements CampaignService {
             campaignDetails.setBudgetDetails(budgetDetails);
         }
         return campaignDetailsList;
+    }
+
+    /**
+     * Fetch a single campaign details object by name
+     *
+     * @param customerId the customer id of the client account
+     * @param campaignName the name of the campaign to fetch
+     * @return campaign details object
+     * @throws Exception
+     */
+    @Override
+    public CampaignDetails findCampaignDetailsByName(long customerId, String campaignName) throws Exception {
+        // TODO validate the campaignName and budgetName strings
+        CampaignDetails campaignDetails = campaignRepository.fetchCampaignDetailsByName(customerId, campaignName);
+
+        // TODO create an endpoint to grab a single budget details object by id or name
+        List<BudgetDetails> existingBudgets = campaignBudgetRepository.fetchAllCampaignBudgetDetails(customerId);
+
+        // find the specific budget details object for this campaign
+        BudgetDetails budgetDetails = campaignUtils.findBudgetDetailsByName(campaignName, existingBudgets);
+
+        // set the budget details object
+        campaignDetails.setBudgetDetails(budgetDetails);
+
+        return campaignDetails;
     }
 
     /**

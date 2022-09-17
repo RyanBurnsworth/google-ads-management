@@ -35,59 +35,29 @@ public class CampaignServiceTest {
     private CampaignBudgetRepository campaignBudgetRepository;
 
     /*
-        Test successfully adding campaigns that have budget details that match an existing budget in the client's account.
-        This requires that the BudgetDetails object within the CampaignDetails object have the same delivery_method,
-        budgetValue and isShared values as an existing budgetDetails object.
-     */
-    @Test
-    void testSuccessfullyAddingSingleCampaignThatMatchesWithExistingBudget() throws Exception {
-        CampaignUtils campaignUtils = new CampaignUtils();
-
-        when(campaignBudgetRepository.fetchAllCampaignBudgetDetails(CUSTOMER_ID))
-                .thenReturn(getListOfMultipleBudgetDetails());
-
-        Campaign campaign = campaignUtils
-                .buildCampaignFromDetails(getCompletedCampaignDetails(), true);
-
-        List<CampaignOperation> campaignOperations = new ArrayList<>();
-        CampaignOperation operation = CampaignOperation.newBuilder()
-                .setCreate(campaign)
-                .build();
-
-        campaignOperations.add(operation);
-
-        campaignService.addCampaignsToAccount(CUSTOMER_ID,
-                Collections.singletonList(getCampaignDetailsWithExistingBudget()));
-
-        verify(campaignRepository, times(1)).addCampaigns(CUSTOMER_ID, campaignOperations);
-    }
-
-    /*
         Test successfully adding a campaign to the client account that DOES NOT have an existing budget set.
         This requires that the budgetResourceName is empty but the campaign details object is complete with
         values not found in the getListOfMultipleBudgetDetails list object.
      */
     @Test
-    void testSuccessfullyAddingSingleCampaignWithoutExistingBudget() throws Exception {
+    void testSuccessfullyAddingSingleCampaign() throws Exception {
         CampaignUtils campaignUtils = new CampaignUtils();
-        when(campaignBudgetRepository.fetchAllCampaignBudgetDetails(CUSTOMER_ID))
-                .thenReturn(getListOfMultipleBudgetDetails());
+        CampaignDetails campaignDetails = getCampaignDetails();
 
         // create campaignBudgetOperations list for the new budget to be created
         List<CampaignBudgetOperation> campaignBudgetOperations =
                 campaignUtils.buildCampaignBudgetOperationList(Collections.singletonList(
-                        getCampaignDetailsWithoutExistingBudget().getBudgetDetails()), true);
+                        campaignDetails.getBudgetDetails()), true);
 
-        // when the budget is created return the same budget details object
+        // when the budget is created return the budget details object containing a resource name
         when(campaignBudgetRepository.createOrUpdateBudgets(CUSTOMER_ID, campaignBudgetOperations))
-                .thenReturn(Collections.singletonList(getNonExistentBudgetDetails()));
+                .thenReturn(Collections.singletonList(getBudgetDetails()));
 
         // set the budget resource name in the campaign details
-        CampaignDetails updatedCampaignDetails = getCampaignDetailsWithoutExistingBudget();
-        updatedCampaignDetails.setBudgetResourceName(getNonExistentBudgetDetails().getResourceName());
+        campaignDetails.setBudgetResourceName(getBudgetDetails().getResourceName());
 
         // create a campaign using the details
-        Campaign campaign = campaignUtils.buildCampaignFromDetails(updatedCampaignDetails, true);
+        Campaign campaign = campaignUtils.buildCampaignFromDetails(campaignDetails, true);
 
         // create the CREATE operations list
         List<CampaignOperation> campaignOperations = new ArrayList<>();
@@ -99,14 +69,14 @@ public class CampaignServiceTest {
 
         // add campaigns to the account
         campaignService.addCampaignsToAccount(CUSTOMER_ID,
-                Collections.singletonList(getCampaignDetailsWithoutExistingBudget()));
+                Collections.singletonList(getCampaignDetails()));
 
         verify(campaignRepository, times(1)).addCampaigns(CUSTOMER_ID, campaignOperations);
     }
 
     @Test
     void testEmptyCampaignNameThrowsInvalidRequestException() {
-        CampaignDetails campaignDetails = getCampaignDetailsWithExistingBudget();
+        CampaignDetails campaignDetails = getCampaignDetails();
         campaignDetails.setCampaignName("");
 
         assertThatThrownBy(() -> campaignService.addCampaignsToAccount(CUSTOMER_ID, Collections.singletonList(campaignDetails)))
@@ -115,7 +85,7 @@ public class CampaignServiceTest {
 
     @Test
     void testZeroBudgetValueThrowsInvalidRequestException() {
-        CampaignDetails campaignDetails = getCampaignDetailsWithExistingBudget();
+        CampaignDetails campaignDetails = getCampaignDetails();
         campaignDetails.getBudgetDetails().setDailyBudgetAmount(0);
 
         assertThatThrownBy(() -> campaignService.addCampaignsToAccount(CUSTOMER_ID, Collections.singletonList(campaignDetails)))
@@ -130,7 +100,7 @@ public class CampaignServiceTest {
         Get a mock campaign details object that contains a BudgetDetails object that exists already
         Returns a single CampaignDetails object
      */
-    private CampaignDetails getCampaignDetailsWithExistingBudget() {
+    private CampaignDetails getCampaignDetails() {
         CampaignDetails campaignDetails = new CampaignDetails();
         campaignDetails.setCampaignId(0L);
         campaignDetails.setCampaignName("Test Campaign 1");
@@ -145,33 +115,9 @@ public class CampaignServiceTest {
         campaignDetails.setAdvertisingChannelType("SEARCH");
         campaignDetails.setPositiveGeoTargetType(7);
         campaignDetails.setNegativeGeoTargetType(5);
-        campaignDetails.setCampaignResourceName("customers/9059845250/campaigns/18343627878");
-        campaignDetails.setBudgetDetails(getExistingBudgetDetails());
-        return campaignDetails;
-    }
-
-    /*
-        Get a mock campaign details object that does not have an existing budget resource set
-        Returns a list with a single CampaignDetails object
-     */
-    private CampaignDetails getCampaignDetailsWithoutExistingBudget() {
-        CampaignDetails campaignDetails = new CampaignDetails();
-        campaignDetails.setCampaignId(0L);
-        campaignDetails.setCampaignName("Test Campaign 2");
-        campaignDetails.setBudgetResourceName(""); // empty budget resource name
-        campaignDetails.setStatus("ENABLED");
-        campaignDetails.setStartDate("2022-11-31");
-        campaignDetails.setEndDate("2022-12-01");
-        campaignDetails.setEnhancedCpcEnabled(false);
-        campaignDetails.setTargetingPartnerSearchNetwork(false);
-        campaignDetails.setTargetingSearchNetwork(true);
-        campaignDetails.setTargetingContentNetwork(false);
-        campaignDetails.setAdvertisingChannelType("DISPLAY");
-        campaignDetails.setPositiveGeoTargetType(7);
-        campaignDetails.setNegativeGeoTargetType(5);
-        campaignDetails.setCampaignResourceName("customers/9059845250/campaigns/18343627878");
-        campaignDetails.setBudgetDetails(getNonExistentBudgetDetails());
-
+        campaignDetails.setCampaignResourceName("");
+        campaignDetails.setBudgetDetails(getBudgetDetails());
+        campaignDetails.getBudgetDetails().setResourceName(""); // update to remove resource name
         return campaignDetails;
     }
 
@@ -179,7 +125,7 @@ public class CampaignServiceTest {
         Get a list of campaign details objects. One has an existing budget and one does not
         Return a list with a 2 CampaignDetails objects
      */
-    private List<CampaignDetails> getMultipleCampaignDetailsList() {
+    private List<CampaignDetails> getListOfCampaignDetails() {
         List<CampaignDetails> campaignDetailsList = new ArrayList<>();
 
         CampaignDetails campaignDetails = new CampaignDetails();
@@ -197,7 +143,7 @@ public class CampaignServiceTest {
         campaignDetails.setPositiveGeoTargetType(7);
         campaignDetails.setNegativeGeoTargetType(5);
         campaignDetails.setCampaignResourceName("");
-        campaignDetails.setBudgetDetails(getExistingBudgetDetails());
+        campaignDetails.setBudgetDetails(getBudgetDetails());
 
         CampaignDetails campaignDetails2 = new CampaignDetails();
         campaignDetails2.setCampaignId(0L);
@@ -214,7 +160,7 @@ public class CampaignServiceTest {
         campaignDetails2.setPositiveGeoTargetType(7);
         campaignDetails2.setNegativeGeoTargetType(5);
         campaignDetails2.setCampaignResourceName("");
-        campaignDetails2.setBudgetDetails(getNonExistentBudgetDetails());
+        campaignDetails2.setBudgetDetails(getBudgetDetails());
 
         campaignDetailsList.add(campaignDetails);
         campaignDetailsList.add(campaignDetails2);
@@ -238,7 +184,7 @@ public class CampaignServiceTest {
         campaignDetails.setPositiveGeoTargetType(7);
         campaignDetails.setNegativeGeoTargetType(5);
         campaignDetails.setCampaignResourceName("customers/9059845250/campaigns/18343627811");
-        campaignDetails.setBudgetDetails(getExistingBudgetDetails());
+        campaignDetails.setBudgetDetails(getBudgetDetails());
         return campaignDetails;
     }
 
@@ -246,8 +192,9 @@ public class CampaignServiceTest {
         Get a budget details object that exists in the list of multiple budget details
         Returns a single BudgetDetails object
      */
-    private BudgetDetails getExistingBudgetDetails() {
+    private BudgetDetails getBudgetDetails() {
         BudgetDetails budgetDetails = new BudgetDetails();
+        budgetDetails.setName("Test Budget Details");
         budgetDetails.setResourceName("customers/9059845250/campaignBudgets/18343627878");
         budgetDetails.setBudgetId(0L);
         budgetDetails.setShared(true);
@@ -259,26 +206,10 @@ public class CampaignServiceTest {
     }
 
     /*
-        Get a budget details object that exists in the list of multiple budget details
-        Returns a single BudgetDetails object
-     */
-    private BudgetDetails getNonExistentBudgetDetails() {
-        BudgetDetails budgetDetails = new BudgetDetails();
-        budgetDetails.setResourceName("customers/9059845250/campaignBudgets/18343627811");
-        budgetDetails.setBudgetId(0L);
-        budgetDetails.setShared(false);
-        budgetDetails.setDailyBudgetAmount(3100);
-        budgetDetails.setDeliveryMethod(2);
-        budgetDetails.setStatus(2);
-
-        return budgetDetails;
-    }
-
-    /*
         Get a mock budget details object
         Returns a list with multiple BudgetDetails object
      */
-    private List<BudgetDetails> getListOfMultipleBudgetDetails() {
+    private List<BudgetDetails> getListOfBudgetDetails() {
         List<BudgetDetails> budgetDetailsList = new ArrayList<>();
 
         BudgetDetails budgetDetails = new BudgetDetails();

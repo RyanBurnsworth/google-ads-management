@@ -9,8 +9,10 @@ import org.springframework.web.bind.annotation.RequestBody;
 import java.util.List;
 
 public interface CampaignController {
-    ResponseEntity<List<CampaignDetails>> fetchAllClientCampaigns(@PathVariable String customerId) throws Exception;
+    ResponseEntity<List<CampaignDetails>> fetchAllCampaignDetails(@PathVariable String customerId) throws Exception;
 
+    ResponseEntity<CampaignDetails> fetchCampaignDetailsByName(@PathVariable String customerId,
+                                                               @PathVariable String campaignName) throws Exception;
     ResponseEntity<Void> createCampaigns(@PathVariable String customerId,
                                          @RequestBody List<CampaignDetails> campaignDetails) throws Exception;
 
