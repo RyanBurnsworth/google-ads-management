@@ -8,7 +8,7 @@ import java.util.List;
 public interface CampaignBudgetRepository {
     List<BudgetDetails> fetchAllCampaignBudgetDetails(long customerId) throws Exception;
 
-    List<BudgetDetails> createOrUpdateBudgets(long customerId, List<CampaignBudgetOperation> campaignBudgetOperationList) throws Exception;
+    List<String> createOrUpdateBudgets(long customerId, List<CampaignBudgetOperation> campaignBudgetOperationList) throws Exception;
 
     void deleteCampaignBudgets(long customerId, List<Long> budgetIds);
 }

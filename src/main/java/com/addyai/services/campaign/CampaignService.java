@@ -1,6 +1,5 @@
 package com.addyai.services.campaign;
 
-import com.addyai.models.BudgetDetails;
 import com.addyai.models.CampaignDetails;
 
 import java.util.List;

@@ -2,6 +2,7 @@ package com.addyai.repos.campaigns.impl;
 
 import com.addyai.GoogleAdsManagementApplication;
 import com.addyai.error_handling.ApiExceptionResolver;
+import com.addyai.error_handling.exceptions.NotFoundException;
 import com.addyai.models.CampaignDetails;
 import com.addyai.repos.campaigns.CampaignRepository;
 import com.addyai.repos.requests.StreamRequest;
@@ -14,6 +15,8 @@ import org.springframework.stereotype.Repository;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import static com.addyai.utils.Constants.RECORD_NOT_FOUND;
 
 @Repository
 public class CampaignRepositoryImpl implements CampaignRepository {
@@ -77,7 +80,7 @@ public class CampaignRepositoryImpl implements CampaignRepository {
             if (campaignDetailsList.size() > 0)
                 return campaignDetailsList.get(0);
             else
-                return new CampaignDetails(); // TODO throw NOT FOUND ERROR
+                throw new NotFoundException(RECORD_NOT_FOUND, "Campaign Not Found", "Campaign " + campaignName + " could not be found!");
         } catch (Exception e) {
             throw ApiExceptionResolver.doResolveException(e);
         }

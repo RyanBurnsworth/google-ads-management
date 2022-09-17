@@ -47,10 +47,8 @@ public class CampaignBudgetRepositoryImpl implements CampaignBudgetRepository {
     }
 
     @Override
-    public List<BudgetDetails> createOrUpdateBudgets(long customerId, List<CampaignBudgetOperation> campaignBudgetOperationList) throws Exception {
-        // TODO: Update to return a list of resourceNames. MutateResponse only returns res name correctly
-
-        List<BudgetDetails> budgetDetailsList = new ArrayList<>();
+    public List<String> createOrUpdateBudgets(long customerId, List<CampaignBudgetOperation> campaignBudgetOperationList) throws Exception {
+        List<String> budgetResourceNameList = new ArrayList<>();
         try {
             CampaignBudgetServiceClient campaignBudgetServiceClient = GoogleAdsManagementApplication.getGoogleAdsClient()
                     .getLatestVersion().createCampaignBudgetServiceClient();
@@ -61,22 +59,13 @@ public class CampaignBudgetRepositoryImpl implements CampaignBudgetRepository {
 
             // create budget details objects from the results and add to list
             for (MutateCampaignBudgetResult response : budgetsResponse.getResultsList()) {
-                BudgetDetails budgetDetails = new BudgetDetails();
-                budgetDetails.setShared(response.getCampaignBudget().getExplicitlyShared());
-                budgetDetails.setStatus(response.getCampaignBudget().getStatusValue());
-                budgetDetails.setBudgetId(response.getCampaignBudget().getId());
-                budgetDetails.setName(response.getCampaignBudget().getName());
-                budgetDetails.setDailyBudgetAmount(
-                        round(response.getCampaignBudget().getAmountMicros() * MICRO_FACTOR));
-                budgetDetails.setResourceName(response.getResourceName());
-
-                budgetDetailsList.add(budgetDetails);
+                budgetResourceNameList.add(response.getResourceName());
             }
         } catch (Exception e) {
             throw ApiExceptionResolver.doResolveException(e);
         }
 
-        return budgetDetailsList;
+        return budgetResourceNameList;
     }
 
     @Override

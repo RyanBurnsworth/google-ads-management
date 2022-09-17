@@ -22,6 +22,7 @@ import java.util.Collections;
 import java.util.List;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.*;
 
 @SpringBootTest(classes = CampaignServiceImpl.class)
@@ -52,7 +53,7 @@ public class CampaignServiceTest {
 
         // when the budget is created return the budget details object containing a resource name
         when(campaignBudgetRepository.createOrUpdateBudgets(CUSTOMER_ID, campaignBudgetOperations))
-                .thenReturn(Collections.singletonList(getBudgetDetails()));
+                .thenReturn(Collections.singletonList("customers/9059845250/campaignBudgets/18343627878"));
 
         // set the budget resource name in the campaign details
         campaignDetails.setBudgetResourceName(getBudgetDetails().getResourceName());
@@ -75,6 +76,9 @@ public class CampaignServiceTest {
         verify(campaignRepository, times(1)).addCampaigns(CUSTOMER_ID, campaignOperations);
     }
 
+    /*
+        Test that an InvalidRequestException is thrown if the campaign name is empty
+     */
     @Test
     void testEmptyCampaignNameThrowsInvalidRequestException() {
         CampaignDetails campaignDetails = getCampaignDetails();
@@ -84,6 +88,9 @@ public class CampaignServiceTest {
                 .isInstanceOf(InvalidRequestException.class);
     }
 
+    /*
+        Test that an InvalidRequestException is thrown if the campaign budget value is 0
+     */
     @Test
     void testZeroBudgetValueThrowsInvalidRequestException() {
         CampaignDetails campaignDetails = getCampaignDetails();
@@ -93,6 +100,9 @@ public class CampaignServiceTest {
                 .isInstanceOf(InvalidRequestException.class);
     }
 
+    /*
+        Test updating existing campaigns
+     */
     @Test
     void testUpdateExistingCampaign() throws Exception {
         CampaignUtils campaignUtils = new CampaignUtils();
@@ -116,6 +126,9 @@ public class CampaignServiceTest {
         verify(campaignRepository, times(1)).updateCampaigns(CUSTOMER_ID, campaignOperations);
     }
 
+    /*
+         Test delete campaigns functionality
+     */
     @Test
     void testDeleteCampaign() throws Exception {
         List<Long> campaignIds = new ArrayList<>();
@@ -128,8 +141,38 @@ public class CampaignServiceTest {
     }
 
     /*
-        Get mock object methods
+        Test finding an individual campaign details object by name
      */
+    @Test
+    void testFindCampaignDetailsByCampaignName() throws Exception {
+        CampaignDetails campaignDetails = getCampaignDetails();
+        when(campaignRepository.fetchCampaignDetailsByName(CUSTOMER_ID, campaignDetails.getCampaignName()))
+                .thenReturn(campaignDetails);
+
+        when(campaignBudgetRepository.fetchAllCampaignBudgetDetails(CUSTOMER_ID)).thenReturn(getListOfBudgetDetails());
+
+        CampaignDetails actualCampaignDetails = campaignService
+                .findCampaignDetailsByName(CUSTOMER_ID, campaignDetails.getCampaignName());
+
+        assertEquals(getCampaignDetails().getCampaignId(), actualCampaignDetails.getCampaignId());
+        assertEquals(getCampaignDetails().getCampaignResourceName(), actualCampaignDetails.getCampaignResourceName());
+        assertEquals(getCampaignDetails().getBudgetResourceName(), actualCampaignDetails.getBudgetResourceName());
+        assertEquals(getCampaignDetails().getEndDate(), actualCampaignDetails.getEndDate());
+        assertEquals(getCampaignDetails().getStartDate(), actualCampaignDetails.getStartDate());
+        assertEquals(getCampaignDetails().getBudgetDetails().getName(), actualCampaignDetails.getBudgetDetails().getName());
+        assertEquals(getCampaignDetails().getBudgetDetails().getDailyBudgetAmount(),
+                actualCampaignDetails.getBudgetDetails().getDailyBudgetAmount());
+    }
+
+    /*
+        Test campaignService.findCampaignDetailsByName throws InvalidRequestException if the campaign
+        name is missing.
+     */
+    @Test
+    void testThrowsExceptionMissingCampaignNameWhenFindingCampaignDetailsByName() {
+        assertThatThrownBy(() -> campaignService.findCampaignDetailsByName(CUSTOMER_ID, ""))
+                .isInstanceOf(InvalidRequestException.class);
+    }
 
     /*
         Get a mock campaign details object that contains a BudgetDetails object that exists already
@@ -203,33 +246,13 @@ public class CampaignServiceTest {
         return campaignDetailsList;
     }
 
-    private CampaignDetails getCompletedCampaignDetails() {
-        CampaignDetails campaignDetails = new CampaignDetails();
-        campaignDetails.setCampaignId(0L);
-        campaignDetails.setCampaignName("Test Campaign 1");
-        campaignDetails.setBudgetResourceName("customers/9059845250/campaignBudgets/18343627878");
-        campaignDetails.setStatus("ENABLED");
-        campaignDetails.setStartDate("2022-09-31");
-        campaignDetails.setEndDate("2022-10-01");
-        campaignDetails.setEnhancedCpcEnabled(false);
-        campaignDetails.setTargetingPartnerSearchNetwork(false);
-        campaignDetails.setTargetingSearchNetwork(true);
-        campaignDetails.setTargetingContentNetwork(false);
-        campaignDetails.setAdvertisingChannelType("SEARCH");
-        campaignDetails.setPositiveGeoTargetType(7);
-        campaignDetails.setNegativeGeoTargetType(5);
-        campaignDetails.setCampaignResourceName("customers/9059845250/campaigns/18343627811");
-        campaignDetails.setBudgetDetails(getBudgetDetails());
-        return campaignDetails;
-    }
-
     /*
         Get a budget details object that exists in the list of multiple budget details
         Returns a single BudgetDetails object
      */
     private BudgetDetails getBudgetDetails() {
         BudgetDetails budgetDetails = new BudgetDetails();
-        budgetDetails.setName("Test Budget Details");
+        budgetDetails.setName("Test Campaign 1");
         budgetDetails.setResourceName("customers/9059845250/campaignBudgets/18343627878");
         budgetDetails.setBudgetId(0L);
         budgetDetails.setShared(true);
@@ -248,7 +271,7 @@ public class CampaignServiceTest {
         List<BudgetDetails> budgetDetailsList = new ArrayList<>();
 
         BudgetDetails budgetDetails = new BudgetDetails();
-        budgetDetails.setName("Test Budget");
+        budgetDetails.setName("Test Campaign 1");
         budgetDetails.setResourceName("customers/9059845250/campaignBudgets/18343627878");
         budgetDetails.setBudgetId(0L);
         budgetDetails.setShared(true);
@@ -257,7 +280,7 @@ public class CampaignServiceTest {
         budgetDetails.setStatus(2);
 
         BudgetDetails budgetDetails2 = new BudgetDetails();
-        budgetDetails2.setName("Test Budget");
+        budgetDetails2.setName("Test Campaign 2");
         budgetDetails2.setResourceName("customers/9059845250/campaignBudgets/18343654871");
         budgetDetails2.setBudgetId(1L);
         budgetDetails2.setShared(false);

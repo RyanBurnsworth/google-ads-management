@@ -1,6 +1,5 @@
 package com.addyai.rest.impl;
 
-import com.addyai.models.BudgetDetails;
 import com.addyai.models.CampaignDetails;
 import com.addyai.rest.CampaignController;
 import com.addyai.services.campaign.CampaignService;
