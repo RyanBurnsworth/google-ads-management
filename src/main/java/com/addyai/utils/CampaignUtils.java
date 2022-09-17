@@ -4,6 +4,7 @@ import com.addyai.error_handling.ValidationErrorResponse;
 import com.addyai.error_handling.exceptions.InvalidRequestException;
 import com.addyai.models.BudgetDetails;
 import com.addyai.models.CampaignDetails;
+import com.google.ads.googleads.lib.utils.FieldMasks;
 import com.google.ads.googleads.v11.common.ManualCpc;
 import com.google.ads.googleads.v11.enums.*;
 import com.google.ads.googleads.v11.resources.Campaign;
@@ -93,47 +94,43 @@ public class CampaignUtils {
         List<CampaignBudgetOperation> campaignBudgetOperations = new ArrayList<>();
 
         for (BudgetDetails budgetDetails : budgetDetailsList) {
-            // if the budget resource name is empty then create a budget from budget details
-            // otherwise if budget resource name is not empty, use continue
-            if (budgetDetails.getResourceName().isEmpty()) {
+            // if shouldCreate is true, create the budget within the client account
+            CampaignBudgetOperation operation;
+            if (shouldCreate) {
+                // build a CampaignBudget object using the given budget details
+                CampaignBudget budget = CampaignBudget.newBuilder()
+                        .setName(budgetDetails.getName())
+                        .setAmountMicros(budgetDetails.getDailyBudgetAmount() * MICRO_FACTOR)
+                        .setStatus(BudgetStatusEnum.BudgetStatus
+                                .forNumber(budgetDetails.getStatus()))
+                        .setDeliveryMethod(BudgetDeliveryMethodEnum.BudgetDeliveryMethod
+                                .forNumber(budgetDetails.getDeliveryMethod()))
+                        .setExplicitlyShared(budgetDetails.isShared()) // only allowed in budget creation
+                        .build();
 
-                // if shouldCreate is true, create the budget within the client account
-                CampaignBudgetOperation operation;
-                if (shouldCreate) {
-                    // build a CampaignBudget object using the given budget details
-                    CampaignBudget budget = CampaignBudget.newBuilder()
-                            .setName(budgetDetails.getName())
-                            .setAmountMicros(budgetDetails.getDailyBudgetAmount() * MICRO_FACTOR)
-                            .setStatus(BudgetStatusEnum.BudgetStatus
-                                    .forNumber(budgetDetails.getStatus()))
-                            .setDeliveryMethod(BudgetDeliveryMethodEnum.BudgetDeliveryMethod
-                                    .forNumber(budgetDetails.getDeliveryMethod()))
-                            .setExplicitlyShared(budgetDetails.isShared()) // only allowed in budget creation
-                            .build();
+                operation = CampaignBudgetOperation.newBuilder()
+                        .setCreate(budget)
+                        .build();
+            } else {
+                // if shouldCreate is false, update the existing budget within the client account
+                CampaignBudget budget = CampaignBudget.newBuilder()
+                        .setName(budgetDetails.getName())
+                        .setResourceName(budgetDetails.getResourceName()) // must include in order to update
+                        .setAmountMicros(budgetDetails.getDailyBudgetAmount() * MICRO_FACTOR)
+                        .setStatus(BudgetStatusEnum.BudgetStatus
+                                .forNumber(budgetDetails.getStatus()))
+                        .setDeliveryMethod(BudgetDeliveryMethodEnum.BudgetDeliveryMethod
+                                .forNumber(budgetDetails.getDeliveryMethod()))
+                        .build();
 
-                    operation = CampaignBudgetOperation.newBuilder()
-                            .setCreate(budget)
-                            .build();
-                } else {
-                    // if shouldCreate is false, update the existing budget within the client account
-                    CampaignBudget budget = CampaignBudget.newBuilder()
-                            .setName(budgetDetails.getName())
-                            .setResourceName(budgetDetails.getResourceName()) // must include in order to update
-                            .setAmountMicros(budgetDetails.getDailyBudgetAmount() * MICRO_FACTOR)
-                            .setStatus(BudgetStatusEnum.BudgetStatus
-                                    .forNumber(budgetDetails.getStatus()))
-                            .setDeliveryMethod(BudgetDeliveryMethodEnum.BudgetDeliveryMethod
-                                    .forNumber(budgetDetails.getDeliveryMethod()))
-                            .build();
-
-                    operation = CampaignBudgetOperation.newBuilder()
-                            .setUpdate(budget)
-                            .build();
-                }
-
-                // add the budget operation to the list of operations
-                campaignBudgetOperations.add(operation);
+                operation = CampaignBudgetOperation.newBuilder()
+                        .setUpdate(budget)
+                        .setUpdateMask(FieldMasks.allSetFieldsOf(budget))
+                        .build();
             }
+
+            // add the budget operation to the list of operations
+            campaignBudgetOperations.add(operation);
         }
         return campaignBudgetOperations;
     }
@@ -236,7 +233,7 @@ public class CampaignUtils {
     /**
      * Retrieve a single [BudgetDetails] based on a budget name
      *
-     * @param budgetName      the name of the campaign budget
+     * @param budgetName        the name of the campaign budget
      * @param budgetDetailsList a list of existing budgetDetails from the client account
      * @return [BudgetDetails] that matched the budget name given
      */

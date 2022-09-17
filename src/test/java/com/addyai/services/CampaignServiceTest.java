@@ -97,6 +97,10 @@ public class CampaignServiceTest {
     void testUpdateExistingCampaign() throws Exception {
         CampaignUtils campaignUtils = new CampaignUtils();
         List<CampaignOperation> campaignOperations = new ArrayList<>();
+
+        List<CampaignBudgetOperation> budgetOperations =
+                campaignUtils.buildCampaignBudgetOperationList(getListOfBudgetDetails(), false);
+
         campaignService.updateCampaigns(CUSTOMER_ID, getListOfCampaignDetails());
 
         for (CampaignDetails campaignDetails : getListOfCampaignDetails()) {
@@ -108,6 +112,7 @@ public class CampaignServiceTest {
             campaignOperations.add(campaignOperation);
         }
 
+        verify(campaignBudgetRepository, times(1)).createOrUpdateBudgets(CUSTOMER_ID, budgetOperations);
         verify(campaignRepository, times(1)).updateCampaigns(CUSTOMER_ID, campaignOperations);
     }
 
@@ -120,20 +125,6 @@ public class CampaignServiceTest {
         campaignService.deleteCampaigns(CUSTOMER_ID, campaignIds);
 
         verify(campaignRepository, times(1)).deleteCampaigns(CUSTOMER_ID, campaignIds);
-    }
-
-    @Test
-    void testUpdatingCampaignBudgets() throws Exception {
-        CampaignUtils campaignUtils = new CampaignUtils();
-        List<BudgetDetails> budgetDetailsList = getListOfBudgetDetails();
-
-        campaignService.updateCampaignBudgets(CUSTOMER_ID, budgetDetailsList);
-
-        List<CampaignBudgetOperation> campaignBudgetOperations = campaignUtils
-                .buildCampaignBudgetOperationList(budgetDetailsList, false);
-
-        verify(campaignBudgetRepository, times(1))
-                .createOrUpdateBudgets(CUSTOMER_ID, campaignBudgetOperations);
     }
 
     /*
@@ -187,7 +178,7 @@ public class CampaignServiceTest {
         campaignDetails.setPositiveGeoTargetType(7);
         campaignDetails.setNegativeGeoTargetType(5);
         campaignDetails.setCampaignResourceName("");
-        campaignDetails.setBudgetDetails(getBudgetDetails());
+        campaignDetails.setBudgetDetails(getListOfBudgetDetails().get(0));
 
         CampaignDetails campaignDetails2 = new CampaignDetails();
         campaignDetails2.setCampaignId(0L);
@@ -204,7 +195,7 @@ public class CampaignServiceTest {
         campaignDetails2.setPositiveGeoTargetType(7);
         campaignDetails2.setNegativeGeoTargetType(5);
         campaignDetails2.setCampaignResourceName("");
-        campaignDetails2.setBudgetDetails(getBudgetDetails());
+        campaignDetails2.setBudgetDetails(getListOfBudgetDetails().get(1));
 
         campaignDetailsList.add(campaignDetails);
         campaignDetailsList.add(campaignDetails2);
@@ -257,6 +248,7 @@ public class CampaignServiceTest {
         List<BudgetDetails> budgetDetailsList = new ArrayList<>();
 
         BudgetDetails budgetDetails = new BudgetDetails();
+        budgetDetails.setName("Test Budget");
         budgetDetails.setResourceName("customers/9059845250/campaignBudgets/18343627878");
         budgetDetails.setBudgetId(0L);
         budgetDetails.setShared(true);
@@ -265,11 +257,12 @@ public class CampaignServiceTest {
         budgetDetails.setStatus(2);
 
         BudgetDetails budgetDetails2 = new BudgetDetails();
+        budgetDetails2.setName("Test Budget");
         budgetDetails2.setResourceName("customers/9059845250/campaignBudgets/18343654871");
         budgetDetails2.setBudgetId(1L);
         budgetDetails2.setShared(false);
         budgetDetails2.setDailyBudgetAmount(250);
-        budgetDetails.setDeliveryMethod(1);
+        budgetDetails2.setDeliveryMethod(1);
         budgetDetails2.setStatus(2);
 
         budgetDetailsList.add(budgetDetails);

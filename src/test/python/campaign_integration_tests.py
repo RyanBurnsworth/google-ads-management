@@ -85,57 +85,8 @@ def test_successful_get_single_campaign_details():
 
     Expects status code 201
 """
-def test_create_campaigns_on_test_account():
-    print(Fore.YELLOW + "[*] Testing Creating Campaign on Test Account")
-
-    campaign_details_1_name = "Test Campaign 1 " + str(randint(100,500000))
-    campaign_details_2_name = "Test Campaign 2 " + str(randint(100,500000))
-
-    campaign_details_1 = {
-            "campaignName": campaign_details_1_name,
-            "status": "ENABLED",
-            "advertisingChannelType": "SEARCH",
-            "positiveGeoTargetType": 7,
-            "negativeGeoTargetType": 5,
-            "enhancedCpcEnabled": False,
-            "startDate": "2023-09-02",
-            "endDate": "2037-09-01",
-            "budgetResourceName": "",
-            "targetingPartnerSearchNetwork": False,
-            "targetingSearchNetwork": True,
-            "targetingContentNetwork": True,
-            "budgetDetails": {
-                "name": campaign_details_1_name,
-                "resourceName" : "",
-                "deliveryMethod": 2,
-                "isShared": False,
-                "dailyBudgetAmount": 345,
-                "status": 2
-            }
-        }
-
-    campaign_details_2 = {
-            "campaignName": campaign_details_2_name,
-            "status": "PAUSED",
-            "advertisingChannelType": "SEARCH",
-            "positiveGeoTargetType": 7,
-            "negativeGeoTargetType": 5,
-            "enhancedCpcEnabled": False,
-            "startDate": "2025-09-02",
-            "endDate": "2037-09-01",
-            "budgetResourceName": "",
-            "targetingPartnerSearchNetwork": False,
-            "targetingSearchNetwork": True,
-            "targetingContentNetwork": False,
-            "budgetDetails": {
-                "name": campaign_details_2_name,
-                "resourceName" : "",
-                "deliveryMethod": 2,
-                "isShared": False,
-                "dailyBudgetAmount": 567,
-                "status": 2
-            }
-        }
+def test_create_campaigns_on_test_account(campaign_details_1_name, campaign_details_2_name, campaign_details_1, campaign_details_2):
+    print(Fore.YELLOW + "[*] Testing Creating 2 Campaigns on Test Account")
 
     # add the two campaign details dicts to a list
     campaign_details_list = [campaign_details_1, campaign_details_2]
@@ -150,6 +101,61 @@ def test_create_campaigns_on_test_account():
 
     # verify the status code is 201
     if (resp.status_code != 201):
+        print("Status Code: ", resp.status_code)
+        print("Response Body: ", resp.content)
+        print(Fore.RED + 'FAILED!')
+        return
+
+    # fetch the newly created campaign details 1 from the test account
+    actual_campaign_details_1 = _get_single_campaign_details(campaign_details_1_name)
+
+    # fetch the newly created campaign details 2 from the test account
+    actual_campaign_details_2 = _get_single_campaign_details(campaign_details_2_name)
+
+    # verify both the campaigns are successfully created compare actual_campaign_details_1 to the campaign details we provided with campaign_details_1
+    if _compare_campaign_details_objects(actual_campaign_details_1, campaign_details_1) and _compare_campaign_details_objects(actual_campaign_details_2, campaign_details_2):
+        print(Fore.GREEN + 'SUCCESS')
+    else:
+        _find_exact_comparison_failure_reason(actual_campaign_details_1, campaign_details_1)
+        print(Fore.RED + 'FAILED!')
+
+"""
+    Create two campaigns on the client account
+
+    Expects status code 201
+"""
+def test_update_campaigns_on_test_account(campaign_details_1_name, campaign_details_2_name, campaign_details_1, campaign_details_2):
+    print(Fore.YELLOW + "[*] Testing Updating 2 Campaigns on Test Account")
+
+    # retrieve campaign objects to parse the campaign resource name and budget resource name from
+    campaign_1 = _get_single_campaign_details(campaign_details_1_name)
+    campaign_2= _get_single_campaign_details(campaign_details_2_name)
+
+    # set the campaign resource names for both campaign details objects
+    campaign_details_1["campaignResourceName"] = campaign_1["campaignResourceName"]
+    campaign_details_2["campaignResourceName"] = campaign_2["campaignResourceName"]
+
+    # set the budget resource names for both campaign details objects
+    campaign_details_1["budgetResourceName"] = campaign_1["budgetDetails"]["resourceName"]
+    campaign_details_2["budgetResourceName"] = campaign_2["budgetDetails"]["resourceName"]
+
+    # set the budget details resource names for both campaign details objects
+    campaign_details_1["budgetDetails"]["resourceName"] = campaign_1["budgetDetails"]["resourceName"]
+    campaign_details_2["budgetDetails"]["resourceName"] = campaign_2["budgetDetails"]["resourceName"]
+
+    # add the two campaign details dicts to a list
+    campaign_details_list = [campaign_details_1, campaign_details_2]
+
+    # perform a POST request on the /campaign/update endpoint to update the 2 campaigns
+    url = BASE_URL + TEST_CLIENT_ACCOUNT_ID + "/campaign/update"
+    data = json.dumps(campaign_details_list)
+    headers = {'Content-type': 'application/json', 'Accept': 'text/plain'}
+
+    # perform the request to the endpoint
+    resp = requests.put(url, data=data, headers=headers)
+
+    # verify the status code is 202
+    if (resp.status_code != 202):
         print("Status Code: ", resp.status_code)
         print("Response Body: ", resp.content)
         print(Fore.RED + 'FAILED!')
@@ -242,10 +248,110 @@ def _get_single_campaign_details(campaignName):
     json_response_body = resp.json()
     return json_response_body
 
+
+
+
+campaign_details_1_name = "Test Campaign 1 " + str(randint(100,500000))
+campaign_details_2_name = "Test Campaign 2 " + str(randint(100,500000))
+
+campaign_details_1 = {
+        "campaignName": campaign_details_1_name,
+        "status": "ENABLED",
+        "advertisingChannelType": "SEARCH",
+        "positiveGeoTargetType": 7,
+        "negativeGeoTargetType": 5,
+        "enhancedCpcEnabled": False,
+        "startDate": "2023-09-02",
+        "endDate": "2037-09-01",
+        "budgetResourceName": "",
+        "targetingPartnerSearchNetwork": False,
+        "targetingSearchNetwork": True,
+        "targetingContentNetwork": True,
+        "budgetDetails": {
+            "name": campaign_details_1_name,
+            "resourceName" : "",
+            "deliveryMethod": 2,
+            "isShared": False,
+            "dailyBudgetAmount": 345,
+            "status": 2
+        }
+    }
+
+campaign_details_2 = {
+        "campaignName": campaign_details_2_name,
+        "status": "PAUSED",
+        "advertisingChannelType": "SEARCH",
+        "positiveGeoTargetType": 7,
+        "negativeGeoTargetType": 5,
+        "enhancedCpcEnabled": False,
+        "startDate": "2025-09-02",
+        "endDate": "2037-09-01",
+        "budgetResourceName": "",
+        "targetingPartnerSearchNetwork": False,
+        "targetingSearchNetwork": True,
+        "targetingContentNetwork": False,
+        "budgetDetails": {
+            "name": campaign_details_2_name,
+            "resourceName" : "",
+            "deliveryMethod": 2,
+            "isShared": False,
+            "dailyBudgetAmount": 567,
+            "status": 2
+        }
+    }
+
+campaign_details_1_updated = {
+        "campaignName": campaign_details_1_name,
+        "status": "PAUSED",
+        "advertisingChannelType": "SEARCH",
+        "positiveGeoTargetType": 7,
+        "negativeGeoTargetType": 5,
+        "enhancedCpcEnabled": False,
+        "startDate": "2030-09-02",
+        "endDate": "2037-09-01",
+        "budgetResourceName": "",
+        "targetingPartnerSearchNetwork": False,
+        "targetingSearchNetwork": True,
+        "targetingContentNetwork": True,
+        "budgetDetails": {
+            "name": campaign_details_1_name,
+            "resourceName" : "",
+            "deliveryMethod": 2,
+            "isShared": False,
+            "dailyBudgetAmount": 755,
+            "status": 2
+        }
+    }
+
+campaign_details_2_updated = {
+        "campaignName": campaign_details_2_name,
+        "status": "ENABLED",
+        "advertisingChannelType": "SEARCH",
+        "positiveGeoTargetType": 7,
+        "negativeGeoTargetType": 5,
+        "enhancedCpcEnabled": True,
+        "startDate": "2023-09-02",
+        "endDate": "2037-09-01",
+        "budgetResourceName": "",
+        "targetingPartnerSearchNetwork": False,
+        "targetingSearchNetwork": True,
+        "targetingContentNetwork": False,
+        "budgetDetails": {
+            "name": campaign_details_2_name,
+            "resourceName" : "",
+            "deliveryMethod": 2,
+            "isShared": False,
+            "dailyBudgetAmount": 550,
+            "status": 2
+        }
+    }
+
 test_successful_get_all_campaign_details()
+
+test_successful_get_single_campaign_details()
 
 test_failed_get_all_campaign_details_invalid_customer_id()
 
-test_create_campaigns_on_test_account()
+test_create_campaigns_on_test_account(campaign_details_1_name, campaign_details_2_name, campaign_details_1, campaign_details_2)
 
-test_successful_get_single_campaign_details()
+test_update_campaigns_on_test_account(campaign_details_1_name, campaign_details_2_name, campaign_details_1_updated, campaign_details_2_updated)

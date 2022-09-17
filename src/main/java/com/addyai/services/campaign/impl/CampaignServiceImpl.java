@@ -135,6 +135,21 @@ public class CampaignServiceImpl implements CampaignService {
     @Override
     public void updateCampaigns(long customerId, List<CampaignDetails> campaignDetailsList) throws Exception {
         List<CampaignOperation> campaignOperations = new ArrayList<>();
+        List<BudgetDetails> budgetDetailsList  = new ArrayList<>();
+
+        // populate a list of all the budgetDetails
+        for (CampaignDetails campaignDetails : campaignDetailsList) {
+            // validate the campaign budget details before adding to the list
+            campaignUtils.validateCampaignBudgetDetails(campaignDetails.getBudgetDetails());
+            budgetDetailsList.add(campaignDetails.getBudgetDetails());
+        }
+
+        // create a list of campaign budget operations for updating campaign budgets
+        List<CampaignBudgetOperation> campaignBudgetOperations =
+                campaignUtils.buildCampaignBudgetOperationList(budgetDetailsList, false);
+
+        // update the campaign budgets
+        campaignBudgetRepository.createOrUpdateBudgets(customerId, campaignBudgetOperations);
 
         // create an UPDATE campaign operation for each campaign
         for (CampaignDetails campaignDetails : campaignDetailsList) {
@@ -161,27 +176,5 @@ public class CampaignServiceImpl implements CampaignService {
     @Override
     public void deleteCampaigns(long customerId, List<Long> campaignIds) throws Exception {
         campaignRepository.deleteCampaigns(customerId, campaignIds);
-    }
-
-    /**
-     * Update campaign budgets within a client's account
-     *
-     * @param customerId        the customer id of the client account
-     * @param budgetDetailsList a list of [BudgetDetails] to be updated
-     */
-    @Override
-    public void updateCampaignBudgets(long customerId, List<BudgetDetails> budgetDetailsList) throws Exception {
-        // validate budget details before proceeding
-        for (BudgetDetails budgetDetails : budgetDetailsList) {
-            campaignUtils.validateCampaignBudgetDetails(budgetDetails);
-        }
-
-        // create a list of CREATE campaign budget operations using the budgetDetails within each campaignDetails
-        // in the campaign details list
-        List<CampaignBudgetOperation> campaignBudgetOperations =
-                campaignUtils.buildCampaignBudgetOperationList(budgetDetailsList, false);
-
-        // perform update on all campaigns
-        campaignBudgetRepository.createOrUpdateBudgets(customerId, campaignBudgetOperations);
     }
 }
