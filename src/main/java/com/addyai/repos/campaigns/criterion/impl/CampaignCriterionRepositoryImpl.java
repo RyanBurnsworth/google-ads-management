@@ -9,7 +9,6 @@ import com.addyai.repos.requests.impl.StreamRequestImpl;
 import com.google.ads.googleads.v11.services.*;
 import org.springframework.stereotype.Repository;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -52,8 +51,6 @@ public class CampaignCriterionRepositoryImpl implements CampaignCriterionReposit
     public String getGeoTargetConstant(String locale,
                                        String countryCode,
                                        String location) throws Exception {
-        List<String> geoTargetResourceNameList = new ArrayList<>();
-
         try {
             // create an instance of GeoTargetConstantServiceClient
             GeoTargetConstantServiceClient geoTargetClient =

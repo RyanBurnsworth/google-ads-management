@@ -4,6 +4,7 @@ import com.addyai.error_handling.exceptions.InvalidRequestException;
 import com.addyai.models.BudgetDetails;
 import com.addyai.models.CampaignDetails;
 import com.addyai.models.campaign_criterion.CampaignCriterionDetails;
+import com.addyai.models.campaign_criterion.LocationDetails;
 import com.addyai.repos.campaigns.CampaignRepository;
 import com.addyai.repos.campaigns.budget.CampaignBudgetRepository;
 import com.addyai.repos.campaigns.criterion.CampaignCriterionRepository;
@@ -86,8 +87,11 @@ public class CampaignServiceImpl implements CampaignService {
         // add campaigns to the client account and store the campaign resource names
         List<String> campaignResourceNames = campaignRepository.addCampaigns(customerId, campaignOperations);
 
-        // associate the campaign resource name and  build campaign criterion operations
+        // Instantiate an empty CampaignCriterionOperation list
         List<CampaignCriterionOperation> campaignCriterionOperationList = new ArrayList<>();
+
+        // set the campaignResource name and, if needed,
+        // set the geo target location constant for locationDetails
         for (int i = 0; i < campaignResourceNames.size(); i++) {
             // extract the campaign resource name from the list
             String campaignResourceName = campaignResourceNames.get(i);
@@ -99,6 +103,20 @@ public class CampaignServiceImpl implements CampaignService {
             // set the campaignResourceName to it's campaignCriterion
             for (CampaignCriterionDetails campaignCriterionDetails : campaignCriterionDetailsList) {
                 campaignCriterionDetails.setCampaignResourceName(campaignResourceName);
+            }
+
+            for (CampaignCriterionDetails campaignCriterionDetails : campaignCriterionDetailsList) {
+                if (campaignCriterionDetails instanceof LocationDetails) {
+                    LocationDetails locationDetails = ((LocationDetails) campaignCriterionDetails);
+
+                    // fetch the geo target constant from Google Ads
+                    String geoTargetConstant = getGeoTargetConstant(locationDetails.getLocale(),
+                            locationDetails.getCountryCode(),
+                            locationDetails.getLocation());
+
+                    // set the geo target constant for this campaign criterion
+                    locationDetails.setGeoTargetingConstant(geoTargetConstant);
+                }
             }
 
             // build a list of campaign criterion operations
@@ -220,5 +238,19 @@ public class CampaignServiceImpl implements CampaignService {
     @Override
     public void deleteCampaigns(long customerId, List<Long> campaignIds) throws Exception {
         campaignRepository.deleteCampaigns(customerId, campaignIds);
+    }
+
+    /**
+     * Fetch the geo target constant for a given location from Google Ads
+     *
+     * @param locale      Locale is using ISO 639-1 format. If an invalid locale is given, 'en' is used by default.
+     * @param countryCode A list of country codes can be referenced here:
+     *                    <a href="https://developers.google.com/google-ads/api/reference/data/geotargets">Country Codes</a>
+     * @param location    the location to target
+     * @return the geo target resource name
+     * @throws Exception
+     */
+    private String getGeoTargetConstant(String locale, String countryCode, String location) throws Exception {
+        return campaignCriterionRepository.getGeoTargetConstant(locale, countryCode, location);
     }
 }

@@ -140,7 +140,7 @@ public class CampaignUtils {
 
     /**
      * Build a list of CampaignCriterionOperation to be used for creating or updating campaign criterion.
-     * The campaign to be updated is specified by it's campaignResourceName
+     * The campaign to be updated is specified by its campaignResourceName
      *
      * @param campaignCriterionDetailsList a list of [CampaignCriterionDetails]
      * @param shouldCreate                 true if it should create, false if it should update
@@ -154,143 +154,102 @@ public class CampaignUtils {
         // TODO: Validate campaign resource name in each object
 
         for (CampaignCriterionDetails campaignCriterionDetails : campaignCriterionDetailsList) {
-            CampaignCriterion campaignCriterion = null;
+            CampaignCriterion.Builder campaignCriterionBuilder = CampaignCriterion.newBuilder();
 
             if (campaignCriterionDetails instanceof AdScheduleDetails) {
-                // create ad schedule info
-                AdScheduleInfo adScheduleInfo = AdScheduleInfo.newBuilder()
-                        .setDayOfWeek(DayOfWeekEnum.DayOfWeek.forNumber(
-                                ((AdScheduleDetails) campaignCriterionDetails).getDayOfWeek()))
-                        .setStartHour(((AdScheduleDetails) campaignCriterionDetails).getStartHour())
-                        .setEndHour(((AdScheduleDetails) campaignCriterionDetails).getEndHour())
-                        .setStartMinuteValue(((AdScheduleDetails) campaignCriterionDetails).getStartMinute())
-                        .setEndMinuteValue(((AdScheduleDetails) campaignCriterionDetails).getEndMinute())
-                        .build();
+                AdScheduleInfo adScheduleInfo = buildAdScheduleInfo((AdScheduleDetails) campaignCriterionDetails);
 
-                campaignCriterion = CampaignCriterion.newBuilder()
+                campaignCriterionBuilder
                         .setAdSchedule(adScheduleInfo)
                         .setCampaign(campaignCriterionDetails.getCampaignResourceName())
-                        .setBidModifier(campaignCriterionDetails.getBidModifier())
-                        .build();
+                        .setBidModifier(campaignCriterionDetails.getBidModifier());
+
             } else if (campaignCriterionDetails instanceof KeywordDetails) {
                 KeywordInfo keywordInfo = KeywordInfo.newBuilder()
                         .setMatchTypeValue(((KeywordDetails) campaignCriterionDetails).getKeywordMatchType())
                         .setText(((KeywordDetails) campaignCriterionDetails).getKeywordText())
                         .build();
 
-                campaignCriterion = CampaignCriterion.newBuilder()
+                campaignCriterionBuilder
                         .setKeyword(keywordInfo)
                         .setCampaign(campaignCriterionDetails.getCampaignResourceName())
-                        .setNegative(campaignCriterionDetails.isNegative())
-                        .build();
+                        .setNegative(campaignCriterionDetails.isNegative());
 
             } else if (campaignCriterionDetails instanceof LanguageDetails) {
+                LanguageDetails languageDetails = ((LanguageDetails) campaignCriterionDetails);
+
                 LanguageInfo languageInfo = LanguageInfo.newBuilder()
-                        .setLanguageConstant(((LanguageDetails) campaignCriterionDetails).getLanguageCode())
+                        .setLanguageConstant(languageDetails.getLanguageCode())
                         .build();
 
-                campaignCriterion = CampaignCriterion.newBuilder()
+                // update if this is a negative language target
+                if (languageDetails.isNegative())
+                    campaignCriterionBuilder.setNegative(true);
+
+                campaignCriterionBuilder
                         .setLanguage(languageInfo)
-                        .setCampaign(campaignCriterionDetails.getCampaignResourceName())
-                        .build();
+                        .setCampaign(campaignCriterionDetails.getCampaignResourceName());
 
             } else if (campaignCriterionDetails instanceof DeviceDetails) {
-                DeviceInfo deviceInfo = DeviceInfo.newBuilder()
-                        .setTypeValue(((DeviceDetails) campaignCriterionDetails).getDeviceType())
-                        .build();
+                DeviceInfo deviceInfo = buildDeviceInfo((DeviceDetails) campaignCriterionDetails);
 
-                campaignCriterion = CampaignCriterion.newBuilder()
+                campaignCriterionBuilder
                         .setDevice(deviceInfo)
                         .setBidModifier(campaignCriterionDetails.getBidModifier())
-                        .setCampaign(campaignCriterionDetails.getCampaignResourceName())
-                        .build();
+                        .setCampaign(campaignCriterionDetails.getCampaignResourceName());
 
             } else if (campaignCriterionDetails instanceof LocationDetails) {
+                LocationDetails locationDetails = ((LocationDetails) campaignCriterionDetails);
+
                 LocationInfo locationInfo = LocationInfo.newBuilder()
-                        .setGeoTargetConstant(((LocationDetails) campaignCriterionDetails).getGeoTargetingConstant())
+                        .setGeoTargetConstant(locationDetails.getGeoTargetingConstant())
                         .build();
 
-                campaignCriterion = CampaignCriterion.newBuilder()
+                // update if a negative target
+                if (locationDetails.isNegative())
+                    campaignCriterionBuilder.setNegative(true);
+
+                // if needed, update the bid modifier
+                if (locationDetails.getBidModifier() != 0.0)
+                    campaignCriterionBuilder.setBidModifier(locationDetails.getBidModifier());
+
+                campaignCriterionBuilder
                         .setLocation(locationInfo)
-                        .setCampaign(campaignCriterionDetails.getCampaignResourceName())
-                        .setNegative(campaignCriterionDetails.isNegative())
-                        .setBidModifier(campaignCriterionDetails.getBidModifier())
-                        .build();
+                        .setCampaign(campaignCriterionDetails.getCampaignResourceName());
 
             } else if (campaignCriterionDetails instanceof ProximityDetails) {
-                ProximityInfo.Builder proximityInfoBuilder = ProximityInfo.newBuilder();
-                ProximityDetails proximityDetails = ((ProximityDetails) campaignCriterionDetails);
+                ProximityDetails proximityDetails = (ProximityDetails) campaignCriterionDetails;
 
-                // if the address details are not empty, create Address info object and set it in the builder
-                if (!proximityDetails.getStreetAddress().isEmpty() && !proximityDetails.getPostalCode().isEmpty() &&
-                        !proximityDetails.getCityName().isEmpty() && !proximityDetails.getProvinceName().isEmpty() &&
-                        !proximityDetails.getCountryCode().isEmpty()) {
+                // create a proximity info builder
+                ProximityInfo.Builder proximityInfoBuilder = buildProximityInfoBuilder(proximityDetails);
 
-                    // build an AddressInfo object and set it in the builder
-                    AddressInfo addressInfo = AddressInfo.newBuilder()
-                            .setStreetAddress(proximityDetails.getStreetAddress())
-                            .setPostalCode(proximityDetails.getPostalCode())
-                            .setCityName(proximityDetails.getCityName())
-                            //.setProvinceCode(proximityDetails.getProvinceCode())
-                            .setProvinceName(proximityDetails.getProvinceName())
-                            .setCountryCode(proximityDetails.getCountryCode())
-                            .build();
-
-                    proximityInfoBuilder.setAddress(addressInfo);
-                }
-
-                // if the latitude and longitude are set, create and set the geopoints info object
-                if (proximityDetails.getMicroLatitude() != 0 &&
-                        proximityDetails.getMicroLongitude() != 0) {
-
-                    // convert longitude and latitude to micro degrees
-                    int longitude = Math.round(proximityDetails.getMicroLongitude() * MICRO_FACTOR);
-                    int latitude = Math.round(proximityDetails.getMicroLatitude() * MICRO_FACTOR);
-
-                    // set the longitude and latitude geo points in the builder
-                    GeoPointInfo geoPointInfo = GeoPointInfo.newBuilder()
-                            .setLatitudeInMicroDegrees(latitude)
-                            .setLongitudeInMicroDegrees(longitude)
-                            .build();
-
-                    proximityInfoBuilder.setGeoPoint(geoPointInfo);
-                }
-
-                // if the radius value is set, assign radius and measurement units for the radius to the builder
-                if (proximityDetails.getRadius() > 0) {
-                    proximityInfoBuilder
-                            .setRadius(proximityDetails.getRadius())
-                            .setRadiusUnitsValue(proximityDetails.getRadiusUnits());
-                }
+                // update if this proximity target is using a bid modifier
+                if (proximityDetails.getBidModifier() != 0.0f)
+                    campaignCriterionBuilder.setBidModifier(proximityDetails.getBidModifier());
 
                 // create the campaign criterion object from the details
-                campaignCriterion = CampaignCriterion.newBuilder()
+                campaignCriterionBuilder
                         .setCampaign(campaignCriterionDetails.getCampaignResourceName())
-                        .setProximity(proximityInfoBuilder.build())
-                        .setNegative(campaignCriterionDetails.isNegative())
-                        .setBidModifier(campaignCriterionDetails.getBidModifier())
-                        .build();
+                        .setProximity(proximityInfoBuilder.build());
             }
 
-            // if campaignCriterion is null, go to the next in the list
-            if (campaignCriterion == null)
-                continue;
+            // build campaign criterion object
+            CampaignCriterion campaignCriterion = campaignCriterionBuilder.build();
 
             // build a create or update campaignCriterionOperation
-            CampaignCriterionOperation operation;
-            if (shouldCreate) {
-                operation = CampaignCriterionOperation.newBuilder()
-                        .setCreate(campaignCriterion)
-                        .build();
-            } else {
-                operation = CampaignCriterionOperation.newBuilder()
+            CampaignCriterionOperation.Builder campaignCriterionOperationBuilder = CampaignCriterionOperation.newBuilder();
+
+            // set create or update flag for campaign criterion operation
+            if (shouldCreate)
+                campaignCriterionOperationBuilder
+                        .setCreate(campaignCriterion);
+            else
+                campaignCriterionOperationBuilder
                         .setUpdate(campaignCriterion)
-                        .setUpdateMask(FieldMasks.allSetFieldsOf(campaignCriterion))
-                        .build();
-            }
+                        .setUpdateMask(FieldMasks.allSetFieldsOf(campaignCriterion));
 
             // add CampaignCriterionOperation to list
-            campaignCriterionOperationList.add(operation);
+            campaignCriterionOperationList.add(campaignCriterionOperationBuilder.build());
         }
         return campaignCriterionOperationList;
     }
@@ -342,6 +301,77 @@ public class CampaignUtils {
                 .setTargetSearchNetwork(isTargetingSearchNetwork)
                 .setTargetPartnerSearchNetwork(isTargetingPartnerSearchNetwork)
                 .build();
+    }
+
+    private AdScheduleInfo buildAdScheduleInfo(AdScheduleDetails adScheduleDetails) {
+        // create ad schedule info
+        return AdScheduleInfo.newBuilder()
+                .setDayOfWeekValue((adScheduleDetails.getDayOfWeek()))
+                .setStartHour(adScheduleDetails.getStartHour())
+                .setEndHour(adScheduleDetails.getEndHour())
+                .setStartMinuteValue(adScheduleDetails.getStartMinute())
+                .setEndMinuteValue(adScheduleDetails.getEndMinute())
+                .build();
+    }
+
+    private DeviceInfo buildDeviceInfo(DeviceDetails deviceDetails) {
+        return DeviceInfo.newBuilder()
+                .setTypeValue(deviceDetails.getDeviceType())
+                .build();
+    }
+
+    private ProximityInfo.Builder buildProximityInfoBuilder(ProximityDetails proximityDetails) {
+        ProximityInfo.Builder proximityInfoBuilder = ProximityInfo.newBuilder();
+
+        // if the address details are not empty, create Address info object and set it in the builder
+        if (!proximityDetails.getStreetAddress().isEmpty() && !proximityDetails.getPostalCode().isEmpty() &&
+                !proximityDetails.getCityName().isEmpty() && !proximityDetails.getCountryCode().isEmpty()) {
+
+            // Instantiate an AddressInfo Builder
+            AddressInfo.Builder addressInfoBuilder = AddressInfo.newBuilder();
+
+            // add the address information to the address info object
+            addressInfoBuilder
+                    .setStreetAddress(proximityDetails.getStreetAddress())
+                    .setPostalCode(proximityDetails.getPostalCode())
+                    .setCityName(proximityDetails.getCityName())
+                    .setCountryCode(proximityDetails.getCountryCode());
+
+            // if providence name and providence code are set, add them to the addressInfo object
+            if (!proximityDetails.getProvinceName().isEmpty() &&
+                    !proximityDetails.getProvinceCode().isEmpty()) {
+                addressInfoBuilder
+                        .setProvinceCode(proximityDetails.getProvinceCode())
+                        .setProvinceName(proximityDetails.getProvinceName());
+            }
+
+            proximityInfoBuilder.setAddress(addressInfoBuilder.build());
+        }
+
+        // if the latitude and longitude are set, create and set the geopoints info object
+        if (proximityDetails.getMicroLatitude() != 0 &&
+                proximityDetails.getMicroLongitude() != 0) {
+
+            // convert longitude and latitude to micro degrees
+            int longitude = Math.round(proximityDetails.getMicroLongitude() * MICRO_FACTOR);
+            int latitude = Math.round(proximityDetails.getMicroLatitude() * MICRO_FACTOR);
+
+            // set the longitude and latitude geo points in the builder
+            GeoPointInfo geoPointInfo = GeoPointInfo.newBuilder()
+                    .setLatitudeInMicroDegrees(latitude)
+                    .setLongitudeInMicroDegrees(longitude)
+                    .build();
+
+            proximityInfoBuilder.setGeoPoint(geoPointInfo);
+        }
+
+        // if the radius value is set, assign radius and measurement units for the radius to the builder
+        if (proximityDetails.getRadius() > 0) {
+            proximityInfoBuilder
+                    .setRadius(proximityDetails.getRadius())
+                    .setRadiusUnitsValue(proximityDetails.getRadiusUnits());
+        }
+        return proximityInfoBuilder;
     }
 
     /**
