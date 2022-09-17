@@ -4,12 +4,15 @@ import com.addyai.error_handling.ValidationErrorResponse;
 import com.addyai.error_handling.exceptions.InvalidRequestException;
 import com.addyai.models.BudgetDetails;
 import com.addyai.models.CampaignDetails;
+import com.addyai.models.campaign_criterion.*;
 import com.google.ads.googleads.lib.utils.FieldMasks;
-import com.google.ads.googleads.v11.common.ManualCpc;
+import com.google.ads.googleads.v11.common.*;
 import com.google.ads.googleads.v11.enums.*;
 import com.google.ads.googleads.v11.resources.Campaign;
 import com.google.ads.googleads.v11.resources.CampaignBudget;
+import com.google.ads.googleads.v11.resources.CampaignCriterion;
 import com.google.ads.googleads.v11.services.CampaignBudgetOperation;
+import com.google.ads.googleads.v11.services.CampaignCriterionOperation;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -133,6 +136,124 @@ public class CampaignUtils {
             campaignBudgetOperations.add(operation);
         }
         return campaignBudgetOperations;
+    }
+
+
+    /**
+     * Build a list of CampaignCriterionOperation to be used for creating or updating campaign criterion.
+     * The campaign to be updated is specified by it's campaignResourceName
+     *
+     * @param campaignCriterionDetailsList a list of [CampaignCriterionDetails]
+     * @param shouldCreate      true if it should create, false if it should update
+     * @return list of [CampaignCriterionOperations] to be performed on the specified campaign
+     */
+    public List<CampaignCriterionOperation> buildCampaignCriterionOperationList(
+            List<CampaignCriterionDetails> campaignCriterionDetailsList,
+            boolean shouldCreate) {
+        List<CampaignCriterionOperation> campaignCriterionOperationList = new ArrayList<>();
+
+        // TODO: Validate campaign resource name in each object
+
+        for (CampaignCriterionDetails campaignCriterionDetails : campaignCriterionDetailsList) {
+            CampaignCriterion campaignCriterion = null;
+
+            if (campaignCriterionDetails instanceof AdScheduleDetails) {
+                // create ad schedule info
+                AdScheduleInfo adScheduleInfo = AdScheduleInfo.newBuilder()
+                        .setDayOfWeek(((AdScheduleDetails) campaignCriterionDetails).getDayOfWeek())
+                        .setStartHour(((AdScheduleDetails) campaignCriterionDetails).getStartHour())
+                        .setEndHour(((AdScheduleDetails) campaignCriterionDetails).getEndHour())
+                        .setStartMinute(((AdScheduleDetails) campaignCriterionDetails).getStartMinute())
+                        .setEndMinute(((AdScheduleDetails) campaignCriterionDetails).getEndMinute())
+                        .build();
+
+                campaignCriterion = CampaignCriterion.newBuilder()
+                        .setAdSchedule(adScheduleInfo)
+                        .setCampaign(campaignCriterionDetails.getCampaignResourceName())
+                        .setBidModifier(campaignCriterionDetails.getBidModifier())
+                        .setNegative(campaignCriterionDetails.isNegative())
+                        .build();
+            } else if (campaignCriterionDetails instanceof KeywordDetails) {
+                KeywordInfo keywordInfo = KeywordInfo.newBuilder()
+                        .setMatchType(((KeywordDetails) campaignCriterionDetails).getKeywordMatchType())
+                        .setText(((KeywordDetails) campaignCriterionDetails).getKeywordText())
+                        .build();
+
+                campaignCriterion = CampaignCriterion.newBuilder()
+                        .setKeyword(keywordInfo)
+                        .setCampaign(campaignCriterionDetails.getCampaignResourceName())
+                        .setNegative(campaignCriterionDetails.isNegative())
+                        .setBidModifier(campaignCriterionDetails.getBidModifier())
+                        .build();
+
+            } else if (campaignCriterionDetails instanceof LanguageLocationDetails) {
+                LanguageInfo languageInfo = LanguageInfo.newBuilder()
+                        .setLanguageConstant(((LanguageLocationDetails) campaignCriterionDetails).getLanguageCode())
+                        .build();
+
+                LocationInfo locationInfo = LocationInfo.newBuilder()
+                        .setGeoTargetConstant(((LanguageLocationDetails) campaignCriterionDetails).getGeoTargetingConstant())
+                        .build();
+
+                campaignCriterion = CampaignCriterion.newBuilder()
+                        .setLanguage(languageInfo)
+                        .setLocation(locationInfo)
+                        .setCampaign(campaignCriterionDetails.getCampaignResourceName())
+                        .setNegative(campaignCriterionDetails.isNegative())
+                        .setBidModifier(campaignCriterionDetails.getBidModifier())
+                        .build();
+
+            } else if (campaignCriterionDetails instanceof ProximityDetails) {
+                AddressInfo addressInfo = AddressInfo.newBuilder()
+                        .setStreetAddress(((ProximityDetails) campaignCriterionDetails).getStreetAddress())
+                        .setPostalCode(((ProximityDetails) campaignCriterionDetails).getPostalCode())
+                        .setCityName(((ProximityDetails) campaignCriterionDetails).getCityName())
+                        .setProvinceCode(((ProximityDetails) campaignCriterionDetails).getProvinceCode())
+                        .setProvinceName(((ProximityDetails) campaignCriterionDetails).getProvinceName())
+                        .setCountryCode(((ProximityDetails) campaignCriterionDetails).getCountryCode())
+                        .build();
+
+                GeoPointInfo geoPointInfo = GeoPointInfo.newBuilder()
+                        .setLatitudeInMicroDegrees(((ProximityDetails) campaignCriterionDetails).getMicroLatitude())
+                        .setLongitudeInMicroDegrees(((ProximityDetails) campaignCriterionDetails).getMicroLongitude())
+                        .build();
+
+                ProximityInfo proximityInfo = ProximityInfo.newBuilder()
+                        .setAddress(addressInfo)
+                        .setRadius(((ProximityDetails) campaignCriterionDetails).getRadius())
+                        .setRadiusUnits(((ProximityDetails) campaignCriterionDetails).getRadiusUnits())
+                        .setGeoPoint(geoPointInfo)
+                        .build();
+
+                campaignCriterion = CampaignCriterion.newBuilder()
+                        .setCampaign(campaignCriterionDetails.getCampaignResourceName())
+                        .setProximity(proximityInfo)
+                        .setNegative(campaignCriterionDetails.isNegative())
+                        .setBidModifier(campaignCriterionDetails.getBidModifier())
+                        .build();
+            }
+
+            // if campaignCriterion is null, go to the next in the list
+            if (campaignCriterion == null)
+                continue;
+
+            // build a create or update campaignCriterionOperation
+            CampaignCriterionOperation operation;
+            if (shouldCreate) {
+                operation = CampaignCriterionOperation.newBuilder()
+                        .setCreate(campaignCriterion)
+                        .build();
+            } else {
+                operation = CampaignCriterionOperation.newBuilder()
+                        .setUpdate(campaignCriterion)
+                        .setUpdateMask(FieldMasks.allSetFieldsOf(campaignCriterion))
+                        .build();
+            }
+
+            // add CampaignCriterionOperation to list
+            campaignCriterionOperationList.add(operation);
+        }
+        return campaignCriterionOperationList;
     }
 
     /**

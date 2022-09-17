@@ -14,9 +14,6 @@ import org.springframework.stereotype.Repository;
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.addyai.utils.Constants.MICRO_FACTOR;
-import static java.lang.Math.round;
-
 @Repository
 public class CampaignBudgetRepositoryImpl implements CampaignBudgetRepository {
     private final GoogleAdsServiceClient googleAdsServiceClient;

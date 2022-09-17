@@ -61,7 +61,7 @@ public class CampaignRepositoryImpl implements CampaignRepository {
     /**
      * Get a campaign details object by campaign name
      *
-     * @param customerId the customer id of the account
+     * @param customerId   the customer id of the account
      * @param campaignName the name of the campaign to be fetched
      * @return list of campaign details
      * @throws Exception
@@ -147,18 +147,26 @@ public class CampaignRepositoryImpl implements CampaignRepository {
      *
      * @param customerId         the id of the customer account
      * @param campaignOperations a list of [CampaignOperation] for processing
+     * @return a list of campaign Resource names
      * @throws Exception
      */
     @Override
-    public void addCampaigns(long customerId, List<CampaignOperation> campaignOperations) throws Exception {
+    public List<String> addCampaigns(long customerId, List<CampaignOperation> campaignOperations) throws Exception {
+        List<String> campaignResourceNameList = new ArrayList<>();
         try {
             CampaignServiceClient campaignServiceClient = GoogleAdsManagementApplication.getGoogleAdsClient()
                     .getLatestVersion().createCampaignServiceClient();
 
             MutateCampaignsResponse response =
                     campaignServiceClient.mutateCampaigns(Long.toString(customerId), campaignOperations);
+
+            // populate a list of campaign resource names
+            for (MutateCampaignResult result : response.getResultsList()) {
+                campaignResourceNameList.add(result.getResourceName());
+            }
         } catch (Exception e) {
             throw ApiExceptionResolver.doResolveException(e);
         }
+        return campaignResourceNameList;
     }
 }

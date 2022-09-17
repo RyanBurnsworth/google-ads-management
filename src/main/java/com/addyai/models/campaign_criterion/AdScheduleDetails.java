@@ -1,11 +1,9 @@
 package com.addyai.models.campaign_criterion;
 
-import com.google.ads.googleads.v11.enums.CampaignCriterionStatusEnum;
-import com.google.ads.googleads.v11.enums.CriterionTypeEnum;
 import com.google.ads.googleads.v11.enums.DayOfWeekEnum;
 import com.google.ads.googleads.v11.enums.MinuteOfHourEnum;
 
-public class AdScheduleCriteria extends CampaignCriteria {
+public class AdScheduleDetails extends CampaignCriterionDetails {
     private DayOfWeekEnum.DayOfWeek dayOfWeek = DayOfWeekEnum.DayOfWeek.UNKNOWN;
 
     // Must be between 0 and 24

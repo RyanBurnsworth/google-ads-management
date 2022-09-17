@@ -14,5 +14,5 @@ public interface CampaignRepository {
 
     void deleteCampaigns(long customerId, List<Long> campaignOperations) throws Exception;
 
-    void addCampaigns(long customerId, List<CampaignOperation> campaignOperations) throws Exception;
+    List<String> addCampaigns(long customerId, List<CampaignOperation> campaignOperations) throws Exception;
 }

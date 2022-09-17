@@ -3,12 +3,12 @@ package com.addyai.models.campaign_criterion;
 import com.google.ads.googleads.v11.enums.CampaignCriterionStatusEnum;
 import com.google.ads.googleads.v11.enums.CriterionTypeEnum;
 
-public abstract class CampaignCriteria {
+public abstract class CampaignCriterionDetails {
     public long campaignCriterionId = 0L;
 
     private long campaignId = 0L;
 
-    private String campaignName = "";
+    private String campaignResourceName = "";
 
     private boolean isNegative = false;
 
@@ -34,12 +34,12 @@ public abstract class CampaignCriteria {
         this.campaignId = campaignId;
     }
 
-    public String getCampaignName() {
-        return campaignName;
+    public String getCampaignResourceName() {
+        return campaignResourceName;
     }
 
-    public void setCampaignName(String campaignName) {
-        this.campaignName = campaignName;
+    public void setCampaignResourceName(String campaignResourceName) {
+        this.campaignResourceName = campaignResourceName;
     }
 
     public boolean isNegative() {

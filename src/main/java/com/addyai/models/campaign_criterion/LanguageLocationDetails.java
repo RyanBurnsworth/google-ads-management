@@ -3,7 +3,7 @@ package com.addyai.models.campaign_criterion;
 import com.google.ads.googleads.v11.enums.CampaignCriterionStatusEnum;
 import com.google.ads.googleads.v11.enums.CriterionTypeEnum;
 
-public class LanguageLocationCriteria extends CampaignCriteria {
+public class LanguageLocationDetails extends CampaignCriterionDetails {
 
     private String geoTargetingConstant = "";
 

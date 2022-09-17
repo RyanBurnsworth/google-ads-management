@@ -1,5 +1,10 @@
 package com.addyai.models;
 
+import com.addyai.models.campaign_criterion.CampaignCriterionDetails;
+
+import java.util.ArrayList;
+import java.util.List;
+
 import static com.addyai.utils.Constants.ADVERTISING_TYPE_SEARCH;
 
 public class CampaignDetails {
@@ -29,9 +34,11 @@ public class CampaignDetails {
 
     private boolean isTargetingPartnerSearchNetwork = false;
 
-    private String budgetResourceName;
+    private String budgetResourceName = "";
 
     private BudgetDetails budgetDetails = new BudgetDetails();
+
+    private List<CampaignCriterionDetails> campaignCriterionDetailsList = new ArrayList<>();
 
     public long getCampaignId() {
         return campaignId;
@@ -151,5 +158,13 @@ public class CampaignDetails {
 
     public void setBudgetDetails(BudgetDetails budgetDetails) {
         this.budgetDetails = budgetDetails;
+    }
+
+    public List<CampaignCriterionDetails> getCampaignCriteriaList() {
+        return campaignCriterionDetailsList;
+    }
+
+    public void setCampaignCriteriaList(List<CampaignCriterionDetails> campaignCriterionDetailsList) {
+        this.campaignCriterionDetailsList = campaignCriterionDetailsList;
     }
 }

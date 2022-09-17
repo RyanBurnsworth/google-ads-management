@@ -1,10 +1,8 @@
 package com.addyai.models.campaign_criterion;
 
-import com.google.ads.googleads.v11.enums.CampaignCriterionStatusEnum;
-import com.google.ads.googleads.v11.enums.CriterionTypeEnum;
 import com.google.ads.googleads.v11.enums.ProximityRadiusUnitsEnum;
 
-public class ProximityCriteria extends CampaignCriteria {
+public class ProximityDetails extends CampaignCriterionDetails {
     private String cityName = "";
 
     private String countryCode = "";

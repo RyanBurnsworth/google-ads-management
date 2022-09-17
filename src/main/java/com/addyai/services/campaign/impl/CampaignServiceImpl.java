@@ -3,13 +3,16 @@ package com.addyai.services.campaign.impl;
 import com.addyai.error_handling.exceptions.InvalidRequestException;
 import com.addyai.models.BudgetDetails;
 import com.addyai.models.CampaignDetails;
+import com.addyai.models.campaign_criterion.CampaignCriterionDetails;
 import com.addyai.repos.campaigns.CampaignRepository;
 import com.addyai.repos.campaigns.budget.CampaignBudgetRepository;
+import com.addyai.repos.campaigns.criterion.CampaignCriterionRepository;
 import com.addyai.services.campaign.CampaignService;
 import com.addyai.utils.CampaignUtils;
 import com.google.ads.googleads.lib.utils.FieldMasks;
 import com.google.ads.googleads.v11.resources.Campaign;
 import com.google.ads.googleads.v11.services.CampaignBudgetOperation;
+import com.google.ads.googleads.v11.services.CampaignCriterionOperation;
 import com.google.ads.googleads.v11.services.CampaignOperation;
 import org.springframework.stereotype.Service;
 
@@ -26,13 +29,17 @@ public class CampaignServiceImpl implements CampaignService {
 
     private final CampaignBudgetRepository campaignBudgetRepository;
 
+    private final CampaignCriterionRepository campaignCriterionRepository;
+
     private final CampaignUtils campaignUtils;
 
     public CampaignServiceImpl(CampaignRepository campaignRepository,
-                               CampaignBudgetRepository campaignBudgetRepository) {
+                               CampaignBudgetRepository campaignBudgetRepository,
+                               CampaignCriterionRepository campaignCriterionRepository) {
         this.campaignUtils = new CampaignUtils();
         this.campaignRepository = campaignRepository;
         this.campaignBudgetRepository = campaignBudgetRepository;
+        this.campaignCriterionRepository = campaignCriterionRepository;
     }
 
     /**
@@ -76,8 +83,35 @@ public class CampaignServiceImpl implements CampaignService {
             campaignOperations.add(op);
         }
 
-        // add campaigns to the client account
-        campaignRepository.addCampaigns(customerId, campaignOperations);
+        // add campaigns to the client account and store the campaign resource names
+        List<String> campaignResourceNames = campaignRepository.addCampaigns(customerId, campaignOperations);
+
+        // associate the campaign resource name and  build campaign criterion operations
+        List<CampaignCriterionOperation> campaignCriterionOperationList = new ArrayList<>();
+        for (int i = 0; i < campaignResourceNames.size(); i++) {
+            // extract the campaign resource name from the list
+            String campaignResourceName = campaignResourceNames.get(i);
+
+            // extract the campaign criterion list
+            List<CampaignCriterionDetails> campaignCriterionDetailsList
+                    = campaignDetailsList.get(i).getCampaignCriteriaList();
+
+            // set the campaignResourceName to it's campaignCriterion
+            for (CampaignCriterionDetails campaignCriterionDetails : campaignCriterionDetailsList) {
+                campaignCriterionDetails.setCampaignResourceName(campaignResourceName);
+            }
+
+            // build a list of campaign criterion operations
+            List<CampaignCriterionOperation> campaignCriterionOperations =
+                    campaignUtils.buildCampaignCriterionOperationList(campaignDetailsList.get(i).getCampaignCriteriaList(),
+                            true);
+
+            // add all the new campaignCriterionOperations to the existing list of operations
+            campaignCriterionOperationList.addAll(campaignCriterionOperations);
+        }
+
+        // create campaign criterion for each campaign on the client account
+        campaignCriterionRepository.addCampaignCriterion(customerId, campaignCriterionOperationList);
     }
 
     /**

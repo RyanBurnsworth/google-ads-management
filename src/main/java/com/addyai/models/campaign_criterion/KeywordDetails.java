@@ -1,10 +1,8 @@
 package com.addyai.models.campaign_criterion;
 
-import com.google.ads.googleads.v11.enums.CampaignCriterionStatusEnum;
-import com.google.ads.googleads.v11.enums.CriterionTypeEnum;
 import com.google.ads.googleads.v11.enums.KeywordMatchTypeEnum;
 
-public class KeywordCriteria extends CampaignCriteria {
+public class KeywordDetails extends CampaignCriterionDetails {
     private String keywordText = "";
 
     private KeywordMatchTypeEnum.KeywordMatchType keywordMatchType = KeywordMatchTypeEnum.KeywordMatchType.UNKNOWN;

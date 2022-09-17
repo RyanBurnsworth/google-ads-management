@@ -5,6 +5,7 @@ import com.addyai.models.BudgetDetails;
 import com.addyai.models.CampaignDetails;
 import com.addyai.repos.campaigns.CampaignRepository;
 import com.addyai.repos.campaigns.budget.CampaignBudgetRepository;
+import com.addyai.repos.campaigns.criterion.CampaignCriterionRepository;
 import com.addyai.services.campaign.CampaignService;
 import com.addyai.services.campaign.impl.CampaignServiceImpl;
 import com.addyai.utils.CampaignUtils;
@@ -35,6 +36,9 @@ public class CampaignServiceTest {
     private CampaignRepository campaignRepository;
     @MockBean
     private CampaignBudgetRepository campaignBudgetRepository;
+
+    @MockBean
+    private CampaignCriterionRepository campaignCriterionRepository;
 
     /*
         Test successfully adding a campaign to the client account that DOES NOT have an existing budget set.
