@@ -37,6 +37,7 @@ def test_successful_get_all_campaign_details():
     # get the first campaign details object in the list from response
     campaign_details = json_response_body[0]
     
+    # verify the status code is 200, the response contains multiple campaign details and the first campaign details is as expected
     if (resp.status_code == 200 and response_len > 0 
         and _compare_campaign_details_objects(campaign_details, first_campaign_in_account_dict)):
         print(Fore.GREEN + 'SUCCESS')
@@ -50,8 +51,12 @@ def test_successful_get_all_campaign_details():
 """
 def test_failed_get_all_campaign_details_invalid_customer_id():
     print(Fore.YELLOW + "[*] Testing Failed Get All Campaign Details -- Invalid Customer ID")
+
+    # perform a GET request on the campaign/details endpoint using an invalid customer id
     url = BASE_URL + INVALID_CLIENT_ACCOUNT_ID + "/campaign/details"
     req = requests.get(url)
+
+    # verify that the status_code is 400
     if req.status_code == 400:
         print(Fore.GREEN + 'SUCCESS')
     else:
@@ -69,6 +74,7 @@ def test_successful_get_single_campaign_details():
     # Fetch the campaign details object from the test account
     campaign_details = _get_single_campaign_details("Leads-Search-1")
     
+    # verify the campaign details fetched matches what is expected
     if (_compare_campaign_details_objects(campaign_details, campaign_in_account_dict)):
         print(Fore.GREEN + 'SUCCESS')
     else:
@@ -131,8 +137,10 @@ def test_create_campaigns_on_test_account():
             }
         }
 
+    # add the two campaign details dicts to a list
     campaign_details_list = [campaign_details_1, campaign_details_2]
 
+    # perform a POST request on the /campaign/create endpoint to create the 2 campaigns
     url = BASE_URL + TEST_CLIENT_ACCOUNT_ID + "/campaign/create"
     data = json.dumps(campaign_details_list)
     headers = {'Content-type': 'application/json', 'Accept': 'text/plain'}
@@ -185,6 +193,9 @@ def _compare_campaign_details_objects(actual_campaign_details, expected_campaign
     else:
         return False
 
+"""
+    Print out the exact failure reason for a comparison between two campaign details objects
+"""
 def _find_exact_comparison_failure_reason(actual_campaign_details, expected_campaign_details):
     if (actual_campaign_details["campaignName"] != expected_campaign_details["campaignName"]):
         print("[!] Campaign Names DO NOT MATCH!")

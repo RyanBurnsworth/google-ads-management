@@ -24,7 +24,6 @@ public class CampaignServiceImpl implements CampaignService {
 
     private final CampaignUtils campaignUtils;
 
-
     public CampaignServiceImpl(CampaignRepository campaignRepository,
                                CampaignBudgetRepository campaignBudgetRepository) {
         this.campaignUtils = new CampaignUtils();
@@ -97,6 +96,7 @@ public class CampaignServiceImpl implements CampaignService {
             BudgetDetails budgetDetails = campaignUtils.findBudgetDetailsByResourceName(campaignDetails.getBudgetResourceName(),
                     existingBudgets);
 
+            // assign the budget details object to the campaign details object
             campaignDetails.setBudgetDetails(budgetDetails);
         }
         return campaignDetailsList;
@@ -133,7 +133,7 @@ public class CampaignServiceImpl implements CampaignService {
      * @param campaignDetailsList a list of updated [CampaignDetails]
      */
     @Override
-    public void updateCampaign(long customerId, List<CampaignDetails> campaignDetailsList) throws Exception {
+    public void updateCampaigns(long customerId, List<CampaignDetails> campaignDetailsList) throws Exception {
         List<CampaignOperation> campaignOperations = new ArrayList<>();
 
         // create an UPDATE campaign operation for each campaign

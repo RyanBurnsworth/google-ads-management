@@ -8,6 +8,7 @@ import com.addyai.repos.campaigns.budget.CampaignBudgetRepository;
 import com.addyai.services.campaign.CampaignService;
 import com.addyai.services.campaign.impl.CampaignServiceImpl;
 import com.addyai.utils.CampaignUtils;
+import com.google.ads.googleads.lib.utils.FieldMasks;
 import com.google.ads.googleads.v11.resources.Campaign;
 import com.google.ads.googleads.v11.services.CampaignBudgetOperation;
 import com.google.ads.googleads.v11.services.CampaignOperation;
@@ -90,6 +91,49 @@ public class CampaignServiceTest {
 
         assertThatThrownBy(() -> campaignService.addCampaignsToAccount(CUSTOMER_ID, Collections.singletonList(campaignDetails)))
                 .isInstanceOf(InvalidRequestException.class);
+    }
+
+    @Test
+    void testUpdateExistingCampaign() throws Exception {
+        CampaignUtils campaignUtils = new CampaignUtils();
+        List<CampaignOperation> campaignOperations = new ArrayList<>();
+        campaignService.updateCampaigns(CUSTOMER_ID, getListOfCampaignDetails());
+
+        for (CampaignDetails campaignDetails : getListOfCampaignDetails()) {
+            Campaign campaign = campaignUtils.buildCampaignFromDetails(campaignDetails, false);
+            CampaignOperation campaignOperation = CampaignOperation.newBuilder()
+                    .setUpdate(campaign)
+                    .setUpdateMask(FieldMasks.allSetFieldsOf(campaign))
+                    .build();
+            campaignOperations.add(campaignOperation);
+        }
+
+        verify(campaignRepository, times(1)).updateCampaigns(CUSTOMER_ID, campaignOperations);
+    }
+
+    @Test
+    void testDeleteCampaign() throws Exception {
+        List<Long> campaignIds = new ArrayList<>();
+        campaignIds.add(1L);
+        campaignIds.add(2L);
+
+        campaignService.deleteCampaigns(CUSTOMER_ID, campaignIds);
+
+        verify(campaignRepository, times(1)).deleteCampaigns(CUSTOMER_ID, campaignIds);
+    }
+
+    @Test
+    void testUpdatingCampaignBudgets() throws Exception {
+        CampaignUtils campaignUtils = new CampaignUtils();
+        List<BudgetDetails> budgetDetailsList = getListOfBudgetDetails();
+
+        campaignService.updateCampaignBudgets(CUSTOMER_ID, budgetDetailsList);
+
+        List<CampaignBudgetOperation> campaignBudgetOperations = campaignUtils
+                .buildCampaignBudgetOperationList(budgetDetailsList, false);
+
+        verify(campaignBudgetRepository, times(1))
+                .createOrUpdateBudgets(CUSTOMER_ID, campaignBudgetOperations);
     }
 
     /*
@@ -228,17 +272,8 @@ public class CampaignServiceTest {
         budgetDetails.setDeliveryMethod(1);
         budgetDetails2.setStatus(2);
 
-        BudgetDetails budgetDetails3 = new BudgetDetails();
-        budgetDetails3.setResourceName("customers/9059845250/campaigns/18793627832");
-        budgetDetails3.setBudgetId(2L);
-        budgetDetails3.setShared(true);
-        budgetDetails3.setDailyBudgetAmount(500);
-        budgetDetails.setDeliveryMethod(2);
-        budgetDetails3.setStatus(1);
-
         budgetDetailsList.add(budgetDetails);
         budgetDetailsList.add(budgetDetails2);
-        budgetDetailsList.add(budgetDetails3);
 
         return budgetDetailsList;
     }

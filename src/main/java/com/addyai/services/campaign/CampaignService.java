@@ -13,7 +13,7 @@ public interface CampaignService {
 
     CampaignDetails findCampaignDetailsByName(long customerId, String campaignName) throws Exception;
 
-    void updateCampaign(long customerId, List<CampaignDetails> campaignDetails) throws Exception;
+    void updateCampaigns(long customerId, List<CampaignDetails> campaignDetails) throws Exception;
 
     void deleteCampaigns(long customerId, List<Long> campaignIds) throws Exception;
 

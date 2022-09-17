@@ -48,7 +48,7 @@ public class CampaignControllerImpl implements CampaignController {
     @PutMapping("/update")
     public ResponseEntity<Void> updateCampaigns(@PathVariable String customerId,
                                                 @RequestBody List<CampaignDetails> campaignDetails) throws Exception {
-        campaignService.updateCampaign(Long.parseLong(customerId), campaignDetails);
+        campaignService.updateCampaigns(Long.parseLong(customerId), campaignDetails);
         return new ResponseEntity<>(HttpStatus.ACCEPTED);
     }
 
