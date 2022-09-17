@@ -1,7 +1,5 @@
 package com.addyai.models.campaign_criterion;
 
-import com.addyai.models.campaign_criterion.CampaignCriterionDetails;
-
 public class LocationDetails extends CampaignCriterionDetails {
     private String geoTargetingConstant = "";
 

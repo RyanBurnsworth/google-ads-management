@@ -1,7 +1,5 @@
 package com.addyai.models.campaign_criterion;
 
-import com.addyai.models.campaign_criterion.CampaignCriterionDetails;
-
 public class AdScheduleDetails extends CampaignCriterionDetails {
     private int dayOfWeek = 1;
 

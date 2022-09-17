@@ -77,4 +77,8 @@ public class Constants {
     public static final int MINUTE_OF_HOUR_THIRTY = MinuteOfHourEnum.MinuteOfHour.THIRTY_VALUE;
     public static final int MINUTE_OF_HOUR_FORTY_FIVE = MinuteOfHourEnum.MinuteOfHour.FORTY_FIVE_VALUE;
 
+    public static final String LANGUAGE_CONSTANT_EN = "languageConstants/1000";
+
+    public static final int RADIUS_UNITS_MILES = ProximityRadiusUnitsEnum.ProximityRadiusUnits.MILES_VALUE;
+    public static final int RADIUS_UNITS_KILOMETERS = ProximityRadiusUnitsEnum.ProximityRadiusUnits.KILOMETERS_VALUE;
 }

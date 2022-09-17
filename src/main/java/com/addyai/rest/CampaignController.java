@@ -2,23 +2,21 @@ package com.addyai.rest;
 
 import com.addyai.models.CampaignDetails;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
 
 import java.util.List;
 
 public interface CampaignController {
-    ResponseEntity<List<CampaignDetails>> fetchAllCampaignDetails(@PathVariable String customerId) throws Exception;
+    ResponseEntity<List<CampaignDetails>> fetchAllCampaignDetails(String customerId) throws Exception;
 
-    ResponseEntity<CampaignDetails> fetchCampaignDetailsByName(@PathVariable String customerId,
-                                                               @PathVariable String campaignName) throws Exception;
+    ResponseEntity<CampaignDetails> fetchCampaignDetailsByName(String customerId,
+                                                               String campaignName) throws Exception;
 
-    ResponseEntity<Void> createCampaigns(@PathVariable String customerId,
-                                         @RequestBody List<CampaignDetails> campaignDetails) throws Exception;
+    ResponseEntity<Void> createCampaigns(String customerId,
+                                         List<CampaignDetails> campaignDetails) throws Exception;
 
-    ResponseEntity<Void> updateCampaigns(@PathVariable String customerId,
-                                         @RequestBody List<CampaignDetails> campaignDetails) throws Exception;
+    ResponseEntity<Void> updateCampaigns(String customerId,
+                                         List<CampaignDetails> campaignDetails) throws Exception;
 
-    ResponseEntity<Void> deleteCampaigns(@PathVariable String customerId,
-                                         @RequestBody List<Long> campaignIds) throws Exception;
+    ResponseEntity<Void> deleteCampaigns(String customerId,
+                                         List<Long> campaignIds) throws Exception;
 }

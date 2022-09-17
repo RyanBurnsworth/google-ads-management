@@ -9,6 +9,8 @@ import com.addyai.repos.requests.impl.StreamRequestImpl;
 import com.google.ads.googleads.v11.services.*;
 import org.springframework.stereotype.Repository;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 @Repository
@@ -44,5 +46,47 @@ public class CampaignCriterionRepositoryImpl implements CampaignCriterionReposit
         } catch (Exception e) {
             throw ApiExceptionResolver.doResolveException(e);
         }
+    }
+
+    @Override
+    public String getGeoTargetConstant(String locale,
+                                       String countryCode,
+                                       String location) throws Exception {
+        List<String> geoTargetResourceNameList = new ArrayList<>();
+
+        try {
+            // create an instance of GeoTargetConstantServiceClient
+            GeoTargetConstantServiceClient geoTargetClient =
+                    GoogleAdsManagementApplication
+                            .googleAdsClient
+                            .getLatestVersion()
+                            .createGeoTargetConstantServiceClient();
+
+            // Create a SuggestGeoTargetConstantsRequest Builder.
+            // Set the locale and countryCode
+            SuggestGeoTargetConstantsRequest.Builder requestBuilder =
+                    SuggestGeoTargetConstantsRequest.newBuilder()
+                            .setLocale(locale)
+                            .setCountryCode(countryCode);
+
+            // Set the locations list in the request builder
+            requestBuilder.getLocationNamesBuilder().addAllNames(Collections.singletonList(location));
+
+            // perform the request and extract the response
+            SuggestGeoTargetConstantsResponse response =
+                    geoTargetClient.suggestGeoTargetConstants(requestBuilder.build());
+
+            // if the geotarget exists in the response results. Return the first geo-target's resource name.
+            if (response.getGeoTargetConstantSuggestionsList().size() > 0 &&
+                    response.getGeoTargetConstantSuggestionsList().get(0).hasGeoTargetConstant()) {
+                return response
+                        .getGeoTargetConstantSuggestionsList().get(0)
+                        .getGeoTargetConstant()
+                        .getResourceName();
+            }
+        } catch (Exception e) {
+            throw ApiExceptionResolver.doResolveException(e);
+        }
+        return "";
     }
 }

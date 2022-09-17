@@ -192,7 +192,6 @@ public class CampaignUtils {
                 campaignCriterion = CampaignCriterion.newBuilder()
                         .setLanguage(languageInfo)
                         .setCampaign(campaignCriterionDetails.getCampaignResourceName())
-                        .setNegative(campaignCriterionDetails.isNegative())
                         .build();
 
             } else if (campaignCriterionDetails instanceof DeviceDetails) {
@@ -219,30 +218,55 @@ public class CampaignUtils {
                         .build();
 
             } else if (campaignCriterionDetails instanceof ProximityDetails) {
-                AddressInfo addressInfo = AddressInfo.newBuilder()
-                        .setStreetAddress(((ProximityDetails) campaignCriterionDetails).getStreetAddress())
-                        .setPostalCode(((ProximityDetails) campaignCriterionDetails).getPostalCode())
-                        .setCityName(((ProximityDetails) campaignCriterionDetails).getCityName())
-                        .setProvinceCode(((ProximityDetails) campaignCriterionDetails).getProvinceCode())
-                        .setProvinceName(((ProximityDetails) campaignCriterionDetails).getProvinceName())
-                        .setCountryCode(((ProximityDetails) campaignCriterionDetails).getCountryCode())
-                        .build();
+                ProximityInfo.Builder proximityInfoBuilder = ProximityInfo.newBuilder();
+                ProximityDetails proximityDetails = ((ProximityDetails) campaignCriterionDetails);
 
-                GeoPointInfo geoPointInfo = GeoPointInfo.newBuilder()
-                        .setLatitudeInMicroDegrees(((ProximityDetails) campaignCriterionDetails).getMicroLatitude())
-                        .setLongitudeInMicroDegrees(((ProximityDetails) campaignCriterionDetails).getMicroLongitude())
-                        .build();
+                // if the address details are not empty, create Address info object and set it in the builder
+                if (!proximityDetails.getStreetAddress().isEmpty() && !proximityDetails.getPostalCode().isEmpty() &&
+                        !proximityDetails.getCityName().isEmpty() && !proximityDetails.getProvinceName().isEmpty() &&
+                        !proximityDetails.getCountryCode().isEmpty()) {
 
-                ProximityInfo proximityInfo = ProximityInfo.newBuilder()
-                        .setAddress(addressInfo)
-                        .setRadius(((ProximityDetails) campaignCriterionDetails).getRadius())
-                        .setRadiusUnits(((ProximityDetails) campaignCriterionDetails).getRadiusUnits())
-                        .setGeoPoint(geoPointInfo)
-                        .build();
+                    // build an AddressInfo object and set it in the builder
+                    AddressInfo addressInfo = AddressInfo.newBuilder()
+                            .setStreetAddress(proximityDetails.getStreetAddress())
+                            .setPostalCode(proximityDetails.getPostalCode())
+                            .setCityName(proximityDetails.getCityName())
+                            //.setProvinceCode(proximityDetails.getProvinceCode())
+                            .setProvinceName(proximityDetails.getProvinceName())
+                            .setCountryCode(proximityDetails.getCountryCode())
+                            .build();
 
+                    proximityInfoBuilder.setAddress(addressInfo);
+                }
+
+                // if the latitude and longitude are set, create and set the geopoints info object
+                if (proximityDetails.getMicroLatitude() != 0 &&
+                        proximityDetails.getMicroLongitude() != 0) {
+
+                    // convert longitude and latitude to micro degrees
+                    int longitude = Math.round(proximityDetails.getMicroLongitude() * MICRO_FACTOR);
+                    int latitude = Math.round(proximityDetails.getMicroLatitude() * MICRO_FACTOR);
+
+                    // set the longitude and latitude geo points in the builder
+                    GeoPointInfo geoPointInfo = GeoPointInfo.newBuilder()
+                            .setLatitudeInMicroDegrees(latitude)
+                            .setLongitudeInMicroDegrees(longitude)
+                            .build();
+
+                    proximityInfoBuilder.setGeoPoint(geoPointInfo);
+                }
+
+                // if the radius value is set, assign radius and measurement units for the radius to the builder
+                if (proximityDetails.getRadius() > 0) {
+                    proximityInfoBuilder
+                            .setRadius(proximityDetails.getRadius())
+                            .setRadiusUnitsValue(proximityDetails.getRadiusUnits());
+                }
+
+                // create the campaign criterion object from the details
                 campaignCriterion = CampaignCriterion.newBuilder()
                         .setCampaign(campaignCriterionDetails.getCampaignResourceName())
-                        .setProximity(proximityInfo)
+                        .setProximity(proximityInfoBuilder.build())
                         .setNegative(campaignCriterionDetails.isNegative())
                         .setBidModifier(campaignCriterionDetails.getBidModifier())
                         .build();

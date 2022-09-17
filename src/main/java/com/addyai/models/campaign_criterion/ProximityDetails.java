@@ -1,8 +1,5 @@
 package com.addyai.models.campaign_criterion;
 
-import com.addyai.models.campaign_criterion.CampaignCriterionDetails;
-import com.google.ads.googleads.v11.enums.ProximityRadiusUnitsEnum;
-
 public class ProximityDetails extends CampaignCriterionDetails {
     private String cityName = "";
 
@@ -16,13 +13,13 @@ public class ProximityDetails extends CampaignCriterionDetails {
 
     private String streetAddress = "";
 
-    private int microLongitude = 0;
+    private float microLongitude = 0.0f;
 
-    private int microLatitude = 0;
+    private float microLatitude = 0.0f;
 
     private double radius = 0.0;
 
-    private ProximityRadiusUnitsEnum.ProximityRadiusUnits radiusUnits;
+    private int radiusUnits;
 
     public String getCityName() {
         return cityName;
@@ -72,7 +69,7 @@ public class ProximityDetails extends CampaignCriterionDetails {
         this.streetAddress = streetAddress;
     }
 
-    public int getMicroLongitude() {
+    public float getMicroLongitude() {
         return microLongitude;
     }
 
@@ -80,7 +77,7 @@ public class ProximityDetails extends CampaignCriterionDetails {
         this.microLongitude = microLongitude;
     }
 
-    public int getMicroLatitude() {
+    public float getMicroLatitude() {
         return microLatitude;
     }
 
@@ -96,11 +93,11 @@ public class ProximityDetails extends CampaignCriterionDetails {
         this.radius = radius;
     }
 
-    public ProximityRadiusUnitsEnum.ProximityRadiusUnits getRadiusUnits() {
+    public int getRadiusUnits() {
         return radiusUnits;
     }
 
-    public void setRadiusUnits(ProximityRadiusUnitsEnum.ProximityRadiusUnits radiusUnits) {
+    public void setRadiusUnits(int radiusUnits) {
         this.radiusUnits = radiusUnits;
     }
 }
