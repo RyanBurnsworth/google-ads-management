@@ -1,13 +1,13 @@
 package com.addyai.repos.campaigns.impl;
 
-import com.addyai.utils.GoogleAdsClientBuilder;
+import com.addyai.builder.GoogleAdsClientBuilder;
 import com.addyai.error_handling.ApiExceptionResolver;
 import com.addyai.error_handling.exceptions.NotFoundException;
 import com.addyai.models.CampaignDetails;
 import com.addyai.repos.campaigns.CampaignRepository;
 import com.addyai.repos.requests.StreamRequest;
 import com.addyai.repos.requests.impl.StreamRequestImpl;
-import com.addyai.utils.GAQLUtils;
+import com.addyai.utils.helpers.GAQLHelper;
 import com.google.ads.googleads.v11.services.*;
 import com.google.ads.googleads.v11.utils.ResourceNames;
 import com.google.api.gax.rpc.ServerStream;
@@ -16,7 +16,7 @@ import org.springframework.stereotype.Repository;
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.addyai.utils.Constants.RECORD_NOT_FOUND;
+import static com.addyai.utils.misc.Constants.RECORD_NOT_FOUND;
 
 @Repository
 public class CampaignRepositoryImpl implements CampaignRepository {
@@ -53,12 +53,12 @@ public class CampaignRepositoryImpl implements CampaignRepository {
         List<CampaignDetails> campaignDetailsList;
 
         try {
-            String query = GAQLUtils.getCampaignDetailsQuery();
+            String query = GAQLHelper.getCampaignDetailsQuery();
 
             SearchGoogleAdsStreamRequest request = requestBuilder.buildStreamRequest(customerId, query);
             ServerStream<SearchGoogleAdsStreamResponse> response = requestBuilder.callStreamRequest(request);
 
-            campaignDetailsList = GAQLUtils.convertStreamResponseToCampaignDetailsList(response);
+            campaignDetailsList = GAQLHelper.convertStreamResponseToCampaignDetailsList(response);
 
             return campaignDetailsList;
         } catch (Exception e) {
@@ -79,12 +79,12 @@ public class CampaignRepositoryImpl implements CampaignRepository {
         List<CampaignDetails> campaignDetailsList;
 
         try {
-            String query = GAQLUtils.getCampaignDetailsByNameQuery(campaignName);
+            String query = GAQLHelper.getCampaignDetailsByNameQuery(campaignName);
 
             SearchGoogleAdsStreamRequest request = requestBuilder.buildStreamRequest(customerId, query);
             ServerStream<SearchGoogleAdsStreamResponse> response = requestBuilder.callStreamRequest(request);
 
-            campaignDetailsList = GAQLUtils.convertStreamResponseToCampaignDetailsList(response);
+            campaignDetailsList = GAQLHelper.convertStreamResponseToCampaignDetailsList(response);
 
             if (campaignDetailsList.size() > 0)
                 return campaignDetailsList.get(0);

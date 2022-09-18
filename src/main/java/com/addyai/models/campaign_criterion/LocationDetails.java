@@ -1,13 +1,16 @@
 package com.addyai.models.campaign_criterion;
 
-public class LocationDetails extends CampaignCriterionDetails {
+import static com.addyai.utils.misc.Constants.DEFAULT_COUNTRY_CODE;
+import static com.addyai.utils.misc.Constants.DEFAULT_LOCALE;
+
+public class LocationDetails extends CriterionDetails {
     private String geoTargetingConstant = "";
 
-    private String locale;
+    private String locale = DEFAULT_LOCALE;
 
-    private String countryCode;
+    private String countryCode = DEFAULT_COUNTRY_CODE;
 
-    private String location;
+    private String location = "";
 
     public String getGeoTargetingConstant() {
         return geoTargetingConstant;

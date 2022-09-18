@@ -1,10 +1,11 @@
-package com.addyai.utils;
+package com.addyai.utils.helpers;
 
 import com.addyai.error_handling.ValidationErrorResponse;
 import com.addyai.error_handling.exceptions.InvalidRequestException;
 import com.addyai.models.BudgetDetails;
 import com.addyai.models.CampaignDetails;
 import com.addyai.models.campaign_criterion.*;
+import com.addyai.utils.validators.EntityValidator;
 import com.google.ads.googleads.lib.utils.FieldMasks;
 import com.google.ads.googleads.v11.common.*;
 import com.google.ads.googleads.v11.enums.AdvertisingChannelTypeEnum;
@@ -20,9 +21,9 @@ import com.google.ads.googleads.v11.services.CampaignCriterionOperation;
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.addyai.utils.Constants.MICRO_FACTOR;
+import static com.addyai.utils.misc.Constants.MICRO_FACTOR;
 
-public class CampaignUtils {
+public class CampaignHelper {
 
     /**
      * Build a campaign object using a CampaignDetails object
@@ -126,45 +127,45 @@ public class CampaignUtils {
     /**
      * Build [CampaignCriterionOperation] to be used for creating or updating campaign criterion.
      *
-     * @param campaignCriterionDetailsList [CampaignCriterionDetails] to create operations from
-     * @param shouldCreate                 true if it should create, false if it should update
+     * @param criterionDetailsList [CampaignCriterionDetails] to create operations from
+     * @param shouldCreate         true if it should create, false if it should update
      * @return [CampaignCriterionOperations]
      */
     public List<CampaignCriterionOperation> buildCampaignCriterionOperationList(
-            List<CampaignCriterionDetails> campaignCriterionDetailsList,
+            List<CriterionDetails> criterionDetailsList,
             boolean shouldCreate) {
         List<CampaignCriterionOperation> campaignCriterionOperationList = new ArrayList<>();
 
-        for (CampaignCriterionDetails campaignCriterionDetails : campaignCriterionDetailsList) {
+        for (CriterionDetails criterionDetails : criterionDetailsList) {
             CampaignCriterion.Builder campaignCriterionBuilder = CampaignCriterion.newBuilder();
 
-            if (campaignCriterionDetails instanceof AdScheduleDetails) {
+            if (criterionDetails instanceof AdScheduleDetails) {
                 // create an ad schedule object info for criterion object
-                AdScheduleInfo adScheduleInfo = buildAdScheduleInfo((AdScheduleDetails) campaignCriterionDetails);
+                AdScheduleInfo adScheduleInfo = buildAdScheduleInfo((AdScheduleDetails) criterionDetails);
 
                 // if the bid modifier is set, apply to campaign criterion
-                if (campaignCriterionDetails.getBidModifier() > 0.0f)
-                    campaignCriterionBuilder.setBidModifier(campaignCriterionDetails.getBidModifier());
+                if (criterionDetails.getBidModifier() > 0.0f)
+                    campaignCriterionBuilder.setBidModifier(criterionDetails.getBidModifier());
 
                 campaignCriterionBuilder
                         .setAdSchedule(adScheduleInfo)
-                        .setCampaign(campaignCriterionDetails.getCampaignResourceName());
+                        .setCampaign(criterionDetails.getCampaignResourceName());
 
-            } else if (campaignCriterionDetails instanceof KeywordDetails) {
+            } else if (criterionDetails instanceof NegativeKeywordDetails) {
                 // create a keyword info object for campaign criterion
                 KeywordInfo keywordInfo = KeywordInfo.newBuilder()
-                        .setMatchTypeValue(((KeywordDetails) campaignCriterionDetails).getKeywordMatchType())
-                        .setText(((KeywordDetails) campaignCriterionDetails).getKeywordText())
+                        .setMatchTypeValue(((NegativeKeywordDetails) criterionDetails).getKeywordMatchType())
+                        .setText(((NegativeKeywordDetails) criterionDetails).getKeywordText())
                         .build();
 
                 campaignCriterionBuilder
                         .setKeyword(keywordInfo)
-                        .setCampaign(campaignCriterionDetails.getCampaignResourceName())
-                        .setNegative(campaignCriterionDetails.isNegative()); // always true for keywordInfo
+                        .setCampaign(criterionDetails.getCampaignResourceName())
+                        .setNegative(criterionDetails.isNegative()); // always true for keywordInfo
 
-            } else if (campaignCriterionDetails instanceof LanguageDetails) {
+            } else if (criterionDetails instanceof LanguageDetails) {
                 // create a language info object for campaign criterion
-                LanguageDetails languageDetails = ((LanguageDetails) campaignCriterionDetails);
+                LanguageDetails languageDetails = ((LanguageDetails) criterionDetails);
 
                 LanguageInfo languageInfo = LanguageInfo.newBuilder()
                         .setLanguageConstant(languageDetails.getLanguageCode())
@@ -176,20 +177,20 @@ public class CampaignUtils {
 
                 campaignCriterionBuilder
                         .setLanguage(languageInfo)
-                        .setCampaign(campaignCriterionDetails.getCampaignResourceName());
+                        .setCampaign(criterionDetails.getCampaignResourceName());
 
-            } else if (campaignCriterionDetails instanceof DeviceDetails) {
+            } else if (criterionDetails instanceof DeviceDetails) {
                 // create device info object for campaign criterion
-                DeviceInfo deviceInfo = buildDeviceInfo((DeviceDetails) campaignCriterionDetails);
+                DeviceInfo deviceInfo = buildDeviceInfo((DeviceDetails) criterionDetails);
 
                 campaignCriterionBuilder
                         .setDevice(deviceInfo)
-                        .setBidModifier(campaignCriterionDetails.getBidModifier()) // always set for DeviceInfo
-                        .setCampaign(campaignCriterionDetails.getCampaignResourceName());
+                        .setBidModifier(criterionDetails.getBidModifier()) // always set for DeviceInfo
+                        .setCampaign(criterionDetails.getCampaignResourceName());
 
-            } else if (campaignCriterionDetails instanceof LocationDetails) {
+            } else if (criterionDetails instanceof LocationDetails) {
                 // create location info object for campaign criterion
-                LocationDetails locationDetails = ((LocationDetails) campaignCriterionDetails);
+                LocationDetails locationDetails = ((LocationDetails) criterionDetails);
 
                 LocationInfo locationInfo = LocationInfo.newBuilder()
                         .setGeoTargetConstant(locationDetails.getGeoTargetingConstant())
@@ -205,11 +206,11 @@ public class CampaignUtils {
 
                 campaignCriterionBuilder
                         .setLocation(locationInfo)
-                        .setCampaign(campaignCriterionDetails.getCampaignResourceName());
+                        .setCampaign(criterionDetails.getCampaignResourceName());
 
-            } else if (campaignCriterionDetails instanceof ProximityDetails) {
+            } else if (criterionDetails instanceof ProximityDetails) {
                 // create proximity info for campaign criterion
-                ProximityDetails proximityDetails = (ProximityDetails) campaignCriterionDetails;
+                ProximityDetails proximityDetails = (ProximityDetails) criterionDetails;
 
                 // create a proximity info builder
                 ProximityInfo.Builder proximityInfoBuilder = buildProximityInfoBuilder(proximityDetails);
@@ -220,7 +221,7 @@ public class CampaignUtils {
 
                 // create the campaign criterion object from the details
                 campaignCriterionBuilder
-                        .setCampaign(campaignCriterionDetails.getCampaignResourceName())
+                        .setCampaign(criterionDetails.getCampaignResourceName())
                         .setProximity(proximityInfoBuilder.build());
             }
 

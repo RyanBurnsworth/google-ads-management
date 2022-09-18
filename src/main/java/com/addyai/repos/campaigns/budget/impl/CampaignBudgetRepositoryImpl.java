@@ -1,12 +1,12 @@
 package com.addyai.repos.campaigns.budget.impl;
 
-import com.addyai.utils.GoogleAdsClientBuilder;
+import com.addyai.builder.GoogleAdsClientBuilder;
 import com.addyai.error_handling.ApiExceptionResolver;
 import com.addyai.models.BudgetDetails;
 import com.addyai.repos.campaigns.budget.CampaignBudgetRepository;
 import com.addyai.repos.requests.StreamRequest;
 import com.addyai.repos.requests.impl.StreamRequestImpl;
-import com.addyai.utils.GAQLUtils;
+import com.addyai.utils.helpers.GAQLHelper;
 import com.google.ads.googleads.v11.services.*;
 import com.google.api.gax.rpc.ServerStream;
 import org.springframework.stereotype.Repository;
@@ -33,13 +33,13 @@ public class CampaignBudgetRepositoryImpl implements CampaignBudgetRepository {
     @Override
     public List<BudgetDetails> fetchAllCampaignBudgetDetails(long customerId) throws Exception {
         try {
-            String query = GAQLUtils.getCampaignBudgetQuery();
+            String query = GAQLHelper.getCampaignBudgetQuery();
 
             // build and perform the search request on client account
             SearchGoogleAdsStreamRequest request = requestBuilder.buildStreamRequest(customerId, query);
             ServerStream<SearchGoogleAdsStreamResponse> response = requestBuilder.callStreamRequest(request);
 
-            return GAQLUtils.convertStreamResponseToBudgetDetails(response);
+            return GAQLHelper.convertStreamResponseToBudgetDetails(response);
         } catch (Exception e) {
             throw ApiExceptionResolver.doResolveException(e);
         }

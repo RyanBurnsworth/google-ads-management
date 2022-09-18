@@ -1,19 +1,24 @@
 package com.addyai.models;
 
+import com.addyai.utils.helpers.DateHelper;
+
+import static com.addyai.utils.misc.Constants.BUDGET_DELIVERY_METHOD_STANDARD;
+import static com.addyai.utils.misc.Constants.BUDGET_STATUS_ENABLED;
+
 public class BudgetDetails {
-    private long budgetId;
+    private long budgetId = 0L;
 
-    private String name;
+    private String name = DateHelper.getCurrentEpochTimeAsString();
 
-    private String resourceName;
+    private String resourceName = "";
 
-    private int deliveryMethod;
+    private int deliveryMethod = BUDGET_DELIVERY_METHOD_STANDARD;
 
-    private boolean isShared;
+    private boolean isShared = false;
 
-    private int dailyBudgetAmount;
+    private int dailyBudgetAmount = 0;
 
-    private int status;
+    private int status = BUDGET_STATUS_ENABLED;
 
     public long getBudgetId() {
         return budgetId;

@@ -1,17 +1,24 @@
 package com.addyai.models.campaign_criterion;
 
-public class AdScheduleDetails extends CampaignCriterionDetails {
-    private int dayOfWeek = 1;
+import static com.addyai.utils.misc.Constants.*;
+
+public class AdScheduleDetails extends CriterionDetails {
+    private int dayOfWeek = DAY_OF_WEEK_SUNDAY;
 
     // Must be between 0 and 24
     private int startHour = 0;
 
     // must be between 0 and 24
-    private int endHour = 0;
+    private int endHour = 23;
 
-    private int startMinute = 1;
+    private int startMinute = MINUTE_OF_HOUR_ZERO;
 
-    private int endMinute = 1;
+    private int endMinute = MINUTE_OF_HOUR_FORTY_FIVE;
+
+    @Override
+    public int getCriterionType() {
+        return CRITERION_TYPE_AD_SCHEDULE;
+    }
 
     public int getDayOfWeek() {
         return dayOfWeek;

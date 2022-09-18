@@ -5,10 +5,10 @@ import com.addyai.models.BudgetDetails;
 import com.addyai.models.CampaignDetails;
 import com.addyai.repos.campaigns.CampaignRepository;
 import com.addyai.repos.campaigns.budget.CampaignBudgetRepository;
-import com.addyai.repos.campaigns.criterion.CampaignCriterionRepository;
+import com.addyai.repos.campaigns.criterion.CriterionRepository;
 import com.addyai.services.campaign.CampaignService;
 import com.addyai.services.campaign.impl.CampaignServiceImpl;
-import com.addyai.utils.CampaignUtils;
+import com.addyai.utils.helpers.CampaignHelper;
 import com.google.ads.googleads.lib.utils.FieldMasks;
 import com.google.ads.googleads.v11.resources.Campaign;
 import com.google.ads.googleads.v11.services.CampaignBudgetOperation;
@@ -38,7 +38,7 @@ public class CampaignServiceTest {
     private CampaignBudgetRepository campaignBudgetRepository;
 
     @MockBean
-    private CampaignCriterionRepository campaignCriterionRepository;
+    private CriterionRepository criterionRepository;
 
     /*
         Test successfully adding a campaign to the client account that DOES NOT have an existing budget set.
@@ -47,12 +47,12 @@ public class CampaignServiceTest {
      */
     @Test
     void testSuccessfullyAddingSingleCampaign() throws Exception {
-        CampaignUtils campaignUtils = new CampaignUtils();
+        CampaignHelper campaignHelper = new CampaignHelper();
         CampaignDetails campaignDetails = getCampaignDetails();
 
         // create campaignBudgetOperations list for the new budget to be created
         List<CampaignBudgetOperation> campaignBudgetOperations =
-                campaignUtils.buildCampaignBudgetOperationList(Collections.singletonList(
+                campaignHelper.buildCampaignBudgetOperationList(Collections.singletonList(
                         campaignDetails.getBudgetDetails()), true);
 
         // when the budget is created return the budget details object containing a resource name
@@ -63,7 +63,7 @@ public class CampaignServiceTest {
         campaignDetails.setBudgetResourceName(getBudgetDetails().getResourceName());
 
         // create a campaign using the details
-        Campaign campaign = campaignUtils.buildCampaignFromDetails(campaignDetails, true);
+        Campaign campaign = campaignHelper.buildCampaignFromDetails(campaignDetails, true);
 
         // create the CREATE operations list
         List<CampaignOperation> campaignOperations = new ArrayList<>();
@@ -109,16 +109,16 @@ public class CampaignServiceTest {
      */
     @Test
     void testUpdateExistingCampaign() throws Exception {
-        CampaignUtils campaignUtils = new CampaignUtils();
+        CampaignHelper campaignHelper = new CampaignHelper();
         List<CampaignOperation> campaignOperations = new ArrayList<>();
 
         List<CampaignBudgetOperation> budgetOperations =
-                campaignUtils.buildCampaignBudgetOperationList(getListOfBudgetDetails(), false);
+                campaignHelper.buildCampaignBudgetOperationList(getListOfBudgetDetails(), false);
 
         campaignService.updateCampaigns(CUSTOMER_ID, getListOfCampaignDetails());
 
         for (CampaignDetails campaignDetails : getListOfCampaignDetails()) {
-            Campaign campaign = campaignUtils.buildCampaignFromDetails(campaignDetails, false);
+            Campaign campaign = campaignHelper.buildCampaignFromDetails(campaignDetails, false);
             CampaignOperation campaignOperation = CampaignOperation.newBuilder()
                     .setUpdate(campaign)
                     .setUpdateMask(FieldMasks.allSetFieldsOf(campaign))

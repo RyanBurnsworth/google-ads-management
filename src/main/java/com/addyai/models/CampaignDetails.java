@@ -1,11 +1,12 @@
 package com.addyai.models;
 
-import com.addyai.models.campaign_criterion.CampaignCriterionDetails;
+import com.addyai.models.campaign_criterion.CriterionDetails;
+import com.addyai.utils.helpers.DateHelper;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.addyai.utils.Constants.ADVERTISING_TYPE_SEARCH;
+import static com.addyai.utils.misc.Constants.*;
 
 public class CampaignDetails {
     private long campaignId = 0L;
@@ -18,27 +19,27 @@ public class CampaignDetails {
 
     private String advertisingChannelType = ADVERTISING_TYPE_SEARCH;
 
-    private int positiveGeoTargetType = 7;
+    private int positiveGeoTargetType = POSITIVE_GEO_TARGET_TYPE_PRESENCE_OR_INTEREST;
 
-    private int negativeGeoTargetType = 5;
+    private int negativeGeoTargetType = NEGATIVE_GEO_TARGET_TYPE_PRESENCE;
 
     private boolean isEnhancedCpcEnabled = false;
 
-    private String startDate = "";
+    private String startDate = DateHelper.getCurrentDate();
 
-    private String endDate = "";
+    private String endDate = DateHelper.getCurrentDatePlusYears(DEFAULT_ADDITIONAL_YEARS_CAMPAIGN_END_DATE);
 
     private boolean isTargetingSearchNetwork = true;
 
     private boolean isTargetingContentNetwork = false;
 
-    private boolean isTargetingPartnerSearchNetwork = false;
+    private boolean isTargetingPartnerSearchNetwork = true;
 
     private String budgetResourceName = "";
 
     private BudgetDetails budgetDetails = new BudgetDetails();
 
-    private List<CampaignCriterionDetails> campaignCriterionDetailsList = new ArrayList<>();
+    private List<CriterionDetails> criterionDetailsList = new ArrayList<>();
 
     public long getCampaignId() {
         return campaignId;
@@ -160,11 +161,11 @@ public class CampaignDetails {
         this.budgetDetails = budgetDetails;
     }
 
-    public List<CampaignCriterionDetails> getCampaignCriteriaList() {
-        return campaignCriterionDetailsList;
+    public List<CriterionDetails> getCampaignCriteriaList() {
+        return criterionDetailsList;
     }
 
-    public void setCampaignCriteriaList(List<CampaignCriterionDetails> campaignCriterionDetailsList) {
-        this.campaignCriterionDetailsList = campaignCriterionDetailsList;
+    public void setCampaignCriteriaList(List<CriterionDetails> criterionDetailsList) {
+        this.criterionDetailsList = criterionDetailsList;
     }
 }

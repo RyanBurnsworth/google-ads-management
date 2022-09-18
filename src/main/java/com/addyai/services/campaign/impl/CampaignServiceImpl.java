@@ -3,13 +3,13 @@ package com.addyai.services.campaign.impl;
 import com.addyai.error_handling.exceptions.InvalidRequestException;
 import com.addyai.models.BudgetDetails;
 import com.addyai.models.CampaignDetails;
-import com.addyai.models.campaign_criterion.CampaignCriterionDetails;
+import com.addyai.models.campaign_criterion.CriterionDetails;
 import com.addyai.models.campaign_criterion.LocationDetails;
 import com.addyai.repos.campaigns.CampaignRepository;
 import com.addyai.repos.campaigns.budget.CampaignBudgetRepository;
-import com.addyai.repos.campaigns.criterion.CampaignCriterionRepository;
+import com.addyai.repos.campaigns.criterion.CriterionRepository;
 import com.addyai.services.campaign.CampaignService;
-import com.addyai.utils.CampaignUtils;
+import com.addyai.utils.helpers.CampaignHelper;
 import com.google.ads.googleads.lib.utils.FieldMasks;
 import com.google.ads.googleads.v11.resources.Campaign;
 import com.google.ads.googleads.v11.services.CampaignBudgetOperation;
@@ -21,8 +21,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import static com.addyai.utils.Constants.INVALID_REQUEST_ERROR;
-import static com.addyai.utils.Constants.MISSING_PARAMS;
+import static com.addyai.utils.misc.Constants.INVALID_REQUEST_ERROR;
+import static com.addyai.utils.misc.Constants.MISSING_PARAMS;
 
 @Service
 public class CampaignServiceImpl implements CampaignService {
@@ -30,17 +30,17 @@ public class CampaignServiceImpl implements CampaignService {
 
     private final CampaignBudgetRepository campaignBudgetRepository;
 
-    private final CampaignCriterionRepository campaignCriterionRepository;
+    private final CriterionRepository criterionRepository;
 
-    private final CampaignUtils campaignUtils;
+    private final CampaignHelper campaignHelper;
 
     public CampaignServiceImpl(CampaignRepository campaignRepository,
                                CampaignBudgetRepository campaignBudgetRepository,
-                               CampaignCriterionRepository campaignCriterionRepository) {
-        this.campaignUtils = new CampaignUtils();
+                               CriterionRepository criterionRepository) {
+        this.campaignHelper = new CampaignHelper();
         this.campaignRepository = campaignRepository;
         this.campaignBudgetRepository = campaignBudgetRepository;
-        this.campaignCriterionRepository = campaignCriterionRepository;
+        this.criterionRepository = criterionRepository;
     }
 
     /**
@@ -55,17 +55,17 @@ public class CampaignServiceImpl implements CampaignService {
 
         for (CampaignDetails campaignDetails : campaignDetailsList) {
             // validate campaign details before proceeding
-            campaignUtils.validateCampaignDetails(campaignDetails);
+            campaignHelper.validateCampaignDetails(campaignDetails);
 
             // validate the campaign budget details
-            campaignUtils.validateCampaignBudgetDetails(campaignDetails.getBudgetDetails());
+            campaignHelper.validateCampaignBudgetDetails(campaignDetails.getBudgetDetails());
 
             //TODO: validate campaign criterion details list
 
             // create a campaign budget operation for this individual budget
             List<BudgetDetails> singleBudgetDetailsList = Collections.singletonList(campaignDetails.getBudgetDetails());
             List<CampaignBudgetOperation> campaignBudgetOperations =
-                    campaignUtils.buildCampaignBudgetOperationList(singleBudgetDetailsList, true);
+                    campaignHelper.buildCampaignBudgetOperationList(singleBudgetDetailsList, true);
 
             // create the budget and extract the budget resource name
             String budgetResourceName =
@@ -75,7 +75,7 @@ public class CampaignServiceImpl implements CampaignService {
             campaignDetails.setBudgetResourceName(budgetResourceName);
 
             // create a Google Ads campaign object from campaign details
-            Campaign campaign = campaignUtils.buildCampaignFromDetails(campaignDetails, true);
+            Campaign campaign = campaignHelper.buildCampaignFromDetails(campaignDetails, true);
 
             // create a CREATE campaign operation
             CampaignOperation op = CampaignOperation.newBuilder()
@@ -99,17 +99,18 @@ public class CampaignServiceImpl implements CampaignService {
             String campaignResourceName = campaignResourceNames.get(i);
 
             // extract the campaign criterion list
-            List<CampaignCriterionDetails> campaignCriterionDetailsList
+            List<CriterionDetails> criterionDetailsList
                     = campaignDetailsList.get(i).getCampaignCriteriaList();
 
             // set the campaignResourceName to it's campaignCriterion
-            for (CampaignCriterionDetails campaignCriterionDetails : campaignCriterionDetailsList) {
-                campaignCriterionDetails.setCampaignResourceName(campaignResourceName);
+            for (CriterionDetails criterionDetails : criterionDetailsList) {
+                criterionDetails.setCampaignResourceName(campaignResourceName);
             }
 
-            for (CampaignCriterionDetails campaignCriterionDetails : campaignCriterionDetailsList) {
-                if (campaignCriterionDetails instanceof LocationDetails) {
-                    LocationDetails locationDetails = ((LocationDetails) campaignCriterionDetails);
+            // if location details object exists within criterionDetails, retrieve and set the geo targeting constant
+            for (CriterionDetails criterionDetails : criterionDetailsList) {
+                if (criterionDetails instanceof LocationDetails) {
+                    LocationDetails locationDetails = ((LocationDetails) criterionDetails);
 
                     // fetch the geo target constant from Google Ads
                     String geoTargetConstant = getGeoTargetConstant(locationDetails.getLocale(),
@@ -123,7 +124,7 @@ public class CampaignServiceImpl implements CampaignService {
 
             // build a list of campaign criterion operations
             List<CampaignCriterionOperation> campaignCriterionOperations =
-                    campaignUtils.buildCampaignCriterionOperationList(campaignDetailsList.get(i).getCampaignCriteriaList(),
+                    campaignHelper.buildCampaignCriterionOperationList(campaignDetailsList.get(i).getCampaignCriteriaList(),
                             true);
 
             // add all the new campaignCriterionOperations to the existing list of operations
@@ -131,7 +132,7 @@ public class CampaignServiceImpl implements CampaignService {
         }
 
         // create campaign criterion for each campaign on the client account
-        campaignCriterionRepository.addCampaignCriterion(customerId, campaignCriterionOperationList);
+        criterionRepository.addCampaignCriterion(customerId, campaignCriterionOperationList);
     }
 
     /**
@@ -150,7 +151,7 @@ public class CampaignServiceImpl implements CampaignService {
 
         // associate the budget details to its campaign details
         for (CampaignDetails campaignDetails : campaignDetailsList) {
-            BudgetDetails budgetDetails = campaignUtils.findBudgetDetailsByResourceName(campaignDetails.getBudgetResourceName(),
+            BudgetDetails budgetDetails = campaignHelper.findBudgetDetailsByResourceName(campaignDetails.getBudgetResourceName(),
                     existingBudgets);
 
             // assign the budget details object to the campaign details object
@@ -182,7 +183,7 @@ public class CampaignServiceImpl implements CampaignService {
         List<BudgetDetails> existingBudgets = campaignBudgetRepository.fetchAllCampaignBudgetDetails(customerId);
 
         // find the specific budget details object for this campaign
-        BudgetDetails budgetDetails = campaignUtils.findBudgetDetailsByName(campaignName, existingBudgets);
+        BudgetDetails budgetDetails = campaignHelper.findBudgetDetailsByName(campaignName, existingBudgets);
 
         // set the budget details object
         campaignDetails.setBudgetDetails(budgetDetails);
@@ -204,20 +205,20 @@ public class CampaignServiceImpl implements CampaignService {
         // extract all the budget details from the campaign details into a list
         for (CampaignDetails campaignDetails : campaignDetailsList) {
             // validate the campaign budget details before adding to the list
-            campaignUtils.validateCampaignBudgetDetails(campaignDetails.getBudgetDetails());
+            campaignHelper.validateCampaignBudgetDetails(campaignDetails.getBudgetDetails());
             budgetDetailsList.add(campaignDetails.getBudgetDetails());
         }
 
         // create a list of campaign budget operations for updating campaign budgets
         List<CampaignBudgetOperation> campaignBudgetOperations =
-                campaignUtils.buildCampaignBudgetOperationList(budgetDetailsList, false);
+                campaignHelper.buildCampaignBudgetOperationList(budgetDetailsList, false);
 
         // update the campaign budgets
         campaignBudgetRepository.createOrUpdateBudgets(customerId, campaignBudgetOperations);
 
         // create an UPDATE campaign operation for each campaign and add to a list
         for (CampaignDetails campaignDetails : campaignDetailsList) {
-            Campaign campaign = campaignUtils.buildCampaignFromDetails(campaignDetails, false);
+            Campaign campaign = campaignHelper.buildCampaignFromDetails(campaignDetails, false);
             CampaignOperation operation = CampaignOperation.newBuilder()
                     .setUpdate(campaign)
                     .setUpdateMask(FieldMasks.allSetFieldsOf(campaign))
@@ -253,6 +254,6 @@ public class CampaignServiceImpl implements CampaignService {
      * @throws Exception
      */
     private String getGeoTargetConstant(String locale, String countryCode, String location) throws Exception {
-        return campaignCriterionRepository.getGeoTargetConstant(locale, countryCode, location);
+        return criterionRepository.getGeoTargetConstant(locale, countryCode, location);
     }
 }

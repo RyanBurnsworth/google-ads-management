@@ -1,9 +1,9 @@
 package com.addyai.repos.campaigns.criterion.impl;
 
-import com.addyai.utils.GoogleAdsClientBuilder;
+import com.addyai.builder.GoogleAdsClientBuilder;
 import com.addyai.error_handling.ApiExceptionResolver;
-import com.addyai.models.campaign_criterion.CampaignCriterionDetails;
-import com.addyai.repos.campaigns.criterion.CampaignCriterionRepository;
+import com.addyai.models.campaign_criterion.CriterionDetails;
+import com.addyai.repos.campaigns.criterion.CriterionRepository;
 import com.addyai.repos.requests.StreamRequest;
 import com.addyai.repos.requests.impl.StreamRequestImpl;
 import com.google.ads.googleads.v11.services.*;
@@ -13,13 +13,13 @@ import java.util.Collections;
 import java.util.List;
 
 @Repository
-public class CampaignCriterionRepositoryImpl implements CampaignCriterionRepository {
+public class CriterionRepositoryImpl implements CriterionRepository {
     private final GoogleAdsServiceClient googleAdsServiceClient;
     private final StreamRequest requestBuilder;
 
     private final CampaignCriterionServiceClient campaignCriterionServiceClient;
 
-    public CampaignCriterionRepositoryImpl() {
+    public CriterionRepositoryImpl() {
         GoogleAdsClientBuilder googleAdsClientBuilder = GoogleAdsClientBuilder.INSTANCE;
 
         this.googleAdsServiceClient = googleAdsClientBuilder
@@ -34,7 +34,7 @@ public class CampaignCriterionRepositoryImpl implements CampaignCriterionReposit
     }
 
     @Override
-    public List<CampaignCriterionDetails> getCampaignCriterionDetails(long customerId, String campaignResourceName) {
+    public List<CriterionDetails> getCampaignCriterionDetails(long customerId, String campaignResourceName) {
         return null;
     }
 

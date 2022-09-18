@@ -8,8 +8,8 @@ public class ValidationErrorResponse {
     public ValidationErrorResponse(String errorType, String errorCode, String errorMessage) {
         super();
 
-        this.errorType = errorType;
         this.errorCode = errorCode;
+        this.errorType = errorType;
         this.errorMessage = errorMessage;
     }
 

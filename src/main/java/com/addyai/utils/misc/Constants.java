@@ -1,9 +1,15 @@
-package com.addyai.utils;
+package com.addyai.utils.misc;
 
 import com.google.ads.googleads.v11.enums.*;
 
 public class Constants {
     public static final long MICRO_FACTOR = 1000000L;
+
+    public static final int DEFAULT_ADDITIONAL_YEARS_CAMPAIGN_END_DATE = 10;
+
+    public static final String DEFAULT_LOCALE = "en";
+    public static final String DEFAULT_COUNTRY_CODE = "US";
+    public static final String LANGUAGE_CONSTANT_EN = "languageConstants/1000";
     public static final String ADVERTISING_TYPE_SEARCH = "SEARCH";
     public static final String INVALID_REQUEST_ERROR = "INVALID_REQUEST";
     public static final String INTERNAL_ERROR = "INTERNAL_ERROR";
@@ -35,6 +41,13 @@ public class Constants {
             = CriterionTypeEnum.CriterionType.LANGUAGE_VALUE;
     public static final int CRITERION_TYPE_PROXIMITY
             = CriterionTypeEnum.CriterionType.PROXIMITY_VALUE;
+
+    public static final int CAMPAIGN_STATUS_ENABLED
+            = CampaignStatusEnum.CampaignStatus.ENABLED_VALUE;
+    public static final int CAMPAIGN_STATUS_PAUSED
+            = CampaignStatusEnum.CampaignStatus.PAUSED_VALUE;
+    public static final int CAMPAIGN_STATUS_REMOVED
+            = CampaignStatusEnum.CampaignStatus.REMOVED_VALUE;
 
     public static final int CRITERION_STATUS_ENABLED
             = CampaignCriterionStatusEnum.CampaignCriterionStatus.ENABLED_VALUE;
@@ -76,8 +89,6 @@ public class Constants {
     public static final int MINUTE_OF_HOUR_FIFTEEN = MinuteOfHourEnum.MinuteOfHour.FIFTEEN_VALUE;
     public static final int MINUTE_OF_HOUR_THIRTY = MinuteOfHourEnum.MinuteOfHour.THIRTY_VALUE;
     public static final int MINUTE_OF_HOUR_FORTY_FIVE = MinuteOfHourEnum.MinuteOfHour.FORTY_FIVE_VALUE;
-
-    public static final String LANGUAGE_CONSTANT_EN = "languageConstants/1000";
 
     public static final int RADIUS_UNITS_MILES = ProximityRadiusUnitsEnum.ProximityRadiusUnits.MILES_VALUE;
     public static final int RADIUS_UNITS_KILOMETERS = ProximityRadiusUnitsEnum.ProximityRadiusUnits.KILOMETERS_VALUE;

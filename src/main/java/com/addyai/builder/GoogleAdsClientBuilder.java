@@ -1,4 +1,4 @@
-package com.addyai.utils;
+package com.addyai.builder;
 
 import com.google.ads.googleads.lib.GoogleAdsClient;
 
@@ -9,7 +9,7 @@ public enum GoogleAdsClientBuilder {
     INSTANCE();
     private GoogleAdsClient googleAdsClient;
 
-    private GoogleAdsClientBuilder() {
+    GoogleAdsClientBuilder() {
         try {
             // build the google ads client from the properties file
             googleAdsClient = GoogleAdsClient.newBuilder().fromPropertiesFile().build();

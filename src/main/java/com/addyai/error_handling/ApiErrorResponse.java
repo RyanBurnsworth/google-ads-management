@@ -14,8 +14,8 @@ public class ApiErrorResponse {
         Date date = new Date();
 
         this.timeStamp = new Timestamp(date.getTime());
-        this.errorType = errorType;
         this.errorCode = errorCode;
+        this.errorType = errorType;
         this.errorMessage = errorMessage;
     }
 

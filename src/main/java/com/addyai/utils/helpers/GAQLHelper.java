@@ -1,4 +1,4 @@
-package com.addyai.utils;
+package com.addyai.utils.helpers;
 
 import com.addyai.models.BudgetDetails;
 import com.addyai.models.CampaignDetails;
@@ -9,9 +9,9 @@ import com.google.api.gax.rpc.ServerStream;
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.addyai.utils.Constants.MICRO_FACTOR;
+import static com.addyai.utils.misc.Constants.MICRO_FACTOR;
 
-public class GAQLUtils {
+public class GAQLHelper {
     public static String getCampaignDetailsQuery() {
         return "SELECT campaign.id," +
                 " campaign.name," +
@@ -23,12 +23,10 @@ public class GAQLUtils {
                 " campaign.geo_target_type_setting.positive_geo_target_type," +
                 " campaign.geo_target_type_setting.negative_geo_target_type," +
                 " campaign.manual_cpc.enhanced_cpc_enabled," +
-                " campaign.optimization_score," +
                 " campaign.start_date," +
                 " campaign.end_date," +
                 " campaign.campaign_budget, " +
                 " campaign.network_settings.target_content_network," +
-                " campaign.network_settings.target_google_search," +
                 " campaign.network_settings.target_partner_search_network," +
                 " campaign.network_settings.target_search_network" +
                 " FROM campaign ORDER BY campaign.id";

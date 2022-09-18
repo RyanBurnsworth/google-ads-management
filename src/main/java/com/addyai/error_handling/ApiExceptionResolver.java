@@ -2,10 +2,11 @@ package com.addyai.error_handling;
 
 import com.addyai.error_handling.exceptions.InvalidRequestException;
 import com.addyai.error_handling.exceptions.ServiceFailureException;
+import com.addyai.utils.helpers.StringHelper;
 import com.google.ads.googleads.v11.errors.GoogleAdsException;
 
-import static com.addyai.utils.Constants.INTERNAL_ERROR;
-import static com.addyai.utils.Constants.UNKNOWN_SERVICE_ERROR;
+import static com.addyai.utils.misc.Constants.INTERNAL_ERROR;
+import static com.addyai.utils.misc.Constants.UNKNOWN_SERVICE_ERROR;
 
 public class ApiExceptionResolver {
     /**
@@ -25,11 +26,12 @@ public class ApiExceptionResolver {
 
             // extract the error code as a String
             if (ex.getStatusCode() != null && ex.getStatusCode().getTransportCode() != null)
-                errorCode = ex.getStatusCode().getTransportCode().toString();
+                errorType = ex.getStatusCode().getTransportCode().toString();
 
             // extract the error type and error message
             if (ex.getGoogleAdsFailure() != null && ex.getGoogleAdsFailure().getErrorsList().size() > 0) {
-                errorType = ex.getGoogleAdsFailure().getErrorsList().get(0).getErrorCode().getRequestError().toString();
+                String uncleanErrorType = ex.getGoogleAdsFailure().getErrorsList().get(0).getErrorCode().toString();
+                errorCode = StringHelper.doCleanErrorCode(uncleanErrorType);
                 errorMessage = ex.getGoogleAdsFailure().getErrorsList().get(0).getMessage();
             }
 

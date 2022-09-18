@@ -5,14 +5,14 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
 
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, property = "type")
 @JsonSubTypes({
-        @JsonSubTypes.Type(value = KeywordDetails.class, name = "keyword"),
+        @JsonSubTypes.Type(value = NegativeKeywordDetails.class, name = "keyword"),
         @JsonSubTypes.Type(value = AdScheduleDetails.class, name = "ad_schedule"),
         @JsonSubTypes.Type(value = ProximityDetails.class, name = "proximity"),
         @JsonSubTypes.Type(value = LanguageDetails.class, name = "language"),
         @JsonSubTypes.Type(value = LocationDetails.class, name = "location"),
         @JsonSubTypes.Type(value = DeviceDetails.class, name = "device")
 })
-public abstract class CampaignCriterionDetails {
+public abstract class CriterionDetails {
     public long campaignCriterionId = 0L;
 
     private long campaignId = 0L;

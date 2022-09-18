@@ -1,7 +1,9 @@
 package com.addyai.models.campaign_criterion;
 
-public class LanguageDetails extends CampaignCriterionDetails {
-    private String languageCode = "EN";
+import static com.addyai.utils.misc.Constants.LANGUAGE_CONSTANT_EN;
+
+public class LanguageDetails extends CriterionDetails {
+    private String languageCode = LANGUAGE_CONSTANT_EN;
 
     public String getLanguageCode() {
         return languageCode;

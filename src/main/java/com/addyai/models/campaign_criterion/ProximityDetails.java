@@ -1,6 +1,8 @@
 package com.addyai.models.campaign_criterion;
 
-public class ProximityDetails extends CampaignCriterionDetails {
+import static com.addyai.utils.misc.Constants.RADIUS_UNITS_MILES;
+
+public class ProximityDetails extends CriterionDetails {
     private String cityName = "";
 
     private String countryCode = "";
@@ -19,7 +21,7 @@ public class ProximityDetails extends CampaignCriterionDetails {
 
     private double radius = 0.0;
 
-    private int radiusUnits;
+    private int radiusUnits = RADIUS_UNITS_MILES;
 
     public String getCityName() {
         return cityName;
