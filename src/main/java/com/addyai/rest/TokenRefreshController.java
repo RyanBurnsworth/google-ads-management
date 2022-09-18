@@ -1,6 +1,6 @@
 package com.addyai.rest;
 
-import com.addyai.account.ManagerAccountService;
+import com.addyai.services.account.ManagerAccountService;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;

@@ -1,6 +1,6 @@
 package com.addyai.repos.campaigns.impl;
 
-import com.addyai.utils.GoogleAdsManagementClient;
+import com.addyai.utils.GoogleAdsClientBuilder;
 import com.addyai.error_handling.ApiExceptionResolver;
 import com.addyai.error_handling.exceptions.NotFoundException;
 import com.addyai.models.CampaignDetails;
@@ -20,19 +20,25 @@ import static com.addyai.utils.Constants.RECORD_NOT_FOUND;
 
 @Repository
 public class CampaignRepositoryImpl implements CampaignRepository {
-    private final GoogleAdsServiceClient googleAdsServiceClient;
+
+    private final CampaignServiceClient campaignServiceClient;
 
     private final StreamRequest requestBuilder;
 
     public CampaignRepositoryImpl() {
-        GoogleAdsManagementClient googleAdsManagementClient = GoogleAdsManagementClient.INSTANCE;
+        GoogleAdsClientBuilder googleAdsClientBuilder = GoogleAdsClientBuilder.INSTANCE;
 
-        this.googleAdsServiceClient = googleAdsManagementClient
+        GoogleAdsServiceClient googleAdsServiceClient = googleAdsClientBuilder
                 .getGoogleAdsClient()
                 .getLatestVersion()
                 .createGoogleAdsServiceClient();
 
         this.requestBuilder = new StreamRequestImpl(googleAdsServiceClient);
+
+        campaignServiceClient = googleAdsClientBuilder
+                .getGoogleAdsClient()
+                .getLatestVersion()
+                .createCampaignServiceClient();
     }
 
     /**
@@ -100,11 +106,6 @@ public class CampaignRepositoryImpl implements CampaignRepository {
     public void updateCampaigns(long customerId,
                                 List<CampaignOperation> campaignOperations) throws Exception {
         try {
-            GoogleAdsManagementClient googleAdsManagementClient = GoogleAdsManagementClient.INSTANCE;
-
-            CampaignServiceClient campaignServiceClient = googleAdsManagementClient.getGoogleAdsClient()
-                    .getLatestVersion().createCampaignServiceClient();
-
             // At this time we are going to assume the response is OK if no exception is thrown
             MutateCampaignsResponse response = campaignServiceClient
                     .mutateCampaigns(Long.toString(customerId), campaignOperations);
@@ -125,11 +126,6 @@ public class CampaignRepositoryImpl implements CampaignRepository {
         List<CampaignOperation> campaignOperations = new ArrayList<>();
 
         try {
-            GoogleAdsManagementClient googleAdsManagementClient = GoogleAdsManagementClient.INSTANCE;
-
-            CampaignServiceClient campaignServiceClient = googleAdsManagementClient.getGoogleAdsClient()
-                    .getLatestVersion().createCampaignServiceClient();
-
             for (long campaignId : campaignIds) {
                 String campaignResourceName = ResourceNames.campaign(customerId, campaignId);
 
@@ -161,11 +157,6 @@ public class CampaignRepositoryImpl implements CampaignRepository {
     public List<String> addCampaigns(long customerId, List<CampaignOperation> campaignOperations) throws Exception {
         List<String> campaignResourceNameList = new ArrayList<>();
         try {
-            GoogleAdsManagementClient googleAdsManagementClient = GoogleAdsManagementClient.INSTANCE;
-
-            CampaignServiceClient campaignServiceClient = googleAdsManagementClient.getGoogleAdsClient()
-                    .getLatestVersion().createCampaignServiceClient();
-
             MutateCampaignsResponse response =
                     campaignServiceClient.mutateCampaigns(Long.toString(customerId), campaignOperations);
 

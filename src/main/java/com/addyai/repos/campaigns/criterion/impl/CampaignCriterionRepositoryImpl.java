@@ -1,6 +1,6 @@
 package com.addyai.repos.campaigns.criterion.impl;
 
-import com.addyai.utils.GoogleAdsManagementClient;
+import com.addyai.utils.GoogleAdsClientBuilder;
 import com.addyai.error_handling.ApiExceptionResolver;
 import com.addyai.models.campaign_criterion.CampaignCriterionDetails;
 import com.addyai.repos.campaigns.criterion.CampaignCriterionRepository;
@@ -20,16 +20,16 @@ public class CampaignCriterionRepositoryImpl implements CampaignCriterionReposit
     private final CampaignCriterionServiceClient campaignCriterionServiceClient;
 
     public CampaignCriterionRepositoryImpl() {
-        GoogleAdsManagementClient googleAdsManagementClient = GoogleAdsManagementClient.INSTANCE;
+        GoogleAdsClientBuilder googleAdsClientBuilder = GoogleAdsClientBuilder.INSTANCE;
 
-        this.googleAdsServiceClient = googleAdsManagementClient
+        this.googleAdsServiceClient = googleAdsClientBuilder
                 .getGoogleAdsClient()
                 .getLatestVersion()
                 .createGoogleAdsServiceClient();
 
         this.requestBuilder = new StreamRequestImpl(googleAdsServiceClient);
 
-        this.campaignCriterionServiceClient = googleAdsManagementClient.getGoogleAdsClient()
+        this.campaignCriterionServiceClient = googleAdsClientBuilder.getGoogleAdsClient()
                 .getLatestVersion().createCampaignCriterionServiceClient();
     }
 
@@ -54,11 +54,11 @@ public class CampaignCriterionRepositoryImpl implements CampaignCriterionReposit
                                        String countryCode,
                                        String location) throws Exception {
         try {
-            GoogleAdsManagementClient googleAdsManagementClient = GoogleAdsManagementClient.INSTANCE;
+            GoogleAdsClientBuilder googleAdsClientBuilder = GoogleAdsClientBuilder.INSTANCE;
 
             // create an instance of GeoTargetConstantServiceClient
             GeoTargetConstantServiceClient geoTargetClient =
-                    googleAdsManagementClient
+                    googleAdsClientBuilder
                             .getGoogleAdsClient()
                             .getLatestVersion()
                             .createGeoTargetConstantServiceClient();

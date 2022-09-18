@@ -1,6 +1,6 @@
 package com.addyai.repos.campaigns.budget.impl;
 
-import com.addyai.utils.GoogleAdsManagementClient;
+import com.addyai.utils.GoogleAdsClientBuilder;
 import com.addyai.error_handling.ApiExceptionResolver;
 import com.addyai.models.BudgetDetails;
 import com.addyai.repos.campaigns.budget.CampaignBudgetRepository;
@@ -20,9 +20,9 @@ public class CampaignBudgetRepositoryImpl implements CampaignBudgetRepository {
     private final StreamRequest requestBuilder;
 
     public CampaignBudgetRepositoryImpl() {
-        GoogleAdsManagementClient googleAdsManagementClient = GoogleAdsManagementClient.INSTANCE;
+        GoogleAdsClientBuilder googleAdsClientBuilder = GoogleAdsClientBuilder.INSTANCE;
 
-        this.googleAdsServiceClient = googleAdsManagementClient
+        this.googleAdsServiceClient = googleAdsClientBuilder
                 .getGoogleAdsClient()
                 .getLatestVersion()
                 .createGoogleAdsServiceClient();
@@ -49,9 +49,9 @@ public class CampaignBudgetRepositoryImpl implements CampaignBudgetRepository {
     public List<String> createOrUpdateBudgets(long customerId, List<CampaignBudgetOperation> campaignBudgetOperationList) throws Exception {
         List<String> budgetResourceNameList = new ArrayList<>();
         try {
-            GoogleAdsManagementClient googleAdsManagementClient = GoogleAdsManagementClient.INSTANCE;
+            GoogleAdsClientBuilder googleAdsClientBuilder = GoogleAdsClientBuilder.INSTANCE;
 
-            CampaignBudgetServiceClient campaignBudgetServiceClient = googleAdsManagementClient.getGoogleAdsClient()
+            CampaignBudgetServiceClient campaignBudgetServiceClient = googleAdsClientBuilder.getGoogleAdsClient()
                     .getLatestVersion().createCampaignBudgetServiceClient();
 
             // At this time we are going to assume the response is OK if no exception is thrown

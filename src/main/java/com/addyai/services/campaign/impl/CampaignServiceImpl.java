@@ -44,7 +44,7 @@ public class CampaignServiceImpl implements CampaignService {
     }
 
     /**
-     * Add campaigns to a client's account
+     * Add campaigns including campaign budget and campaign criterion to a client's account
      *
      * @param customerId          the customer id of the client account
      * @param campaignDetailsList list of [CampaignDetails] to be used in campaign creation
@@ -60,7 +60,9 @@ public class CampaignServiceImpl implements CampaignService {
             // validate the campaign budget details
             campaignUtils.validateCampaignBudgetDetails(campaignDetails.getBudgetDetails());
 
-            // create a campaign budget operation only for this individual budget
+            //TODO: validate campaign criterion details list
+
+            // create a campaign budget operation for this individual budget
             List<BudgetDetails> singleBudgetDetailsList = Collections.singletonList(campaignDetails.getBudgetDetails());
             List<CampaignBudgetOperation> campaignBudgetOperations =
                     campaignUtils.buildCampaignBudgetOperationList(singleBudgetDetailsList, true);
@@ -158,11 +160,11 @@ public class CampaignServiceImpl implements CampaignService {
     }
 
     /**
-     * Fetch a single [CampaignDetails] by name
+     * Fetch a single CampaignDetails by name
      *
      * @param customerId   the customer id of the client account
      * @param campaignName the name of the campaign to fetch
-     * @return [CampaignDetails]
+     * @return CampaignDetails
      * @throws Exception
      */
     @Override

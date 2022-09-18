@@ -1,4 +1,4 @@
-package com.addyai.account;
+package com.addyai.services.account;
 
 import com.google.ads.googleads.lib.GoogleAdsClient;
 import com.google.api.client.http.GenericUrl;

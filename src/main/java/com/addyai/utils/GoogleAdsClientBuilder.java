@@ -5,11 +5,11 @@ import com.google.ads.googleads.lib.GoogleAdsClient;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 
-public enum GoogleAdsManagementClient {
+public enum GoogleAdsClientBuilder {
     INSTANCE();
     private GoogleAdsClient googleAdsClient;
 
-    private GoogleAdsManagementClient() {
+    private GoogleAdsClientBuilder() {
         try {
             // build the google ads client from the properties file
             googleAdsClient = GoogleAdsClient.newBuilder().fromPropertiesFile().build();
@@ -23,11 +23,11 @@ public enum GoogleAdsManagementClient {
         }
     }
 
-    public GoogleAdsManagementClient getInstance() {
+    public GoogleAdsClientBuilder getInstance() {
         return INSTANCE;
     }
 
     public GoogleAdsClient getGoogleAdsClient() {
-        return googleAdsClient;
+        return this.googleAdsClient;
     }
 }

@@ -7,7 +7,10 @@ import com.addyai.models.CampaignDetails;
 import com.addyai.models.campaign_criterion.*;
 import com.google.ads.googleads.lib.utils.FieldMasks;
 import com.google.ads.googleads.v11.common.*;
-import com.google.ads.googleads.v11.enums.*;
+import com.google.ads.googleads.v11.enums.AdvertisingChannelTypeEnum;
+import com.google.ads.googleads.v11.enums.CampaignStatusEnum;
+import com.google.ads.googleads.v11.enums.NegativeGeoTargetTypeEnum;
+import com.google.ads.googleads.v11.enums.PositiveGeoTargetTypeEnum;
 import com.google.ads.googleads.v11.resources.Campaign;
 import com.google.ads.googleads.v11.resources.CampaignBudget;
 import com.google.ads.googleads.v11.resources.CampaignCriterion;
@@ -22,11 +25,11 @@ import static com.addyai.utils.Constants.MICRO_FACTOR;
 public class CampaignUtils {
 
     /**
-     * Generate a campaign object using a CampaignDetails object (for use in creating new campaigns)
+     * Build a campaign object using a CampaignDetails object
      *
-     * @param campaignDetails [CampaignDetails] to be parsed into a [Campaign]
+     * @param campaignDetails details to be parsed into a [Campaign]
      * @param shouldCreate    true/false if this campaign should be created or updated
-     * @return [Campaign] parsed from [CampaignDetails] provided
+     * @return Campaign created from the CampaignDetails provided
      */
     public Campaign buildCampaignFromDetails(CampaignDetails campaignDetails,
                                              boolean shouldCreate) {
@@ -53,118 +56,102 @@ public class CampaignUtils {
         AdvertisingChannelTypeEnum.AdvertisingChannelType advertisingChannelType =
                 AdvertisingChannelTypeEnum.AdvertisingChannelType.valueOf(campaignDetails.getAdvertisingChannelType());
 
-        // create and return a campaign object with the above settings
-        if (shouldCreate) {
-            // if shouldCreate is true return a campaign object for creation
-            return Campaign.newBuilder()
-                    .setStatus(status)
-                    .setId(campaignDetails.getCampaignId())
-                    .setStartDate(campaignDetails.getStartDate())
-                    .setEndDate(campaignDetails.getEndDate())
-                    .setName(campaignDetails.getCampaignName())
-                    .setGeoTargetTypeSetting(geoTargetTypeSetting)
-                    .setCampaignBudget(campaignDetails.getBudgetResourceName())
-                    .setManualCpc(manualCpc)
-                    .setNetworkSettings(networkSettings)
-                    .setAdvertisingChannelType(advertisingChannelType) // only set for campaign creation
-                    .build();
-        } else {
-            // if shouldCreate is false return a campaign object for updating
-            return Campaign.newBuilder()
-                    .setStatus(status)
-                    .setId(campaignDetails.getCampaignId())
-                    .setStartDate(campaignDetails.getStartDate())
-                    .setEndDate(campaignDetails.getEndDate())
-                    .setName(campaignDetails.getCampaignName())
-                    .setResourceName(campaignDetails.getCampaignResourceName()) // needed for updating
-                    .setGeoTargetTypeSetting(geoTargetTypeSetting)
-                    .setCampaignBudget(campaignDetails.getBudgetResourceName())
-                    .setManualCpc(manualCpc)
-                    .setNetworkSettings(networkSettings)
-                    .build();
-        }
+        Campaign.Builder campaignBuilder = Campaign.newBuilder();
+
+        // set the general campaign values
+        campaignBuilder.setStatus(status)
+                .setId(campaignDetails.getCampaignId())
+                .setStartDate(campaignDetails.getStartDate())
+                .setEndDate(campaignDetails.getEndDate())
+                .setName(campaignDetails.getCampaignName())
+                .setGeoTargetTypeSetting(geoTargetTypeSetting)
+                .setCampaignBudget(campaignDetails.getBudgetResourceName())
+                .setManualCpc(manualCpc)
+                .setNetworkSettings(networkSettings);
+
+        // set advertising channel if creating campaign
+        // set resource name is updating a campaign
+        if (shouldCreate)
+            campaignBuilder.setAdvertisingChannelType(advertisingChannelType);
+        else
+            campaignBuilder.setResourceName(campaignDetails.getCampaignResourceName());
+
+        return campaignBuilder.build();
     }
 
     /**
-     * Build a list of CampaignBudgetOperations to be used for creating or updating campaign budgets
+     * Build [CampaignBudgetOperation] to be used for creating or updating campaign budgets
      *
-     * @param budgetDetailsList a list of budget details
+     * @param budgetDetailsList [BudgetDetails] to create budgets from
      * @param shouldCreate      true if it should create budget, false if it should update
-     * @return list of CampaignBudgetOperations to be performed on the client account
+     * @return [CampaignBudgetOperation]
      */
     public List<CampaignBudgetOperation> buildCampaignBudgetOperationList(List<BudgetDetails> budgetDetailsList,
                                                                           boolean shouldCreate) {
         List<CampaignBudgetOperation> campaignBudgetOperations = new ArrayList<>();
 
+        // create and store a budget operation for each budget detail given
         for (BudgetDetails budgetDetails : budgetDetailsList) {
-            // if shouldCreate is true, create the budget within the client account
-            CampaignBudgetOperation operation;
+            CampaignBudget.Builder budgetBuilder = CampaignBudget.newBuilder();
+            CampaignBudgetOperation.Builder budgetOperationBuilder = CampaignBudgetOperation.newBuilder();
+
+            // set the general budget fields
+            budgetBuilder
+                    .setName(budgetDetails.getName())
+                    .setAmountMicros(budgetDetails.getDailyBudgetAmount() * MICRO_FACTOR)
+                    .setStatusValue(budgetDetails.getStatus())
+                    .setDeliveryMethodValue(budgetDetails.getDeliveryMethod());
+
+            // set the explicitly shared flag when creating budgets
+            // set the budget resource name when updating budgets
             if (shouldCreate) {
-                // build a CampaignBudget object using the given budget details
-                CampaignBudget budget = CampaignBudget.newBuilder()
-                        .setName(budgetDetails.getName())
-                        .setAmountMicros(budgetDetails.getDailyBudgetAmount() * MICRO_FACTOR)
-                        .setStatus(BudgetStatusEnum.BudgetStatus
-                                .forNumber(budgetDetails.getStatus()))
-                        .setDeliveryMethod(BudgetDeliveryMethodEnum.BudgetDeliveryMethod
-                                .forNumber(budgetDetails.getDeliveryMethod()))
-                        .setExplicitlyShared(budgetDetails.isShared()) // only allowed in budget creation
-                        .build();
-
-                operation = CampaignBudgetOperation.newBuilder()
-                        .setCreate(budget)
-                        .build();
+                budgetBuilder.setExplicitlyShared(budgetDetails.isShared());
+                budgetOperationBuilder.setCreate(budgetBuilder.build());
             } else {
-                // if shouldCreate is false, update the existing budget within the client account
-                CampaignBudget budget = CampaignBudget.newBuilder()
-                        .setName(budgetDetails.getName())
-                        .setResourceName(budgetDetails.getResourceName()) // must include in order to update
-                        .setAmountMicros(budgetDetails.getDailyBudgetAmount() * MICRO_FACTOR)
-                        .setStatus(BudgetStatusEnum.BudgetStatus
-                                .forNumber(budgetDetails.getStatus()))
-                        .setDeliveryMethod(BudgetDeliveryMethodEnum.BudgetDeliveryMethod
-                                .forNumber(budgetDetails.getDeliveryMethod()))
-                        .build();
+                budgetBuilder.setResourceName(budgetDetails.getResourceName());
 
-                operation = CampaignBudgetOperation.newBuilder()
-                        .setUpdate(budget)
-                        .setUpdateMask(FieldMasks.allSetFieldsOf(budget))
-                        .build();
+                CampaignBudget budget = budgetBuilder.build();
+
+                budgetOperationBuilder.setUpdate(budget);
+                budgetOperationBuilder.setUpdateMask(FieldMasks.allSetFieldsOf(budget));
             }
 
             // add the budget operation to the list of operations
-            campaignBudgetOperations.add(operation);
+            campaignBudgetOperations.add(budgetOperationBuilder.build());
         }
+
         return campaignBudgetOperations;
     }
 
     /**
-     * Build a list of CampaignCriterionOperation to be used for creating or updating campaign criterion.
-     * The campaign to be updated is specified by its campaignResourceName
+     * Build [CampaignCriterionOperation] to be used for creating or updating campaign criterion.
      *
-     * @param campaignCriterionDetailsList a list of [CampaignCriterionDetails]
+     * @param campaignCriterionDetailsList [CampaignCriterionDetails] to create operations from
      * @param shouldCreate                 true if it should create, false if it should update
-     * @return list of [CampaignCriterionOperations] to be performed on the specified campaign
+     * @return [CampaignCriterionOperations]
      */
     public List<CampaignCriterionOperation> buildCampaignCriterionOperationList(
             List<CampaignCriterionDetails> campaignCriterionDetailsList,
             boolean shouldCreate) {
         List<CampaignCriterionOperation> campaignCriterionOperationList = new ArrayList<>();
 
-        // TODO: Validate campaign resource name in each object
-
         for (CampaignCriterionDetails campaignCriterionDetails : campaignCriterionDetailsList) {
             CampaignCriterion.Builder campaignCriterionBuilder = CampaignCriterion.newBuilder();
 
             if (campaignCriterionDetails instanceof AdScheduleDetails) {
+                // create an ad schedule object info for criterion object
                 AdScheduleInfo adScheduleInfo = buildAdScheduleInfo((AdScheduleDetails) campaignCriterionDetails);
+
+                // if the bid modifier is set, apply to campaign criterion
+                if (campaignCriterionDetails.getBidModifier() > 0.0f)
+                    campaignCriterionBuilder.setBidModifier(campaignCriterionDetails.getBidModifier());
 
                 campaignCriterionBuilder
                         .setAdSchedule(adScheduleInfo)
-                        .setCampaign(campaignCriterionDetails.getCampaignResourceName())
-                        .setBidModifier(campaignCriterionDetails.getBidModifier());
+                        .setCampaign(campaignCriterionDetails.getCampaignResourceName());
 
             } else if (campaignCriterionDetails instanceof KeywordDetails) {
+                // create a keyword info object for campaign criterion
                 KeywordInfo keywordInfo = KeywordInfo.newBuilder()
                         .setMatchTypeValue(((KeywordDetails) campaignCriterionDetails).getKeywordMatchType())
                         .setText(((KeywordDetails) campaignCriterionDetails).getKeywordText())
@@ -173,9 +160,10 @@ public class CampaignUtils {
                 campaignCriterionBuilder
                         .setKeyword(keywordInfo)
                         .setCampaign(campaignCriterionDetails.getCampaignResourceName())
-                        .setNegative(campaignCriterionDetails.isNegative());
+                        .setNegative(campaignCriterionDetails.isNegative()); // always true for keywordInfo
 
             } else if (campaignCriterionDetails instanceof LanguageDetails) {
+                // create a language info object for campaign criterion
                 LanguageDetails languageDetails = ((LanguageDetails) campaignCriterionDetails);
 
                 LanguageInfo languageInfo = LanguageInfo.newBuilder()
@@ -191,14 +179,16 @@ public class CampaignUtils {
                         .setCampaign(campaignCriterionDetails.getCampaignResourceName());
 
             } else if (campaignCriterionDetails instanceof DeviceDetails) {
+                // create device info object for campaign criterion
                 DeviceInfo deviceInfo = buildDeviceInfo((DeviceDetails) campaignCriterionDetails);
 
                 campaignCriterionBuilder
                         .setDevice(deviceInfo)
-                        .setBidModifier(campaignCriterionDetails.getBidModifier())
+                        .setBidModifier(campaignCriterionDetails.getBidModifier()) // always set for DeviceInfo
                         .setCampaign(campaignCriterionDetails.getCampaignResourceName());
 
             } else if (campaignCriterionDetails instanceof LocationDetails) {
+                // create location info object for campaign criterion
                 LocationDetails locationDetails = ((LocationDetails) campaignCriterionDetails);
 
                 LocationInfo locationInfo = LocationInfo.newBuilder()
@@ -218,6 +208,7 @@ public class CampaignUtils {
                         .setCampaign(campaignCriterionDetails.getCampaignResourceName());
 
             } else if (campaignCriterionDetails instanceof ProximityDetails) {
+                // create proximity info for campaign criterion
                 ProximityDetails proximityDetails = (ProximityDetails) campaignCriterionDetails;
 
                 // create a proximity info builder
@@ -303,6 +294,12 @@ public class CampaignUtils {
                 .build();
     }
 
+    /**
+     * Build an AdScheduleInfo object from details
+     *
+     * @param adScheduleDetails the AdScheduleDetails to build AdScheduleInfo from
+     * @return AdScheduleInfo object
+     */
     private AdScheduleInfo buildAdScheduleInfo(AdScheduleDetails adScheduleDetails) {
         // create ad schedule info
         return AdScheduleInfo.newBuilder()
@@ -314,12 +311,25 @@ public class CampaignUtils {
                 .build();
     }
 
+    /**
+     * Build a DeviceInfo object from details
+     *
+     * @param deviceDetails the DeviceDetails to build DeviceInfo from
+     * @return DeviceInfo object
+     */
     private DeviceInfo buildDeviceInfo(DeviceDetails deviceDetails) {
         return DeviceInfo.newBuilder()
                 .setTypeValue(deviceDetails.getDeviceType())
                 .build();
     }
 
+    /**
+     * Build a ProximityInfo.Builder object from details
+     * Can be built using either AddressInfo or GeoPointInfo
+     *
+     * @param proximityDetails the ProximityDetails to create ProximityInfo.Builder from
+     * @return ProximityInfo.Builder object
+     */
     private ProximityInfo.Builder buildProximityInfoBuilder(ProximityDetails proximityDetails) {
         ProximityInfo.Builder proximityInfoBuilder = ProximityInfo.newBuilder();
 
@@ -409,7 +419,7 @@ public class CampaignUtils {
      *
      * @param resourceName      the resource name of the campaign budget
      * @param budgetDetailsList a list of existing budgetDetails from the client account
-     * @return [BudgetDetails] that matched the resource name given
+     * @return [BudgetDetails] that matched the resource name given; null if no budget is found
      */
     public BudgetDetails findBudgetDetailsByResourceName(String resourceName, List<BudgetDetails> budgetDetailsList) {
         for (BudgetDetails budgetDetails : budgetDetailsList) {
@@ -425,7 +435,7 @@ public class CampaignUtils {
      *
      * @param budgetName        the name of the campaign budget
      * @param budgetDetailsList a list of existing budgetDetails from the client account
-     * @return [BudgetDetails] that matched the budget name given
+     * @return [BudgetDetails] that matched the budget name given; null if no budget is found
      */
     public BudgetDetails findBudgetDetailsByName(String budgetName, List<BudgetDetails> budgetDetailsList) {
         for (BudgetDetails budgetDetails : budgetDetailsList) {
