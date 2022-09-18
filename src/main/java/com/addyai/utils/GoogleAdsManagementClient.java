@@ -1,19 +1,17 @@
-package com.addyai.builder;
+package com.addyai.utils;
 
 import com.google.ads.googleads.lib.GoogleAdsClient;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
 
-/**
- * Builds a GoogleAdsClient for single use throughout application
- */
-public class GoogleAdsClientBuilder {
-    private final GoogleAdsClient googleAdsClient;
+public enum GoogleAdsManagementClient {
+    INSTANCE();
+    private GoogleAdsClient googleAdsClient;
 
-    public GoogleAdsClientBuilder() {
-        GoogleAdsClient googleAdsClient = null;
+    private GoogleAdsManagementClient() {
         try {
+            // build the google ads client from the properties file
             googleAdsClient = GoogleAdsClient.newBuilder().fromPropertiesFile().build();
         } catch (FileNotFoundException fnfe) {
             System.err.printf(
@@ -23,10 +21,13 @@ public class GoogleAdsClientBuilder {
             System.err.printf("Failed to create GoogleAdsClient. Exception: %s%n", ioe);
             System.exit(1);
         }
-        this.googleAdsClient = googleAdsClient;
     }
 
-    public GoogleAdsClient build() {
-        return this.googleAdsClient;
+    public GoogleAdsManagementClient getInstance() {
+        return INSTANCE;
+    }
+
+    public GoogleAdsClient getGoogleAdsClient() {
+        return googleAdsClient;
     }
 }

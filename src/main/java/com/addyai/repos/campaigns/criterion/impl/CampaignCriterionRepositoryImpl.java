@@ -1,6 +1,6 @@
 package com.addyai.repos.campaigns.criterion.impl;
 
-import com.addyai.GoogleAdsManagementApplication;
+import com.addyai.utils.GoogleAdsManagementClient;
 import com.addyai.error_handling.ApiExceptionResolver;
 import com.addyai.models.campaign_criterion.CampaignCriterionDetails;
 import com.addyai.repos.campaigns.criterion.CampaignCriterionRepository;
@@ -20,14 +20,16 @@ public class CampaignCriterionRepositoryImpl implements CampaignCriterionReposit
     private final CampaignCriterionServiceClient campaignCriterionServiceClient;
 
     public CampaignCriterionRepositoryImpl() {
-        this.googleAdsServiceClient = GoogleAdsManagementApplication
+        GoogleAdsManagementClient googleAdsManagementClient = GoogleAdsManagementClient.INSTANCE;
+
+        this.googleAdsServiceClient = googleAdsManagementClient
                 .getGoogleAdsClient()
                 .getLatestVersion()
                 .createGoogleAdsServiceClient();
 
         this.requestBuilder = new StreamRequestImpl(googleAdsServiceClient);
 
-        this.campaignCriterionServiceClient = GoogleAdsManagementApplication.getGoogleAdsClient()
+        this.campaignCriterionServiceClient = googleAdsManagementClient.getGoogleAdsClient()
                 .getLatestVersion().createCampaignCriterionServiceClient();
     }
 
@@ -52,10 +54,12 @@ public class CampaignCriterionRepositoryImpl implements CampaignCriterionReposit
                                        String countryCode,
                                        String location) throws Exception {
         try {
+            GoogleAdsManagementClient googleAdsManagementClient = GoogleAdsManagementClient.INSTANCE;
+
             // create an instance of GeoTargetConstantServiceClient
             GeoTargetConstantServiceClient geoTargetClient =
-                    GoogleAdsManagementApplication
-                            .googleAdsClient
+                    googleAdsManagementClient
+                            .getGoogleAdsClient()
                             .getLatestVersion()
                             .createGeoTargetConstantServiceClient();
 

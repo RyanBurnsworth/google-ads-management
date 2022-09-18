@@ -1,6 +1,6 @@
 package com.addyai.repos.campaigns.impl;
 
-import com.addyai.GoogleAdsManagementApplication;
+import com.addyai.utils.GoogleAdsManagementClient;
 import com.addyai.error_handling.ApiExceptionResolver;
 import com.addyai.error_handling.exceptions.NotFoundException;
 import com.addyai.models.CampaignDetails;
@@ -25,7 +25,9 @@ public class CampaignRepositoryImpl implements CampaignRepository {
     private final StreamRequest requestBuilder;
 
     public CampaignRepositoryImpl() {
-        this.googleAdsServiceClient = GoogleAdsManagementApplication
+        GoogleAdsManagementClient googleAdsManagementClient = GoogleAdsManagementClient.INSTANCE;
+
+        this.googleAdsServiceClient = googleAdsManagementClient
                 .getGoogleAdsClient()
                 .getLatestVersion()
                 .createGoogleAdsServiceClient();
@@ -77,6 +79,7 @@ public class CampaignRepositoryImpl implements CampaignRepository {
             ServerStream<SearchGoogleAdsStreamResponse> response = requestBuilder.callStreamRequest(request);
 
             campaignDetailsList = GAQLUtils.convertStreamResponseToCampaignDetailsList(response);
+
             if (campaignDetailsList.size() > 0)
                 return campaignDetailsList.get(0);
             else
@@ -97,7 +100,9 @@ public class CampaignRepositoryImpl implements CampaignRepository {
     public void updateCampaigns(long customerId,
                                 List<CampaignOperation> campaignOperations) throws Exception {
         try {
-            CampaignServiceClient campaignServiceClient = GoogleAdsManagementApplication.getGoogleAdsClient()
+            GoogleAdsManagementClient googleAdsManagementClient = GoogleAdsManagementClient.INSTANCE;
+
+            CampaignServiceClient campaignServiceClient = googleAdsManagementClient.getGoogleAdsClient()
                     .getLatestVersion().createCampaignServiceClient();
 
             // At this time we are going to assume the response is OK if no exception is thrown
@@ -120,7 +125,9 @@ public class CampaignRepositoryImpl implements CampaignRepository {
         List<CampaignOperation> campaignOperations = new ArrayList<>();
 
         try {
-            CampaignServiceClient campaignServiceClient = GoogleAdsManagementApplication.getGoogleAdsClient()
+            GoogleAdsManagementClient googleAdsManagementClient = GoogleAdsManagementClient.INSTANCE;
+
+            CampaignServiceClient campaignServiceClient = googleAdsManagementClient.getGoogleAdsClient()
                     .getLatestVersion().createCampaignServiceClient();
 
             for (long campaignId : campaignIds) {
@@ -154,7 +161,9 @@ public class CampaignRepositoryImpl implements CampaignRepository {
     public List<String> addCampaigns(long customerId, List<CampaignOperation> campaignOperations) throws Exception {
         List<String> campaignResourceNameList = new ArrayList<>();
         try {
-            CampaignServiceClient campaignServiceClient = GoogleAdsManagementApplication.getGoogleAdsClient()
+            GoogleAdsManagementClient googleAdsManagementClient = GoogleAdsManagementClient.INSTANCE;
+
+            CampaignServiceClient campaignServiceClient = googleAdsManagementClient.getGoogleAdsClient()
                     .getLatestVersion().createCampaignServiceClient();
 
             MutateCampaignsResponse response =
