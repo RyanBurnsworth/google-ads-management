@@ -33,7 +33,7 @@ public class CampaignDetails {
 
     private boolean isTargetingContentNetwork = false;
 
-    private boolean isTargetingPartnerSearchNetwork = true;
+    private boolean isTargetingGoogleSearchNetwork = true;
 
     private String budgetResourceName = "";
 
@@ -137,12 +137,12 @@ public class CampaignDetails {
         isTargetingContentNetwork = targetingContentNetwork;
     }
 
-    public boolean isTargetingPartnerSearchNetwork() {
-        return isTargetingPartnerSearchNetwork;
+    public boolean isTargetingGoogleSearchNetwork() {
+        return isTargetingGoogleSearchNetwork;
     }
 
-    public void setTargetingPartnerSearchNetwork(boolean targetingPartnerSearchNetwork) {
-        isTargetingPartnerSearchNetwork = targetingPartnerSearchNetwork;
+    public void setTargetingGoogleSearchNetwork(boolean targetingGoogleSearchNetwork) {
+        isTargetingGoogleSearchNetwork = targetingGoogleSearchNetwork;
     }
 
     public String getBudgetResourceName() {

@@ -191,7 +191,7 @@ public class CampaignServiceTest {
         campaignDetails.setStartDate("2022-09-31");
         campaignDetails.setEndDate("2022-10-01");
         campaignDetails.setEnhancedCpcEnabled(false);
-        campaignDetails.setTargetingPartnerSearchNetwork(false);
+        campaignDetails.setTargetingGoogleSearchNetwork(false);
         campaignDetails.setTargetingSearchNetwork(true);
         campaignDetails.setTargetingContentNetwork(false);
         campaignDetails.setAdvertisingChannelType("SEARCH");
@@ -218,7 +218,7 @@ public class CampaignServiceTest {
         campaignDetails.setStartDate("2022-09-31");
         campaignDetails.setEndDate("2022-10-01");
         campaignDetails.setEnhancedCpcEnabled(false);
-        campaignDetails.setTargetingPartnerSearchNetwork(false);
+        campaignDetails.setTargetingGoogleSearchNetwork(false);
         campaignDetails.setTargetingSearchNetwork(true);
         campaignDetails.setTargetingContentNetwork(false);
         campaignDetails.setAdvertisingChannelType("SEARCH");
@@ -235,7 +235,7 @@ public class CampaignServiceTest {
         campaignDetails2.setStartDate("2022-11-31");
         campaignDetails2.setEndDate("2022-12-01");
         campaignDetails2.setEnhancedCpcEnabled(false);
-        campaignDetails2.setTargetingPartnerSearchNetwork(false);
+        campaignDetails2.setTargetingGoogleSearchNetwork(false);
         campaignDetails2.setTargetingSearchNetwork(true);
         campaignDetails2.setTargetingContentNetwork(false);
         campaignDetails2.setAdvertisingChannelType("DISPLAY");

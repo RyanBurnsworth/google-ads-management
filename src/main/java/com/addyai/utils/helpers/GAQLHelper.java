@@ -85,7 +85,7 @@ public class GAQLHelper {
                 details.setEndDate(googleAdsRow.getCampaign().getEndDate());
                 details.setTargetingSearchNetwork(googleAdsRow.getCampaign().getNetworkSettings().getTargetSearchNetwork());
                 details.setTargetingContentNetwork(googleAdsRow.getCampaign().getNetworkSettings().getTargetContentNetwork());
-                details.setTargetingPartnerSearchNetwork(googleAdsRow.getCampaign().getNetworkSettings().getTargetPartnerSearchNetwork());
+                details.setTargetingGoogleSearchNetwork(googleAdsRow.getCampaign().getNetworkSettings().getTargetPartnerSearchNetwork());
                 details.setBudgetResourceName(googleAdsRow.getCampaign().getCampaignBudget());
                 campaignDetailsList.add(details);
             }

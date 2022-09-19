@@ -15,8 +15,19 @@ public class Constants {
     public static final String INTERNAL_ERROR = "INTERNAL_ERROR";
     public static final String UNKNOWN_SERVICE_ERROR = "UNKNOWN_SERVICE_ERROR";
     public static final String RECORD_NOT_FOUND = "RECORD_NOT_FOUND";
+
     public static final String MISSING_PARAMS = "Missing Parameters";
 
+    public static final String CAMPAIGN_ENABLED_STATUS = "ENABLED";
+    public static final String CAMPAIGN_PAUSED_STATUS = "PAUSED";
+    public static final String CAMPAIGN_ADVERTISING_CHANNEL_SEARCH = "SEARCH";
+    public static final String CAMPAIGN_ADVERTISING_CHANNEL_CONTENT = "CONTENT";
+
+    public static final String LANGUAGE_CODE_PREFIX = "languageConstants/";
+
+    public static final String NOT_FOUND_ERR_CODE = "NOT_FOUND";
+
+    public static final String NOT_FOUND_CAMPAIGN = "Campaign not found";
     public static final int POSITIVE_GEO_TARGET_TYPE_PRESENCE_OR_INTEREST
             = PositiveGeoTargetTypeEnum.PositiveGeoTargetType.PRESENCE_OR_INTEREST_VALUE;
     public static final int POSITIVE_GEO_TARGET_TYPE_SEARCH_INTEREST
@@ -49,6 +60,11 @@ public class Constants {
     public static final int CAMPAIGN_STATUS_REMOVED
             = CampaignStatusEnum.CampaignStatus.REMOVED_VALUE;
 
+    public static final int BUDGET_STATUS_ENABLED
+            = BudgetStatusEnum.BudgetStatus.ENABLED_VALUE;
+    public static final int BUDGET_STATUS_REMOVED
+            = BudgetStatusEnum.BudgetStatus.REMOVED_VALUE;
+
     public static final int CRITERION_STATUS_ENABLED
             = CampaignCriterionStatusEnum.CampaignCriterionStatus.ENABLED_VALUE;
     public static final int CRITERION_STATUS_PAUSED
@@ -67,11 +83,6 @@ public class Constants {
             = BudgetDeliveryMethodEnum.BudgetDeliveryMethod.STANDARD_VALUE;
     public static final int BUDGET_DELIVERY_METHOD_ACCELERATED
             = BudgetDeliveryMethodEnum.BudgetDeliveryMethod.ACCELERATED_VALUE;
-
-    public static final int BUDGET_STATUS_ENABLED
-            = BudgetStatusEnum.BudgetStatus.ENABLED_VALUE;
-    public static final int BUDGET_STATUS_REMOVED
-            = BudgetStatusEnum.BudgetStatus.REMOVED_VALUE;
 
     public static final int DEVICE_TYPE_DESKTOP = DeviceEnum.Device.DESKTOP_VALUE;
     public static final int DEVICE_TYPE_MOBILE = DeviceEnum.Device.MOBILE_VALUE;

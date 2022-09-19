@@ -45,7 +45,7 @@ public class CampaignHelper {
         // extract network settings into its own object
         Campaign.NetworkSettings networkSettings = buildNetworkSettings(
                 campaignDetails.isTargetingContentNetwork(),
-                campaignDetails.isTargetingPartnerSearchNetwork(),
+                campaignDetails.isTargetingGoogleSearchNetwork(),
                 campaignDetails.isTargetingSearchNetwork()
         );
 
@@ -291,7 +291,7 @@ public class CampaignHelper {
         return Campaign.NetworkSettings.newBuilder()
                 .setTargetContentNetwork(isTargetingContentNetwork)
                 .setTargetSearchNetwork(isTargetingSearchNetwork)
-                .setTargetPartnerSearchNetwork(isTargetingPartnerSearchNetwork)
+                .setTargetGoogleSearch(isTargetingPartnerSearchNetwork)
                 .build();
     }
 
@@ -395,13 +395,11 @@ public class CampaignHelper {
         // validate campaign details
         ValidationErrorResponse validationErrorResponse = EntityValidator.isCampaignDetailsValid(campaignDetails);
         if (validationErrorResponse != null)
-            throw new InvalidRequestException(validationErrorResponse.getErrorType(),
-                    validationErrorResponse.getErrorCode(),
-                    validationErrorResponse.getErrorMessage());
+            throw new InvalidRequestException(validationErrorResponse.getErrorCode(), validationErrorResponse.getErrorMessage());
     }
 
     /**
-     * Validate budget details before pushing to Google Ads API
+     * Validate BudgetDetails before pushing to Google Ads API
      * If validation fails throw InvalidRequestException
      *
      * @param budgetDetails [BudgetDetails] to be validated
@@ -410,7 +408,22 @@ public class CampaignHelper {
         // validate budget details
         ValidationErrorResponse validationErrorResponse = EntityValidator.isBudgetDetailsValid(budgetDetails);
         if (validationErrorResponse != null)
-            throw new InvalidRequestException(validationErrorResponse.getErrorType(),
+            throw new InvalidRequestException(
+                    validationErrorResponse.getErrorCode(),
+                    validationErrorResponse.getErrorMessage());
+    }
+
+    /**
+     * Validate CriterionDetails before pushing to Google Ads API
+     * If validation fails throw InvalidRequestException
+     *
+     * @param criterionDetails [CriterionDetails] to be validated
+     */
+    public void validateCampaignCriterionDetails(List<CriterionDetails> criterionDetails) {
+        // validate criterion details
+        ValidationErrorResponse validationErrorResponse = EntityValidator.isCriterionDetailsValid(criterionDetails);
+        if (validationErrorResponse != null)
+            throw new InvalidRequestException(
                     validationErrorResponse.getErrorCode(),
                     validationErrorResponse.getErrorMessage());
     }

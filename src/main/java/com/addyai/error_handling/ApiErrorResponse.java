@@ -5,26 +5,20 @@ import java.util.Date;
 
 public class ApiErrorResponse {
     private final Date timeStamp;
-    private final String errorType;
     private final String errorCode;
     private final String errorMessage;
 
-    public ApiErrorResponse(String errorType, String errorCode, String errorMessage) {
+    public ApiErrorResponse(String errorCode, String errorMessage) {
         super();
         Date date = new Date();
 
         this.timeStamp = new Timestamp(date.getTime());
         this.errorCode = errorCode;
-        this.errorType = errorType;
         this.errorMessage = errorMessage;
     }
 
     public Date getTimeStamp() {
         return timeStamp;
-    }
-
-    public String getErrorType() {
-        return errorType;
     }
 
     public String getErrorCode() {

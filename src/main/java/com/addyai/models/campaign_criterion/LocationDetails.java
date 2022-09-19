@@ -21,16 +21,16 @@ public class LocationDetails extends CriterionDetails {
     }
 
     public String getLocale() {
-        return locale;
-    }
+        return "en";
+    } // currently only using 'en' for locale
 
     public void setLocale(String locale) {
         this.locale = locale;
     }
 
     public String getCountryCode() {
-        return countryCode;
-    }
+        return "US";
+    } // currently only using US for country code
 
     public void setCountryCode(String countryCode) {
         this.countryCode = countryCode;

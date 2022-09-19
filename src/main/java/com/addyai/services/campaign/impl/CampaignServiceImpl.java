@@ -54,13 +54,14 @@ public class CampaignServiceImpl implements CampaignService {
         List<CampaignOperation> campaignOperations = new ArrayList<>();
 
         for (CampaignDetails campaignDetails : campaignDetailsList) {
-            // validate campaign details before proceeding
+            // validate the campaigns details
             campaignHelper.validateCampaignDetails(campaignDetails);
 
-            // validate the campaign budget details
+            // validate the campaigns budget details
             campaignHelper.validateCampaignBudgetDetails(campaignDetails.getBudgetDetails());
 
-            //TODO: validate campaign criterion details list
+            // validate the campaigns criterion details
+            campaignHelper.validateCampaignCriterionDetails(campaignDetails.getCampaignCriteriaList());
 
             // create a campaign budget operation for this individual budget
             List<BudgetDetails> singleBudgetDetailsList = Collections.singletonList(campaignDetails.getBudgetDetails());
@@ -171,9 +172,8 @@ public class CampaignServiceImpl implements CampaignService {
     @Override
     public CampaignDetails findCampaignDetailsByName(long customerId, String campaignName) throws Exception {
         // throw an InvalidRequestException if the campaignName is missing
-        if (campaignName.isEmpty()) {
-            throw new InvalidRequestException(INVALID_REQUEST_ERROR, MISSING_PARAMS, "Missing campaign name");
-        }
+        if (campaignName.isEmpty())
+            throw new InvalidRequestException(INVALID_REQUEST_ERROR, MISSING_PARAMS);
 
         // fetch the campaign details from the client account using the campaign name
         CampaignDetails campaignDetails = campaignRepository.fetchCampaignDetailsByName(customerId, campaignName);

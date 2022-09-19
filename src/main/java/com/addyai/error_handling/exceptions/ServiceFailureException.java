@@ -6,7 +6,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
 public class ServiceFailureException extends BaseApiException {
 
-    public ServiceFailureException(String errorType, String errorCode, String errorMessage) {
-        super(errorType, errorCode, errorMessage);
+    public ServiceFailureException(String errorCode, String errorMessage) {
+        super(errorCode, errorMessage);
     }
 }

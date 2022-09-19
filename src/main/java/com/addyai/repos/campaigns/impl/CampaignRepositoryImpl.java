@@ -16,7 +16,8 @@ import org.springframework.stereotype.Repository;
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.addyai.utils.misc.Constants.RECORD_NOT_FOUND;
+import static com.addyai.utils.misc.Constants.NOT_FOUND_CAMPAIGN;
+import static com.addyai.utils.misc.Constants.NOT_FOUND_ERR_CODE;
 
 @Repository
 public class CampaignRepositoryImpl implements CampaignRepository {
@@ -89,7 +90,7 @@ public class CampaignRepositoryImpl implements CampaignRepository {
             if (campaignDetailsList.size() > 0)
                 return campaignDetailsList.get(0);
             else
-                throw new NotFoundException(RECORD_NOT_FOUND, "Campaign Not Found", "Campaign " + campaignName + " could not be found!");
+                throw new NotFoundException(NOT_FOUND_ERR_CODE, NOT_FOUND_CAMPAIGN + ": " + campaignName);
         } catch (Exception e) {
             throw ApiExceptionResolver.doResolveException(e);
         }

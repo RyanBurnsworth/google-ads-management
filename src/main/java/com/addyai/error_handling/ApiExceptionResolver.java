@@ -16,17 +16,12 @@ public class ApiExceptionResolver {
      * @return the resolved exception
      */
     public static Exception doResolveException(Exception exception) {
-        String errorType = "";
         String errorCode = "";
         String errorMessage = "";
 
         // check if exception is specific to Google Ads
         if (exception instanceof GoogleAdsException) {
             GoogleAdsException ex = (GoogleAdsException) exception;
-
-            // extract the error code as a String
-            if (ex.getStatusCode() != null && ex.getStatusCode().getTransportCode() != null)
-                errorType = ex.getStatusCode().getTransportCode().toString();
 
             // extract the error type and error message
             if (ex.getGoogleAdsFailure() != null && ex.getGoogleAdsFailure().getErrorsList().size() > 0) {
@@ -35,9 +30,9 @@ public class ApiExceptionResolver {
                 errorMessage = ex.getGoogleAdsFailure().getErrorsList().get(0).getMessage();
             }
 
-            return new InvalidRequestException(errorType, errorCode, errorMessage);
+            return new InvalidRequestException(errorCode, errorMessage);
         }
 
-        return new ServiceFailureException(INTERNAL_ERROR, UNKNOWN_SERVICE_ERROR, exception.getMessage());
+        return new ServiceFailureException(UNKNOWN_SERVICE_ERROR, exception.getMessage());
     }
 }

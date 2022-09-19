@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 @ResponseStatus(HttpStatus.BAD_REQUEST)
 public class InvalidRequestException extends BaseApiException {
 
-    public InvalidRequestException(String errorType, String errorCode, String errorMessage) {
-        super(errorType, errorCode, errorMessage);
+    public InvalidRequestException(String errorCode, String errorMessage) {
+        super(errorCode, errorMessage);
     }
 }
