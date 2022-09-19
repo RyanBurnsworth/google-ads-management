@@ -17,10 +17,23 @@ package com.addyai.adapter;
 
 import com.addyai.models.BudgetDetails;
 import com.addyai.models.CampaignDetails;
+import com.addyai.models.campaign_criterion.*;
 import com.google.ads.googleads.v11.services.GoogleAdsRow;
 
 public interface GoogleAdsRowAdapter {
     CampaignDetails getCampaignDetails(GoogleAdsRow googleAdsRow);
 
     BudgetDetails getBudgetDetails(GoogleAdsRow googleAdsRow);
+
+    AdScheduleDetails getAdScheduleDetails(GoogleAdsRow googleAdsRow);
+
+    NegativeKeywordDetails getKeywordDetails(GoogleAdsRow googleAdsRow);
+
+    ProximityDetails getProximityDetails(GoogleAdsRow googleAdsRow);
+
+    LocationDetails getLocationDetails(GoogleAdsRow googleAdsRow);
+
+    LanguageDetails getLanguageDetails(GoogleAdsRow googleAdsRow);
+
+    DeviceDetails getDeviceDetails(GoogleAdsRow googleAdsRow);
 }

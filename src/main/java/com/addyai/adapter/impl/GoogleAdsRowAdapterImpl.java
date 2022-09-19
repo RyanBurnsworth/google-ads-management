@@ -18,9 +18,10 @@ package com.addyai.adapter.impl;
 import com.addyai.adapter.GoogleAdsRowAdapter;
 import com.addyai.models.BudgetDetails;
 import com.addyai.models.CampaignDetails;
+import com.addyai.models.campaign_criterion.*;
 import com.google.ads.googleads.v11.services.GoogleAdsRow;
 
-import static com.addyai.utils.misc.Constants.MICRO_FACTOR;
+import static com.addyai.utils.misc.Constants.*;
 
 public class GoogleAdsRowAdapterImpl implements GoogleAdsRowAdapter {
     @Override
@@ -57,5 +58,96 @@ public class GoogleAdsRowAdapterImpl implements GoogleAdsRowAdapter {
         budgetDetails.setStatus(googleAdsRow.getCampaignBudget().getStatusValue());
 
         return budgetDetails;
+    }
+
+    @Override
+    public AdScheduleDetails getAdScheduleDetails(GoogleAdsRow googleAdsRow) {
+        AdScheduleDetails adScheduleDetails = new AdScheduleDetails();
+        adScheduleDetails.setCriterionType(CRITERION_TYPE_AD_SCHEDULE);
+        adScheduleDetails.setCampaignCriterionId(googleAdsRow.getCampaignCriterion().getCriterionId());
+        adScheduleDetails.setCampaignResourceName(googleAdsRow.getCampaignCriterion().getCampaign());
+        adScheduleDetails.setBidModifier(googleAdsRow.getCampaignCriterion().getBidModifier());
+        adScheduleDetails.setStatus(googleAdsRow.getCampaignCriterion().getStatusValue());
+        adScheduleDetails.setDayOfWeek(googleAdsRow.getCampaignCriterion().getAdSchedule().getDayOfWeekValue());
+        adScheduleDetails.setStartHour(googleAdsRow.getCampaignCriterion().getAdSchedule().getStartHour());
+        adScheduleDetails.setEndHour(googleAdsRow.getCampaignCriterion().getAdSchedule().getEndHour());
+        adScheduleDetails.setStartMinute(googleAdsRow.getCampaignCriterion().getAdSchedule().getStartMinuteValue());
+        adScheduleDetails.setEndMinute(googleAdsRow.getCampaignCriterion().getAdSchedule().getEndMinuteValue());
+
+        return adScheduleDetails;
+    }
+
+    @Override
+    public NegativeKeywordDetails getKeywordDetails(GoogleAdsRow googleAdsRow) {
+        NegativeKeywordDetails negativeKeywordDetails = new NegativeKeywordDetails();
+        negativeKeywordDetails.setCriterionType(CRITERION_TYPE_KEYWORD);
+        negativeKeywordDetails.setCampaignCriterionId(googleAdsRow.getCampaignCriterion().getCriterionId());
+        negativeKeywordDetails.setCampaignResourceName(googleAdsRow.getCampaignCriterion().getCampaign());
+        negativeKeywordDetails.setNegative(googleAdsRow.getCampaignCriterion().getNegative());
+        negativeKeywordDetails.setStatus(googleAdsRow.getCampaignCriterion().getStatusValue());
+        negativeKeywordDetails.setKeywordText(googleAdsRow.getCampaignCriterion().getKeyword().getText());
+        negativeKeywordDetails.setKeywordMatchType(googleAdsRow.getCampaignCriterion().getKeyword().getMatchTypeValue());
+
+        return negativeKeywordDetails;
+    }
+
+    @Override
+    public ProximityDetails getProximityDetails(GoogleAdsRow googleAdsRow) {
+        ProximityDetails proximityDetails = new ProximityDetails();
+        proximityDetails.setCriterionType(CRITERION_TYPE_PROXIMITY);
+        proximityDetails.setCampaignCriterionId(googleAdsRow.getCampaignCriterion().getCriterionId());
+        proximityDetails.setCampaignResourceName(googleAdsRow.getCampaignCriterion().getCampaign());
+        proximityDetails.setStatus(googleAdsRow.getCampaignCriterion().getStatusValue());
+        proximityDetails.setBidModifier(googleAdsRow.getCampaignCriterion().getBidModifier());
+        proximityDetails.setCityName(googleAdsRow.getCampaignCriterion().getProximity().getAddress().getCityName());
+        proximityDetails.setProvinceName(googleAdsRow.getCampaignCriterion().getProximity().getAddress().getProvinceName());
+        proximityDetails.setStreetAddress(googleAdsRow.getCampaignCriterion().getProximity().getAddress().getStreetAddress());
+        proximityDetails.setPostalCode(googleAdsRow.getCampaignCriterion().getProximity().getAddress().getPostalCode());
+        proximityDetails.setProvinceCode(googleAdsRow.getCampaignCriterion().getProximity().getAddress().getProvinceCode());
+        proximityDetails.setCountryCode(googleAdsRow.getCampaignCriterion().getProximity().getAddress().getCountryCode());
+        proximityDetails.setMicroLongitude(googleAdsRow.getCampaignCriterion().getProximity().getGeoPoint().getLongitudeInMicroDegrees());
+        proximityDetails.setMicroLatitude(googleAdsRow.getCampaignCriterion().getProximity().getGeoPoint().getLatitudeInMicroDegrees());
+        proximityDetails.setRadius(googleAdsRow.getCampaignCriterion().getProximity().getRadius());
+        proximityDetails.setRadiusUnits(googleAdsRow.getCampaignCriterion().getProximity().getRadiusUnitsValue());
+
+        return proximityDetails;
+    }
+
+    @Override
+    public LocationDetails getLocationDetails(GoogleAdsRow googleAdsRow) {
+        LocationDetails locationDetails = new LocationDetails();
+        locationDetails.setCriterionType(CRITERION_TYPE_LOCATION);
+        locationDetails.setCampaignCriterionId(googleAdsRow.getCampaignCriterion().getCriterionId());
+        locationDetails.setCampaignResourceName(googleAdsRow.getCampaignCriterion().getCampaign());
+        locationDetails.setStatus(googleAdsRow.getCampaignCriterion().getStatusValue());
+        locationDetails.setNegative(googleAdsRow.getCampaignCriterion().getNegative());
+        locationDetails.setGeoTargetingConstant(googleAdsRow.getCampaignCriterion().getLocation().getGeoTargetConstant());
+
+        return locationDetails;
+    }
+
+    @Override
+    public LanguageDetails getLanguageDetails(GoogleAdsRow googleAdsRow) {
+        LanguageDetails languageDetails = new LanguageDetails();
+        languageDetails.setCriterionType(CRITERION_TYPE_LANGUAGE);
+        languageDetails.setCampaignCriterionId(googleAdsRow.getCampaignCriterion().getCriterionId());
+        languageDetails.setCampaignResourceName(googleAdsRow.getCampaignCriterion().getCampaign());
+        languageDetails.setStatus(googleAdsRow.getCampaignCriterion().getStatusValue());
+        languageDetails.setLanguageCode(googleAdsRow.getCampaignCriterion().getLanguage().getLanguageConstant());
+
+        return languageDetails;
+    }
+
+    @Override
+    public DeviceDetails getDeviceDetails(GoogleAdsRow googleAdsRow) {
+        DeviceDetails deviceDetails = new DeviceDetails();
+        deviceDetails.setCriterionType(CRITERION_TYPE_DEVICE);
+        deviceDetails.setCampaignCriterionId(googleAdsRow.getCampaignCriterion().getCriterionId());
+        deviceDetails.setCampaignResourceName(googleAdsRow.getCampaignCriterion().getCampaign());
+        deviceDetails.setStatus(googleAdsRow.getCampaignCriterion().getStatusValue());
+        deviceDetails.setBidModifier(googleAdsRow.getCampaignCriterion().getBidModifier());
+        deviceDetails.setDeviceType(googleAdsRow.getCampaignCriterion().getDevice().getTypeValue());
+
+        return deviceDetails;
     }
 }

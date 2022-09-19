@@ -16,6 +16,7 @@
 package com.addyai.services.campaign.impl;
 
 import com.addyai.enums.OperationType;
+import com.addyai.error_handling.ValidationErrorResponse;
 import com.addyai.error_handling.exceptions.InvalidRequestException;
 import com.addyai.models.BudgetDetails;
 import com.addyai.models.CampaignDetails;
@@ -25,6 +26,7 @@ import com.addyai.repos.campaigns.criterion.CriterionRepository;
 import com.addyai.services.campaign.CampaignService;
 import com.addyai.utils.helpers.CampaignHelper;
 import com.addyai.utils.helpers.CampaignHelperImpl;
+import com.addyai.utils.validators.EntityValidator;
 import com.google.ads.googleads.v11.services.CampaignBudgetOperation;
 import com.google.ads.googleads.v11.services.CampaignOperation;
 import org.springframework.stereotype.Service;
@@ -57,7 +59,7 @@ public class CampaignServiceImpl implements CampaignService {
 
     @Override
     public void upsertCampaigns(long customerId, List<CampaignDetails> campaignDetailsList, boolean shouldCreate) throws Exception {
-        //TODO perform validation here
+        validateCampaignDetails(campaignDetailsList);
 
         campaignDetailsList = associateBudgetsToCampaigns(customerId, campaignDetailsList);
 
@@ -173,5 +175,29 @@ public class CampaignServiceImpl implements CampaignService {
                 return budgetDetails;
         }
         return null;
+    }
+
+    private void validateCampaignDetails(List<CampaignDetails> campaignDetailsList) {
+        ValidationErrorResponse validationErrorResponse;
+        for (CampaignDetails campaignDetails : campaignDetailsList) {
+            validationErrorResponse = EntityValidator.isCampaignDetailsValid(campaignDetails);
+            if (validationErrorResponse != null)
+                throw new InvalidRequestException(
+                        validationErrorResponse.getErrorCode(),
+                        validationErrorResponse.getErrorMessage());
+
+            validationErrorResponse = EntityValidator.isBudgetDetailsValid(campaignDetails.getBudgetDetails());
+            if (validationErrorResponse != null)
+                throw new InvalidRequestException(
+                        validationErrorResponse.getErrorCode(),
+                        validationErrorResponse.getErrorMessage());
+
+            validationErrorResponse = EntityValidator.isCriterionDetailsValid(campaignDetails.getCampaignCriteriaList());
+            if (validationErrorResponse != null)
+                throw new InvalidRequestException(
+                        validationErrorResponse.getErrorCode(),
+                        validationErrorResponse.getErrorMessage());
+
+        }
     }
 }

@@ -19,6 +19,8 @@ import com.addyai.adapter.GoogleAdsRowAdapter;
 import com.addyai.adapter.impl.GoogleAdsRowAdapterImpl;
 import com.addyai.models.BudgetDetails;
 import com.addyai.models.CampaignDetails;
+import com.addyai.models.campaign_criterion.*;
+import com.google.ads.googleads.v11.enums.CriterionTypeEnum;
 import com.google.ads.googleads.v11.services.GoogleAdsRow;
 import com.google.ads.googleads.v11.services.SearchGoogleAdsStreamResponse;
 import com.google.api.gax.rpc.ServerStream;
@@ -81,6 +83,25 @@ public class GAQLHelper {
                 " FROM campaign_budget WHERE campaign_budget.status = 'ENABLED'";
     }
 
+    public static String getAdScheduleCriterionQuery() {
+        return "SELECT " +
+                "  campaign_criterion.criterion_id, " +
+                "  campaign_criterion.type, " +
+                "  campaign_criterion.status " +
+                "  campaign_criterion.campaign, " +
+                "  campaign_criterion.ad_schedule.start_minute, " +
+                "  campaign_criterion.ad_schedule.start_hour, " +
+                "  campaign_criterion.ad_schedule.end_minute, " +
+                "  campaign_criterion.ad_schedule.day_of_week, " +
+                "  campaign_criterion.ad_schedule.end_hour, " +
+                "  campaign_criterion.bid_modifier, " +
+                "FROM campaign_criterion WHERE campaign_criterion.status = 'ENABLED'";
+    }
+
+    public static String getNegativeKeywordQuery() {
+        return "";
+    }
+
     public static List<CampaignDetails> convertStreamResponseToCampaignDetailsList(ServerStream<SearchGoogleAdsStreamResponse> streamResponse) {
         GoogleAdsRowAdapter googleAdsRowAdapter = new GoogleAdsRowAdapterImpl();
         List<CampaignDetails> campaignDetailsList = new ArrayList<>();
@@ -106,5 +127,45 @@ public class GAQLHelper {
             }
         }
         return budgetDetailsList;
+    }
+
+    public static List<CriterionDetails> convertStreamResponseToCriterionDetails(
+            ServerStream<SearchGoogleAdsStreamResponse> streamResponse, CriterionTypeEnum.CriterionType criterionType) {
+        GoogleAdsRowAdapter googleAdsRowAdapter = new GoogleAdsRowAdapterImpl();
+        List<CriterionDetails> criterionDetailsList = new ArrayList<>();
+
+        for (SearchGoogleAdsStreamResponse response : streamResponse) {
+            for (GoogleAdsRow googleAdsRow : response.getResultsList()) {
+                switch (criterionType) {
+                    case AD_SCHEDULE:
+                        AdScheduleDetails adScheduleDetails = googleAdsRowAdapter.getAdScheduleDetails(googleAdsRow);
+                        criterionDetailsList.add(adScheduleDetails);
+                        break;
+                    case KEYWORD:
+                        NegativeKeywordDetails negativeKeywordDetails = googleAdsRowAdapter.getKeywordDetails(googleAdsRow);
+                        criterionDetailsList.add(negativeKeywordDetails);
+                        break;
+                    case DEVICE:
+                        DeviceDetails deviceDetails = googleAdsRowAdapter.getDeviceDetails(googleAdsRow);
+                        criterionDetailsList.add(deviceDetails);
+                        break;
+                    case LANGUAGE:
+                        LanguageDetails languageDetails = googleAdsRowAdapter.getLanguageDetails(googleAdsRow);
+                        criterionDetailsList.add(languageDetails);
+                        break;
+                    case LOCATION:
+                        LocationDetails locationDetails = googleAdsRowAdapter.getLocationDetails(googleAdsRow);
+                        criterionDetailsList.add(locationDetails);
+                        break;
+                    case PROXIMITY:
+                        ProximityDetails proximityDetails = googleAdsRowAdapter.getProximityDetails(googleAdsRow);
+                        criterionDetailsList.add(proximityDetails);
+                        break;
+                    default:
+                        break;
+                }
+            }
+        }
+        return criterionDetailsList;
     }
 }

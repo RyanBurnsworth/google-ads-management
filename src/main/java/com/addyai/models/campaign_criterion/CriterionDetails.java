@@ -30,8 +30,6 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
 public abstract class CriterionDetails {
     public long campaignCriterionId = 0L;
 
-    private long campaignId = 0L;
-
     private String campaignResourceName = "";
 
     private boolean isNegative = false;
@@ -48,14 +46,6 @@ public abstract class CriterionDetails {
 
     public void setCampaignCriterionId(long campaignCriterionId) {
         this.campaignCriterionId = campaignCriterionId;
-    }
-
-    public long getCampaignId() {
-        return campaignId;
-    }
-
-    public void setCampaignId(long campaignId) {
-        this.campaignId = campaignId;
     }
 
     public String getCampaignResourceName() {
