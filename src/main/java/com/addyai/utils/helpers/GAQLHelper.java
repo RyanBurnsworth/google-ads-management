@@ -1,3 +1,18 @@
+/*
+ * Copyright (c) 2022.
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; either version 2
+ * of the License, or (at your option) any later version. This program
+ * is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty
+ * of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU General Public License for more details.
+ *
+ *
+ */
+
 package com.addyai.utils.helpers;
 
 import com.addyai.models.BudgetDetails;
@@ -29,7 +44,7 @@ public class GAQLHelper {
                 " campaign.network_settings.target_content_network," +
                 " campaign.network_settings.target_partner_search_network," +
                 " campaign.network_settings.target_search_network" +
-                " FROM campaign ORDER BY campaign.id";
+                " FROM campaign WHERE campaign.status IN ('ENABLED', 'PAUSED') ORDER BY campaign.id";
     }
 
     public static String getCampaignDetailsByNameQuery(String name) {
@@ -63,7 +78,7 @@ public class GAQLHelper {
                 " campaign_budget.resource_name," +
                 " campaign_budget.name," +
                 " campaign_budget.id" +
-                " FROM campaign_budget";
+                " FROM campaign_budget WHERE campaign_budget.status = 'ENABLED'";
     }
 
     public static List<CampaignDetails> convertStreamResponseToCampaignDetailsList(ServerStream<SearchGoogleAdsStreamResponse> streamResponse) {

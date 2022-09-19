@@ -1,3 +1,18 @@
+/*
+ * Copyright (c) 2022.
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; either version 2
+ * of the License, or (at your option) any later version. This program
+ * is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty
+ * of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU General Public License for more details.
+ *
+ *
+ */
+
 package com.addyai.services.campaign.impl;
 
 import com.addyai.error_handling.exceptions.InvalidRequestException;
@@ -117,6 +132,14 @@ public class CampaignServiceImpl implements CampaignService {
                     String geoTargetConstant = getGeoTargetConstant(locationDetails.getLocale(),
                             locationDetails.getCountryCode(),
                             locationDetails.getLocation());
+
+                    // if the geoTargetConstant is not found, remove this criterion details from the list
+                    // this will allow us to skip this invalid criterion and avoid an error from Google Ads
+                    if (geoTargetConstant.isEmpty()) {
+                        // TODO: Add logging to show this criterion is being skipped
+                        criterionDetailsList.remove(criterionDetails);
+                        continue;
+                    }
 
                     // set the geo target constant for this campaign criterion
                     locationDetails.setGeoTargetingConstant(geoTargetConstant);

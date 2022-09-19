@@ -1,3 +1,18 @@
+/*
+ * Copyright (c) 2022.
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; either version 2
+ * of the License, or (at your option) any later version. This program
+ * is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty
+ * of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU General Public License for more details.
+ *
+ *
+ */
+
 package com.addyai.repos.campaigns.criterion.impl;
 
 import com.addyai.builder.GoogleAdsClientBuilder;
@@ -34,7 +49,7 @@ public class CriterionRepositoryImpl implements CriterionRepository {
     }
 
     @Override
-    public List<CriterionDetails> getCampaignCriterionDetails(long customerId, String campaignResourceName) {
+    public List<CriterionDetails> fetchCampaignCriterionDetails(long customerId, String campaignResourceName) {
         return null;
     }
 
@@ -42,7 +57,7 @@ public class CriterionRepositoryImpl implements CriterionRepository {
     public void addCampaignCriterion(long customerId,
                                      List<CampaignCriterionOperation> campaignCriterionOperationList) throws Exception {
         try {
-            MutateCampaignCriteriaResponse response = campaignCriterionServiceClient
+            campaignCriterionServiceClient
                     .mutateCampaignCriteria(Long.toString(customerId), campaignCriterionOperationList);
         } catch (Exception e) {
             throw ApiExceptionResolver.doResolveException(e);
