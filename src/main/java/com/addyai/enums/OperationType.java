@@ -13,17 +13,10 @@
  *
  */
 
-package com.addyai.repos.campaigns;
+package com.addyai.enums;
 
-import com.addyai.models.CampaignDetails;
-import com.google.ads.googleads.v11.services.CampaignOperation;
-
-import java.util.List;
-
-public interface CampaignRepository {
-    List<CampaignDetails> fetchAllCampaignDetails(long customerId) throws Exception;
-
-    CampaignDetails fetchCampaignDetailsByName(long customerId, String campaignName) throws Exception;
-
-    void performCampaignOperations(long customerId, List<CampaignOperation> campaignOperations) throws Exception;
+public enum OperationType {
+    CREATE,
+    UPDATE,
+    REMOVE
 }

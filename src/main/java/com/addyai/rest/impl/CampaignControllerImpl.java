@@ -54,7 +54,7 @@ public class CampaignControllerImpl implements CampaignController {
     @PostMapping("/create")
     public ResponseEntity<Void> createCampaigns(@PathVariable String customerId,
                                                 @RequestBody List<CampaignDetails> campaignDetails) throws Exception {
-        campaignService.addCampaignsToAccount(Long.parseLong(customerId), campaignDetails);
+        campaignService.upsertCampaigns(Long.parseLong(customerId), campaignDetails, true);
         return new ResponseEntity<>(HttpStatus.CREATED);
     }
 
@@ -62,7 +62,7 @@ public class CampaignControllerImpl implements CampaignController {
     @PutMapping("/update")
     public ResponseEntity<Void> updateCampaigns(@PathVariable String customerId,
                                                 @RequestBody List<CampaignDetails> campaignDetails) throws Exception {
-        campaignService.updateCampaigns(Long.parseLong(customerId), campaignDetails);
+        campaignService.upsertCampaigns(Long.parseLong(customerId), campaignDetails, false);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 

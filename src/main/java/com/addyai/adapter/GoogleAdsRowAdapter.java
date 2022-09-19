@@ -13,19 +13,14 @@
  *
  */
 
-package com.addyai.services.campaign;
+package com.addyai.adapter;
 
+import com.addyai.models.BudgetDetails;
 import com.addyai.models.CampaignDetails;
+import com.google.ads.googleads.v11.services.GoogleAdsRow;
 
-import java.util.List;
+public interface GoogleAdsRowAdapter {
+    CampaignDetails getCampaignDetails(GoogleAdsRow googleAdsRow);
 
-public interface CampaignService {
-
-    void upsertCampaigns(long customerId, List<CampaignDetails> campaignDetailsList, boolean shouldCreate) throws Exception;
-
-    List<CampaignDetails> findAllCampaignDetails(long customerId) throws Exception;
-
-    CampaignDetails findCampaignDetailsByName(long customerId, String campaignName) throws Exception;
-
-    void deleteCampaigns(long customerId, List<Long> campaignIds) throws Exception;
+    BudgetDetails getBudgetDetails(GoogleAdsRow googleAdsRow);
 }

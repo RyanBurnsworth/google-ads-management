@@ -15,6 +15,8 @@
 
 package com.addyai.utils.helpers;
 
+import com.addyai.adapter.GoogleAdsRowAdapter;
+import com.addyai.adapter.impl.GoogleAdsRowAdapterImpl;
 import com.addyai.models.BudgetDetails;
 import com.addyai.models.CampaignDetails;
 import com.google.ads.googleads.v11.services.GoogleAdsRow;
@@ -23,8 +25,6 @@ import com.google.api.gax.rpc.ServerStream;
 
 import java.util.ArrayList;
 import java.util.List;
-
-import static com.addyai.utils.misc.Constants.MICRO_FACTOR;
 
 public class GAQLHelper {
     public static String getCampaignDetailsQuery() {
@@ -82,26 +82,12 @@ public class GAQLHelper {
     }
 
     public static List<CampaignDetails> convertStreamResponseToCampaignDetailsList(ServerStream<SearchGoogleAdsStreamResponse> streamResponse) {
+        GoogleAdsRowAdapter googleAdsRowAdapter = new GoogleAdsRowAdapterImpl();
         List<CampaignDetails> campaignDetailsList = new ArrayList<>();
 
         for (SearchGoogleAdsStreamResponse response : streamResponse) {
             for (GoogleAdsRow googleAdsRow : response.getResultsList()) {
-                CampaignDetails details = new CampaignDetails();
-
-                details.setCampaignId(googleAdsRow.getCampaign().getId());
-                details.setCampaignName(googleAdsRow.getCampaign().getName());
-                details.setCampaignResourceName(googleAdsRow.getCampaign().getResourceName());
-                details.setStatus(googleAdsRow.getCampaign().getStatus().toString());
-                details.setAdvertisingChannelType(googleAdsRow.getCampaign().getAdvertisingChannelType().toString());
-                details.setPositiveGeoTargetType(googleAdsRow.getCampaign().getGeoTargetTypeSetting().getPositiveGeoTargetTypeValue());
-                details.setNegativeGeoTargetType(googleAdsRow.getCampaign().getGeoTargetTypeSetting().getNegativeGeoTargetTypeValue());
-                details.setEnhancedCpcEnabled(googleAdsRow.getCampaign().getManualCpc().getEnhancedCpcEnabled());
-                details.setStartDate(googleAdsRow.getCampaign().getStartDate());
-                details.setEndDate(googleAdsRow.getCampaign().getEndDate());
-                details.setTargetingSearchNetwork(googleAdsRow.getCampaign().getNetworkSettings().getTargetSearchNetwork());
-                details.setTargetingContentNetwork(googleAdsRow.getCampaign().getNetworkSettings().getTargetContentNetwork());
-                details.setTargetingGoogleSearchNetwork(googleAdsRow.getCampaign().getNetworkSettings().getTargetPartnerSearchNetwork());
-                details.setBudgetResourceName(googleAdsRow.getCampaign().getCampaignBudget());
+                CampaignDetails details = googleAdsRowAdapter.getCampaignDetails(googleAdsRow);
                 campaignDetailsList.add(details);
             }
         }
@@ -110,19 +96,12 @@ public class GAQLHelper {
     }
 
     public static List<BudgetDetails> convertStreamResponseToBudgetDetails(ServerStream<SearchGoogleAdsStreamResponse> streamResponse) {
+        GoogleAdsRowAdapter googleAdsRowAdapter = new GoogleAdsRowAdapterImpl();
         List<BudgetDetails> budgetDetailsList = new ArrayList<>();
 
         for (SearchGoogleAdsStreamResponse response : streamResponse) {
             for (GoogleAdsRow googleAdsRow : response.getResultsList()) {
-                BudgetDetails budgetDetails = new BudgetDetails();
-                budgetDetails.setBudgetId(googleAdsRow.getCampaignBudget().getId());
-                budgetDetails.setDailyBudgetAmount(Math.round((float) googleAdsRow.getCampaignBudget().getAmountMicros() / MICRO_FACTOR));
-                budgetDetails.setName(googleAdsRow.getCampaignBudget().getName());
-                budgetDetails.setResourceName(googleAdsRow.getCampaignBudget().getResourceName());
-                budgetDetails.setDeliveryMethod(googleAdsRow.getCampaignBudget().getDeliveryMethodValue());
-                budgetDetails.setShared(googleAdsRow.getCampaignBudget().getExplicitlyShared());
-                budgetDetails.setStatus(googleAdsRow.getCampaignBudget().getStatusValue());
-
+                BudgetDetails budgetDetails = googleAdsRowAdapter.getBudgetDetails(googleAdsRow);
                 budgetDetailsList.add(budgetDetails);
             }
         }

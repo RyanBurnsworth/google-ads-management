@@ -24,11 +24,9 @@ import com.addyai.repos.requests.StreamRequest;
 import com.addyai.repos.requests.impl.StreamRequestImpl;
 import com.addyai.utils.helpers.GAQLHelper;
 import com.google.ads.googleads.v11.services.*;
-import com.google.ads.googleads.v11.utils.ResourceNames;
 import com.google.api.gax.rpc.ServerStream;
 import org.springframework.stereotype.Repository;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import static com.addyai.utils.misc.Constants.NOT_FOUND_CAMPAIGN;
@@ -111,78 +109,12 @@ public class CampaignRepositoryImpl implements CampaignRepository {
         }
     }
 
-    /**
-     * Update a list of campaigns within a given customer account
-     *
-     * @param customerId         the customerId of the account to update
-     * @param campaignOperations the list of campaign operations to be performed on the account
-     * @throws Exception
-     */
     @Override
-    public void updateCampaigns(long customerId,
-                                List<CampaignOperation> campaignOperations) throws Exception {
+    public void performCampaignOperations(long customerId, List<CampaignOperation> campaignOperations) throws Exception {
         try {
-            // At this time we are going to assume the response is OK if no exception is thrown
-            MutateCampaignsResponse response = campaignServiceClient
-                    .mutateCampaigns(Long.toString(customerId), campaignOperations);
+            campaignServiceClient.mutateCampaigns(Long.toString(customerId), campaignOperations);
         } catch (Exception e) {
             throw ApiExceptionResolver.doResolveException(e);
         }
-    }
-
-    /**
-     * Delete campaigns within a client's account
-     *
-     * @param customerId  the customer id of the client account
-     * @param campaignIds the ids of the campaigns to delete
-     * @throws Exception
-     */
-    @Override
-    public void deleteCampaigns(long customerId, List<Long> campaignIds) throws Exception {
-        List<CampaignOperation> campaignOperations = new ArrayList<>();
-
-        try {
-            for (long campaignId : campaignIds) {
-                String campaignResourceName = ResourceNames.campaign(customerId, campaignId);
-
-                // Constructs an operation that will remove the campaign with the specified resource name.
-                CampaignOperation operation =
-                        CampaignOperation.newBuilder().setRemove(campaignResourceName).build();
-
-                campaignOperations.add(operation);
-            }
-
-            // At this time we are going to assume the response is OK if no exception is thrown
-            MutateCampaignsResponse response =
-                    campaignServiceClient.mutateCampaigns(
-                            Long.toString(customerId), campaignOperations);
-        } catch (Exception e) {
-            throw ApiExceptionResolver.doResolveException(e);
-        }
-    }
-
-    /**
-     * Add campaigns to a client's campaign
-     *
-     * @param customerId         the id of the customer account
-     * @param campaignOperations a list of [CampaignOperation] for processing
-     * @return a list of campaign Resource names
-     * @throws Exception
-     */
-    @Override
-    public List<String> addCampaigns(long customerId, List<CampaignOperation> campaignOperations) throws Exception {
-        List<String> campaignResourceNameList = new ArrayList<>();
-        try {
-            MutateCampaignsResponse response =
-                    campaignServiceClient.mutateCampaigns(Long.toString(customerId), campaignOperations);
-
-            // populate a list of campaign resource names
-            for (MutateCampaignResult result : response.getResultsList()) {
-                campaignResourceNameList.add(result.getResourceName());
-            }
-        } catch (Exception e) {
-            throw ApiExceptionResolver.doResolveException(e);
-        }
-        return campaignResourceNameList;
     }
 }
