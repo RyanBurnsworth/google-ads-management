@@ -36,9 +36,10 @@ public class TestUtils {
     public static final long MOCK_BUDGET_ID = 1L;
     public static final long MOCK_BUDGET_AMOUNT = 100L;
     public static final String MOCK_BUDGET_NAME = "Test Budget 1";
-    public static final String MOCK_BUDGET_RESOURCE_NAME = "customers/9059845250/campaignBudgets/11599749725";
+    public static final String MOCK_BUDGET_RESOURCE_NAME = "customers/9059845250/campaignBudgets/1";
 
     public static final long MOCK_CRITERION_ID = 2L;
+    public static final String MOCK_CRITERION_RESOURCE_NAME = "customers/905984520/criterion/2";
     public static final float MOCK_BID_MODIFIER = 2.0f;
     public static final String MOCK_NEGATIVE_KEYWORD = "testing sucks";
     public static final double PROXIMITY_RADIUS = 20.0;

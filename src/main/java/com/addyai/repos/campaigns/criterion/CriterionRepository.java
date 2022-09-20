@@ -24,7 +24,7 @@ public interface CriterionRepository {
 
     List<CriterionDetails> fetchCampaignCriterionDetails(long customerId, String campaignResourceName);
 
-    void addCampaignCriterion(long customerId, List<CampaignCriterionOperation> campaignCriterionOperationList) throws Exception;
+    List<String> performCriterionOperations(long customerId, List<CampaignCriterionOperation> campaignCriterionOperationList) throws Exception;
 
     String getGeoTargetConstant(String locale, String countryCode, String location) throws Exception;
 }

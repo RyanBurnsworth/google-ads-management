@@ -83,23 +83,90 @@ public class GAQLHelper {
                 " FROM campaign_budget WHERE campaign_budget.status = 'ENABLED'";
     }
 
-    public static String getAdScheduleCriterionQuery() {
+    public static String getAdScheduleCriterionQuery(String campaign) {
         return "SELECT " +
                 "  campaign_criterion.criterion_id, " +
+                "  campaign_criterion.resource_name, " +
                 "  campaign_criterion.type, " +
-                "  campaign_criterion.status " +
+                "  campaign_criterion.status, " +
                 "  campaign_criterion.campaign, " +
                 "  campaign_criterion.ad_schedule.start_minute, " +
                 "  campaign_criterion.ad_schedule.start_hour, " +
                 "  campaign_criterion.ad_schedule.end_minute, " +
                 "  campaign_criterion.ad_schedule.day_of_week, " +
                 "  campaign_criterion.ad_schedule.end_hour, " +
-                "  campaign_criterion.bid_modifier, " +
-                "FROM campaign_criterion WHERE campaign_criterion.status = 'ENABLED'";
+                "  campaign_criterion.bid_modifier " +
+                "FROM campaign_criterion WHERE campaign_criterion.status = 'ENABLED' AND campaign_criterion.campaign ='" + campaign + "'";
     }
 
-    public static String getNegativeKeywordQuery() {
-        return "";
+    public static String getNegativeKeywordQuery(String campaign) {
+        return "SELECT " +
+                "  campaign_criterion.criterion_id, " +
+                "  campaign_criterion.resource_name, " +
+                "  campaign_criterion.campaign, " +
+                "  campaign_criterion.type, " +
+                "  campaign_criterion.status, " +
+                "  campaign_criterion.negative, " +
+                "  campaign_criterion.keyword.text, " +
+                "  campaign_criterion.keyword.match_type " +
+                "FROM campaign_criterion WHERE campaign_criterion.status = 'ENABLED' AND campaign_criterion.campaign ='" + campaign + "'";
+    }
+
+    public static String getProximityQuery(String campaign) {
+        return "SELECT " +
+                "  campaign_criterion.criterion_id, " +
+                "  campaign_criterion.resource_name, " +
+                "  campaign_criterion.campaign, " +
+                "  campaign_criterion.type, " +
+                "  campaign_criterion.status, " +
+                "  campaign_criterion.negative, " +
+                "  campaign_criterion.proximity.address.city_name, " +
+                "  campaign_criterion.proximity.address.country_code, " +
+                "  campaign_criterion.proximity.address.postal_code, " +
+                "  campaign_criterion.proximity.address.province_code, " +
+                "  campaign_criterion.proximity.address.province_name, " +
+                "  campaign_criterion.proximity.address.street_address, " +
+                "  campaign_criterion.proximity.geo_point.latitude_in_micro_degrees, " +
+                "  campaign_criterion.proximity.geo_point.longitude_in_micro_degrees, " +
+                "  campaign_criterion.proximity.radius, " +
+                "  campaign_criterion.proximity.radius_units " +
+                "FROM campaign_criterion WHERE campaign_criterion.status = 'ENABLED' AND campaign_criterion.campaign ='" + campaign + "'";
+    }
+
+    public static String getDeviceQuery(String campaign) {
+        return "SELECT " +
+                "  campaign_criterion.criterion_id, " +
+                "  campaign_criterion.resource_name, " +
+                "  campaign_criterion.campaign, " +
+                "  campaign_criterion.type, " +
+                "  campaign_criterion.status, " +
+                "  campaign_criterion.negative, " +
+                "  campaign_criterion.device.type " +
+                "FROM campaign_criterion WHERE campaign_criterion.status = 'ENABLED' AND campaign_criterion.campaign ='" + campaign + "'";
+    }
+
+    public static String getLanguageQuery(String campaign) {
+        return "SELECT " +
+                "  campaign_criterion.criterion_id, " +
+                "  campaign_criterion.resource_name, " +
+                "  campaign_criterion.campaign, " +
+                "  campaign_criterion.type, " +
+                "  campaign_criterion.status, " +
+                "  campaign_criterion.negative, " +
+                "  campaign_criterion.language.language_constant " +
+                "FROM campaign_criterion WHERE campaign_criterion.status = 'ENABLED' AND campaign_criterion.campaign ='" + campaign + "'";
+    }
+
+    public static String getLocationQuery(String campaign) {
+        return "SELECT " +
+                "  campaign_criterion.criterion_id, " +
+                "  campaign_criterion.resource_name, " +
+                "  campaign_criterion.campaign, " +
+                "  campaign_criterion.type, " +
+                "  campaign_criterion.status, " +
+                "  campaign_criterion.negative, " +
+                "  campaign_criterion.location.geo_target_constant " +
+                "FROM campaign_criterion WHERE campaign_criterion.status = 'ENABLED' AND campaign_criterion.campaign ='" + campaign + "'";
     }
 
     public static List<CampaignDetails> convertStreamResponseToCampaignDetailsList(ServerStream<SearchGoogleAdsStreamResponse> streamResponse) {

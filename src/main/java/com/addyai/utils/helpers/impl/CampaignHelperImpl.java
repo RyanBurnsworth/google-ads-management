@@ -13,12 +13,13 @@
  *
  */
 
-package com.addyai.utils.helpers;
+package com.addyai.utils.helpers.impl;
 
 import com.addyai.enums.OperationType;
 import com.addyai.models.BudgetDetails;
 import com.addyai.models.CampaignDetails;
 import com.addyai.models.campaign_criterion.*;
+import com.addyai.utils.helpers.CampaignHelper;
 import com.google.ads.googleads.lib.utils.FieldMasks;
 import com.google.ads.googleads.v11.common.*;
 import com.google.ads.googleads.v11.enums.AdvertisingChannelTypeEnum;
@@ -34,6 +35,7 @@ import com.google.ads.googleads.v11.services.CampaignOperation;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import static com.addyai.utils.misc.Constants.MICRO_FACTOR;
 
@@ -122,116 +124,122 @@ public class CampaignHelperImpl implements CampaignHelper {
      * @return [CampaignCriterionOperations]
      */
     @Override
-    public List<CampaignCriterionOperation> buildCampaignCriterionOperationList(List<CriterionDetails> criterionDetailsList, boolean shouldCreate) {
+    public List<CampaignCriterionOperation> buildCampaignCriterionOperationList(Map<String, List<CriterionDetails>> criterionMapping,
+                                                                                boolean shouldCreate) {
         List<CampaignCriterionOperation> campaignCriterionOperationList = new ArrayList<>();
 
-        for (CriterionDetails criterionDetails : criterionDetailsList) {
-            CampaignCriterion.Builder campaignCriterionBuilder = CampaignCriterion.newBuilder();
+        criterionMapping.forEach((campaignResourceName, criterionDetailsList) -> {
+            for (CriterionDetails criterionDetails : criterionDetailsList) {
+                CampaignCriterion.Builder campaignCriterionBuilder = CampaignCriterion.newBuilder();
 
-            if (criterionDetails instanceof AdScheduleDetails) {
-                // create an ad schedule object info for criterion object
-                AdScheduleInfo adScheduleInfo = buildAdScheduleInfo((AdScheduleDetails) criterionDetails);
+                if (criterionDetails instanceof AdScheduleDetails) {
+                    // create an ad schedule object info for criterion object
+                    AdScheduleInfo adScheduleInfo = buildAdScheduleInfo((AdScheduleDetails) criterionDetails);
 
-                // if the bid modifier is set, apply to campaign criterion
-                if (criterionDetails.getBidModifier() > 0.0f)
-                    campaignCriterionBuilder.setBidModifier(criterionDetails.getBidModifier());
+                    // if the bid modifier is set, apply to campaign criterion
+                    if (criterionDetails.getBidModifier() > 0.0f)
+                        campaignCriterionBuilder.setBidModifier(criterionDetails.getBidModifier());
 
-                campaignCriterionBuilder
-                        .setAdSchedule(adScheduleInfo)
-                        .setCampaign(criterionDetails.getCampaignResourceName());
+                    campaignCriterionBuilder
+                            .setAdSchedule(adScheduleInfo)
+                            .setCampaign(criterionDetails.getCampaignResourceName());
 
-            } else if (criterionDetails instanceof NegativeKeywordDetails) {
-                // create a keyword info object for campaign criterion
-                KeywordInfo keywordInfo = KeywordInfo.newBuilder()
-                        .setMatchTypeValue(((NegativeKeywordDetails) criterionDetails).getKeywordMatchType())
-                        .setText(((NegativeKeywordDetails) criterionDetails).getKeywordText())
+                } else if (criterionDetails instanceof NegativeKeywordDetails) {
+                    // create a keyword info object for campaign criterion
+                    KeywordInfo keywordInfo = KeywordInfo.newBuilder()
+                            .setMatchTypeValue(((NegativeKeywordDetails) criterionDetails).getKeywordMatchType())
+                            .setText(((NegativeKeywordDetails) criterionDetails).getKeywordText())
+                            .build();
+
+                    campaignCriterionBuilder
+                            .setKeyword(keywordInfo)
+                            .setCampaign(criterionDetails.getCampaignResourceName())
+                            .setNegative(criterionDetails.isNegative()); // always true for keywordInfo
+
+                } else if (criterionDetails instanceof LanguageDetails) {
+                    // create a language info object for campaign criterion
+                    LanguageDetails languageDetails = ((LanguageDetails) criterionDetails);
+
+                    LanguageInfo languageInfo = LanguageInfo.newBuilder()
+                            .setLanguageConstant(languageDetails.getLanguageCode())
+                            .build();
+
+                    // update if this is a negative language target
+                    if (languageDetails.isNegative())
+                        campaignCriterionBuilder.setNegative(true);
+
+                    campaignCriterionBuilder
+                            .setLanguage(languageInfo)
+                            .setCampaign(criterionDetails.getCampaignResourceName());
+
+                } else if (criterionDetails instanceof DeviceDetails) {
+                    // create device info object for campaign criterion
+                    DeviceInfo deviceInfo = buildDeviceInfo((DeviceDetails) criterionDetails);
+
+                    campaignCriterionBuilder
+                            .setDevice(deviceInfo)
+                            .setBidModifier(criterionDetails.getBidModifier()) // always set for DeviceInfo
+                            .setCampaign(criterionDetails.getCampaignResourceName());
+
+                } else if (criterionDetails instanceof LocationDetails) {
+                    // create location info object for campaign criterion
+                    LocationDetails locationDetails = ((LocationDetails) criterionDetails);
+
+                    LocationInfo locationInfo = LocationInfo.newBuilder()
+                            .setGeoTargetConstant(locationDetails.getGeoTargetingConstant())
+                            .build();
+
+                    // update if a negative target
+                    if (locationDetails.isNegative())
+                        campaignCriterionBuilder.setNegative(true);
+
+                    // if needed, update the bid modifier
+                    if (locationDetails.getBidModifier() != 0.0)
+                        campaignCriterionBuilder.setBidModifier(locationDetails.getBidModifier());
+
+                    campaignCriterionBuilder
+                            .setLocation(locationInfo)
+                            .setCampaign(criterionDetails.getCampaignResourceName());
+
+                } else if (criterionDetails instanceof ProximityDetails) {
+                    // create proximity info for campaign criterion
+                    ProximityDetails proximityDetails = (ProximityDetails) criterionDetails;
+
+                    // create a proximity info builder
+                    ProximityInfo.Builder proximityInfoBuilder = buildProximityInfoBuilder(proximityDetails);
+
+                    // update if this proximity target is using a bid modifier
+                    if (proximityDetails.getBidModifier() != 0.0f)
+                        campaignCriterionBuilder.setBidModifier(proximityDetails.getBidModifier());
+
+                    // create the campaign criterion object from the details
+                    campaignCriterionBuilder
+                            .setCampaign(criterionDetails.getCampaignResourceName())
+                            .setProximity(proximityInfoBuilder.build());
+                }
+
+                // build campaign criterion object
+                CampaignCriterion campaignCriterion = campaignCriterionBuilder
+                        .setCampaign(campaignResourceName)
                         .build();
 
-                campaignCriterionBuilder
-                        .setKeyword(keywordInfo)
-                        .setCampaign(criterionDetails.getCampaignResourceName())
-                        .setNegative(criterionDetails.isNegative()); // always true for keywordInfo
+                // build a create or update campaignCriterionOperation
+                CampaignCriterionOperation.Builder campaignCriterionOperationBuilder = CampaignCriterionOperation.newBuilder();
 
-            } else if (criterionDetails instanceof LanguageDetails) {
-                // create a language info object for campaign criterion
-                LanguageDetails languageDetails = ((LanguageDetails) criterionDetails);
+                // set create or update flag for campaign criterion operation
+                if (shouldCreate)
+                    campaignCriterionOperationBuilder
+                            .setCreate(campaignCriterion);
+                else
+                    campaignCriterionOperationBuilder
+                            .setUpdate(campaignCriterion)
+                            .setUpdateMask(FieldMasks.allSetFieldsOf(campaignCriterion));
 
-                LanguageInfo languageInfo = LanguageInfo.newBuilder()
-                        .setLanguageConstant(languageDetails.getLanguageCode())
-                        .build();
-
-                // update if this is a negative language target
-                if (languageDetails.isNegative())
-                    campaignCriterionBuilder.setNegative(true);
-
-                campaignCriterionBuilder
-                        .setLanguage(languageInfo)
-                        .setCampaign(criterionDetails.getCampaignResourceName());
-
-            } else if (criterionDetails instanceof DeviceDetails) {
-                // create device info object for campaign criterion
-                DeviceInfo deviceInfo = buildDeviceInfo((DeviceDetails) criterionDetails);
-
-                campaignCriterionBuilder
-                        .setDevice(deviceInfo)
-                        .setBidModifier(criterionDetails.getBidModifier()) // always set for DeviceInfo
-                        .setCampaign(criterionDetails.getCampaignResourceName());
-
-            } else if (criterionDetails instanceof LocationDetails) {
-                // create location info object for campaign criterion
-                LocationDetails locationDetails = ((LocationDetails) criterionDetails);
-
-                LocationInfo locationInfo = LocationInfo.newBuilder()
-                        .setGeoTargetConstant(locationDetails.getGeoTargetingConstant())
-                        .build();
-
-                // update if a negative target
-                if (locationDetails.isNegative())
-                    campaignCriterionBuilder.setNegative(true);
-
-                // if needed, update the bid modifier
-                if (locationDetails.getBidModifier() != 0.0)
-                    campaignCriterionBuilder.setBidModifier(locationDetails.getBidModifier());
-
-                campaignCriterionBuilder
-                        .setLocation(locationInfo)
-                        .setCampaign(criterionDetails.getCampaignResourceName());
-
-            } else if (criterionDetails instanceof ProximityDetails) {
-                // create proximity info for campaign criterion
-                ProximityDetails proximityDetails = (ProximityDetails) criterionDetails;
-
-                // create a proximity info builder
-                ProximityInfo.Builder proximityInfoBuilder = buildProximityInfoBuilder(proximityDetails);
-
-                // update if this proximity target is using a bid modifier
-                if (proximityDetails.getBidModifier() != 0.0f)
-                    campaignCriterionBuilder.setBidModifier(proximityDetails.getBidModifier());
-
-                // create the campaign criterion object from the details
-                campaignCriterionBuilder
-                        .setCampaign(criterionDetails.getCampaignResourceName())
-                        .setProximity(proximityInfoBuilder.build());
+                // add CampaignCriterionOperation to list
+                campaignCriterionOperationList.add(campaignCriterionOperationBuilder.build());
             }
+        });
 
-            // build campaign criterion object
-            CampaignCriterion campaignCriterion = campaignCriterionBuilder.build();
-
-            // build a create or update campaignCriterionOperation
-            CampaignCriterionOperation.Builder campaignCriterionOperationBuilder = CampaignCriterionOperation.newBuilder();
-
-            // set create or update flag for campaign criterion operation
-            if (shouldCreate)
-                campaignCriterionOperationBuilder
-                        .setCreate(campaignCriterion);
-            else
-                campaignCriterionOperationBuilder
-                        .setUpdate(campaignCriterion)
-                        .setUpdateMask(FieldMasks.allSetFieldsOf(campaignCriterion));
-
-            // add CampaignCriterionOperation to list
-            campaignCriterionOperationList.add(campaignCriterionOperationBuilder.build());
-        }
         return campaignCriterionOperationList;
     }
 

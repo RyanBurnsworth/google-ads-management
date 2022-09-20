@@ -25,6 +25,7 @@ import com.google.ads.googleads.v11.enums.BudgetStatusEnum;
 import com.google.ads.googleads.v11.enums.CriterionTypeEnum;
 import com.google.ads.googleads.v11.enums.DeviceEnum;
 import com.google.ads.googleads.v11.services.GoogleAdsRow;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -39,10 +40,15 @@ public class GoogleAdsRowAdapterImplTest {
     @Autowired
     private GoogleAdsRowAdapter googleAdsRowAdapter;
 
+    private TestUtils testUtils;
+
+    @BeforeEach
+    void setup() {
+        testUtils = new TestUtils();
+    }
+
     @Test
     void testGetCampaignDetails() {
-        TestUtils testUtils = new TestUtils();
-
         GoogleAdsRow googleAdsRow = GoogleAdsRow.newBuilder()
                 .setCampaign(testUtils.getMockCampaign()).build();
 
@@ -66,8 +72,6 @@ public class GoogleAdsRowAdapterImplTest {
 
     @Test
     void testGetBudgetDetails() {
-        TestUtils testUtils = new TestUtils();
-
         GoogleAdsRow googleAdsRow = GoogleAdsRow.newBuilder()
                 .setCampaignBudget(testUtils.getMockCampaignBudget())
                 .build();
@@ -84,8 +88,6 @@ public class GoogleAdsRowAdapterImplTest {
 
     @Test
     void testGetAdScheduleDetails() {
-        TestUtils testUtils = new TestUtils();
-
         GoogleAdsRow googleAdsRow = GoogleAdsRow.newBuilder()
                 .setCampaignCriterion(testUtils.getMockCampaignCriterion(CriterionTypeEnum.CriterionType.AD_SCHEDULE))
                 .build();
@@ -105,8 +107,6 @@ public class GoogleAdsRowAdapterImplTest {
 
     @Test
     void testGetNegativeKeywordDetails() {
-        TestUtils testUtils = new TestUtils();
-
         GoogleAdsRow googleAdsRow = GoogleAdsRow.newBuilder()
                 .setCampaignCriterion(testUtils.getMockCampaignCriterion(CriterionTypeEnum.CriterionType.KEYWORD))
                 .build();
@@ -123,8 +123,6 @@ public class GoogleAdsRowAdapterImplTest {
 
     @Test
     void testGetProximityDetails() {
-        TestUtils testUtils = new TestUtils();
-
         GoogleAdsRow googleAdsRow = GoogleAdsRow.newBuilder()
                 .setCampaignCriterion(testUtils.getMockCampaignCriterion(CriterionTypeEnum.CriterionType.PROXIMITY))
                 .build();
@@ -147,8 +145,6 @@ public class GoogleAdsRowAdapterImplTest {
 
     @Test
     void testGetLocationDetails() {
-        TestUtils testUtils = new TestUtils();
-
         GoogleAdsRow googleAdsRow = GoogleAdsRow.newBuilder()
                 .setCampaignCriterion(testUtils.getMockCampaignCriterion(CriterionTypeEnum.CriterionType.LOCATION))
                 .build();
@@ -164,8 +160,6 @@ public class GoogleAdsRowAdapterImplTest {
 
     @Test
     void testGetLanguageDetails() {
-        TestUtils testUtils = new TestUtils();
-
         GoogleAdsRow googleAdsRow = GoogleAdsRow.newBuilder()
                 .setCampaignCriterion(testUtils.getMockCampaignCriterion(CriterionTypeEnum.CriterionType.LANGUAGE))
                 .build();
@@ -181,8 +175,6 @@ public class GoogleAdsRowAdapterImplTest {
 
     @Test
     void testGetDeviceDetails() {
-        TestUtils testUtils = new TestUtils();
-
         GoogleAdsRow googleAdsRow = GoogleAdsRow.newBuilder()
                 .setCampaignCriterion(testUtils.getMockCampaignCriterion(CriterionTypeEnum.CriterionType.DEVICE))
                 .build();

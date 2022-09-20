@@ -64,6 +64,7 @@ public class GoogleAdsRowAdapterImpl implements GoogleAdsRowAdapter {
     public AdScheduleDetails getAdScheduleDetails(GoogleAdsRow googleAdsRow) {
         AdScheduleDetails adScheduleDetails = new AdScheduleDetails();
         adScheduleDetails.setCriterionType(CRITERION_TYPE_AD_SCHEDULE);
+        adScheduleDetails.setCriterionResourceName(googleAdsRow.getCampaignCriterion().getResourceName());
         adScheduleDetails.setCampaignCriterionId(googleAdsRow.getCampaignCriterion().getCriterionId());
         adScheduleDetails.setCampaignResourceName(googleAdsRow.getCampaignCriterion().getCampaign());
         adScheduleDetails.setBidModifier(googleAdsRow.getCampaignCriterion().getBidModifier());
@@ -82,6 +83,7 @@ public class GoogleAdsRowAdapterImpl implements GoogleAdsRowAdapter {
         NegativeKeywordDetails negativeKeywordDetails = new NegativeKeywordDetails();
         negativeKeywordDetails.setCriterionType(CRITERION_TYPE_KEYWORD);
         negativeKeywordDetails.setCampaignCriterionId(googleAdsRow.getCampaignCriterion().getCriterionId());
+        negativeKeywordDetails.setCriterionResourceName(googleAdsRow.getCampaignCriterion().getResourceName());
         negativeKeywordDetails.setCampaignResourceName(googleAdsRow.getCampaignCriterion().getCampaign());
         negativeKeywordDetails.setNegative(googleAdsRow.getCampaignCriterion().getNegative());
         negativeKeywordDetails.setStatus(googleAdsRow.getCampaignCriterion().getStatusValue());
@@ -96,6 +98,7 @@ public class GoogleAdsRowAdapterImpl implements GoogleAdsRowAdapter {
         ProximityDetails proximityDetails = new ProximityDetails();
         proximityDetails.setCriterionType(CRITERION_TYPE_PROXIMITY);
         proximityDetails.setCampaignCriterionId(googleAdsRow.getCampaignCriterion().getCriterionId());
+        proximityDetails.setCriterionResourceName(googleAdsRow.getCampaignCriterion().getResourceName());
         proximityDetails.setCampaignResourceName(googleAdsRow.getCampaignCriterion().getCampaign());
         proximityDetails.setStatus(googleAdsRow.getCampaignCriterion().getStatusValue());
         proximityDetails.setBidModifier(googleAdsRow.getCampaignCriterion().getBidModifier());
@@ -118,6 +121,7 @@ public class GoogleAdsRowAdapterImpl implements GoogleAdsRowAdapter {
         LocationDetails locationDetails = new LocationDetails();
         locationDetails.setCriterionType(CRITERION_TYPE_LOCATION);
         locationDetails.setCampaignCriterionId(googleAdsRow.getCampaignCriterion().getCriterionId());
+        locationDetails.setCriterionResourceName(googleAdsRow.getCampaignCriterion().getResourceName());
         locationDetails.setCampaignResourceName(googleAdsRow.getCampaignCriterion().getCampaign());
         locationDetails.setStatus(googleAdsRow.getCampaignCriterion().getStatusValue());
         locationDetails.setNegative(googleAdsRow.getCampaignCriterion().getNegative());
@@ -131,6 +135,7 @@ public class GoogleAdsRowAdapterImpl implements GoogleAdsRowAdapter {
         LanguageDetails languageDetails = new LanguageDetails();
         languageDetails.setCriterionType(CRITERION_TYPE_LANGUAGE);
         languageDetails.setCampaignCriterionId(googleAdsRow.getCampaignCriterion().getCriterionId());
+        languageDetails.setCriterionResourceName(googleAdsRow.getCampaignCriterion().getResourceName());
         languageDetails.setCampaignResourceName(googleAdsRow.getCampaignCriterion().getCampaign());
         languageDetails.setStatus(googleAdsRow.getCampaignCriterion().getStatusValue());
         languageDetails.setLanguageCode(googleAdsRow.getCampaignCriterion().getLanguage().getLanguageConstant());
@@ -143,6 +148,7 @@ public class GoogleAdsRowAdapterImpl implements GoogleAdsRowAdapter {
         DeviceDetails deviceDetails = new DeviceDetails();
         deviceDetails.setCriterionType(CRITERION_TYPE_DEVICE);
         deviceDetails.setCampaignCriterionId(googleAdsRow.getCampaignCriterion().getCriterionId());
+        deviceDetails.setCriterionResourceName(googleAdsRow.getCampaignCriterion().getResourceName());
         deviceDetails.setCampaignResourceName(googleAdsRow.getCampaignCriterion().getCampaign());
         deviceDetails.setStatus(googleAdsRow.getCampaignCriterion().getStatusValue());
         deviceDetails.setBidModifier(googleAdsRow.getCampaignCriterion().getBidModifier());

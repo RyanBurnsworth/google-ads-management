@@ -21,11 +21,17 @@ import com.addyai.models.campaign_criterion.CriterionDetails;
 import com.addyai.repos.campaigns.criterion.CriterionRepository;
 import com.addyai.repos.requests.StreamRequest;
 import com.addyai.repos.requests.impl.StreamRequestImpl;
+import com.addyai.utils.helpers.GAQLHelper;
+import com.google.ads.googleads.v11.enums.CriterionTypeEnum;
 import com.google.ads.googleads.v11.services.*;
+import com.google.api.gax.rpc.ServerStream;
 import org.springframework.stereotype.Repository;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+
+import static com.addyai.utils.misc.Constants.NUM_CRITERION_CLASSES_SUPPORTED;
 
 @Repository
 public class CriterionRepositoryImpl implements CriterionRepository {
@@ -50,18 +56,113 @@ public class CriterionRepositoryImpl implements CriterionRepository {
 
     @Override
     public List<CriterionDetails> fetchCampaignCriterionDetails(long customerId, String campaignResourceName) {
-        return null;
+        List<CriterionDetails> criterionDetailsList = new ArrayList<>();
+        SearchGoogleAdsStreamRequest request;
+        ServerStream<SearchGoogleAdsStreamResponse> response;
+        String query;
+
+        for (int i = 0; i < NUM_CRITERION_CLASSES_SUPPORTED; i++) {
+            switch (i) {
+                case 0:
+                    query = GAQLHelper.getNegativeKeywordQuery(campaignResourceName);
+
+                    request = requestBuilder.buildStreamRequest(customerId, query);
+                    response = requestBuilder.callStreamRequest(request);
+
+                    List<CriterionDetails> negativeKeywordDetails =
+                            GAQLHelper.convertStreamResponseToCriterionDetails(
+                                    response,
+                                    CriterionTypeEnum.CriterionType.KEYWORD);
+                    criterionDetailsList.addAll(negativeKeywordDetails);
+                    break;
+                case 1:
+                    query = GAQLHelper.getAdScheduleCriterionQuery(campaignResourceName);
+
+                    request = requestBuilder.buildStreamRequest(customerId, query);
+                    response = requestBuilder.callStreamRequest(request);
+
+                    List<CriterionDetails> adScheduleDetails =
+                            GAQLHelper.convertStreamResponseToCriterionDetails(
+                                    response,
+                                    CriterionTypeEnum.CriterionType.AD_SCHEDULE);
+
+                    criterionDetailsList.addAll(adScheduleDetails);
+                    break;
+                case 2:
+                    query = GAQLHelper.getLanguageQuery(campaignResourceName);
+
+                    request = requestBuilder.buildStreamRequest(customerId, query);
+                    response = requestBuilder.callStreamRequest(request);
+
+                    List<CriterionDetails> languageDetails =
+                            GAQLHelper.convertStreamResponseToCriterionDetails(
+                                    response,
+                                    CriterionTypeEnum.CriterionType.LANGUAGE);
+
+                    criterionDetailsList.addAll(languageDetails);
+                    break;
+                case 3:
+                    query = GAQLHelper.getDeviceQuery(campaignResourceName);
+
+                    request = requestBuilder.buildStreamRequest(customerId, query);
+                    response = requestBuilder.callStreamRequest(request);
+
+                    List<CriterionDetails> deviceDetails =
+                            GAQLHelper.convertStreamResponseToCriterionDetails(
+                                    response,
+                                    CriterionTypeEnum.CriterionType.DEVICE);
+
+                    criterionDetailsList.addAll(deviceDetails);
+                    break;
+                case 4:
+                    query = GAQLHelper.getLocationQuery(campaignResourceName);
+
+                    request = requestBuilder.buildStreamRequest(customerId, query);
+                    response = requestBuilder.callStreamRequest(request);
+
+                    List<CriterionDetails> locationDetails =
+                            GAQLHelper.convertStreamResponseToCriterionDetails(
+                                    response,
+                                    CriterionTypeEnum.CriterionType.LOCATION);
+
+                    criterionDetailsList.addAll(locationDetails);
+                    break;
+                case 5:
+                    query = GAQLHelper.getProximityQuery(campaignResourceName);
+
+                    request = requestBuilder.buildStreamRequest(customerId, query);
+                    response = requestBuilder.callStreamRequest(request);
+
+                    List<CriterionDetails> proximityDetails =
+                            GAQLHelper.convertStreamResponseToCriterionDetails(
+                                    response,
+                                    CriterionTypeEnum.CriterionType.PROXIMITY);
+
+                    criterionDetailsList.addAll(proximityDetails);
+                    break;
+                default:
+                    break;
+            }
+        }
+        return criterionDetailsList;
     }
 
     @Override
-    public void addCampaignCriterion(long customerId,
-                                     List<CampaignCriterionOperation> campaignCriterionOperationList) throws Exception {
+    public List<String> performCriterionOperations(long customerId,
+                                                   List<CampaignCriterionOperation> campaignCriterionOperationList) throws Exception {
+        List<String> criterionResourceNameList = new ArrayList<>();
+
         try {
-            campaignCriterionServiceClient
+            MutateCampaignCriteriaResponse response = campaignCriterionServiceClient
                     .mutateCampaignCriteria(Long.toString(customerId), campaignCriterionOperationList);
+
+            for (MutateCampaignCriterionResult result : response.getResultsList()) {
+                criterionResourceNameList.add(result.getResourceName());
+            }
         } catch (Exception e) {
             throw ApiExceptionResolver.doResolveException(e);
         }
+        return criterionResourceNameList;
     }
 
     @Override

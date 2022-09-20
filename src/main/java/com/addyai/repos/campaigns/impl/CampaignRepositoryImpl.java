@@ -27,6 +27,7 @@ import com.google.ads.googleads.v11.services.*;
 import com.google.api.gax.rpc.ServerStream;
 import org.springframework.stereotype.Repository;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import static com.addyai.utils.misc.Constants.NOT_FOUND_CAMPAIGN;
@@ -110,11 +111,18 @@ public class CampaignRepositoryImpl implements CampaignRepository {
     }
 
     @Override
-    public void performCampaignOperations(long customerId, List<CampaignOperation> campaignOperations) throws Exception {
+    public List<String> performCampaignOperations(long customerId, List<CampaignOperation> campaignOperations) throws Exception {
+        List<String> campaignResourceNameList = new ArrayList<>();
+
         try {
-            campaignServiceClient.mutateCampaigns(Long.toString(customerId), campaignOperations);
+            MutateCampaignsResponse response =
+                    campaignServiceClient.mutateCampaigns(Long.toString(customerId), campaignOperations);
+            for (MutateCampaignResult result : response.getResultsList()) {
+                campaignResourceNameList.add(result.getResourceName());
+            }
         } catch (Exception e) {
             throw ApiExceptionResolver.doResolveException(e);
         }
+        return campaignResourceNameList;
     }
 }

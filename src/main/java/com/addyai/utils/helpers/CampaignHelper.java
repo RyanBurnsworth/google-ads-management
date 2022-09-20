@@ -24,6 +24,7 @@ import com.google.ads.googleads.v11.services.CampaignCriterionOperation;
 import com.google.ads.googleads.v11.services.CampaignOperation;
 
 import java.util.List;
+import java.util.Map;
 
 public interface CampaignHelper {
     List<CampaignOperation> buildCampaignOperationList(List<CampaignDetails> campaignDetailsList,
@@ -32,6 +33,6 @@ public interface CampaignHelper {
     List<CampaignBudgetOperation> buildCampaignBudgetOperationList(List<BudgetDetails> budgetDetailsList,
                                                                    boolean shouldCreate);
 
-    List<CampaignCriterionOperation> buildCampaignCriterionOperationList(List<CriterionDetails> criterionDetailsList,
+    List<CampaignCriterionOperation> buildCampaignCriterionOperationList(Map<String, List<CriterionDetails>> criterionMapper,
                                                                          boolean shouldCreate);
 }

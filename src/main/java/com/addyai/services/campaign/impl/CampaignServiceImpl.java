@@ -20,20 +20,20 @@ import com.addyai.error_handling.ValidationErrorResponse;
 import com.addyai.error_handling.exceptions.InvalidRequestException;
 import com.addyai.models.BudgetDetails;
 import com.addyai.models.CampaignDetails;
+import com.addyai.models.campaign_criterion.CriterionDetails;
 import com.addyai.repos.campaigns.CampaignRepository;
 import com.addyai.repos.campaigns.budget.CampaignBudgetRepository;
 import com.addyai.repos.campaigns.criterion.CriterionRepository;
 import com.addyai.services.campaign.CampaignService;
 import com.addyai.utils.helpers.CampaignHelper;
-import com.addyai.utils.helpers.CampaignHelperImpl;
+import com.addyai.utils.helpers.impl.CampaignHelperImpl;
 import com.addyai.utils.validators.EntityValidator;
 import com.google.ads.googleads.v11.services.CampaignBudgetOperation;
+import com.google.ads.googleads.v11.services.CampaignCriterionOperation;
 import com.google.ads.googleads.v11.services.CampaignOperation;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 
 import static com.addyai.utils.misc.Constants.INVALID_REQUEST_ERROR;
 import static com.addyai.utils.misc.Constants.MISSING_PARAMS;
@@ -68,7 +68,18 @@ public class CampaignServiceImpl implements CampaignService {
         List<CampaignOperation> campaignOperationList = campaignHelper
                 .buildCampaignOperationList(campaignDetailsList, operationType);
 
-        campaignRepository.performCampaignOperations(customerId, campaignOperationList);
+        List<String> campaignResourceNameList =
+                campaignRepository.performCampaignOperations(customerId, campaignOperationList);
+
+        // TODO: update location geo target
+
+        Map<String, List<CriterionDetails>> mapping =
+                buildCampaignResNameToCriterionMapping(campaignResourceNameList, campaignDetailsList);
+
+        List<CampaignCriterionOperation> campaignCriterionOperationList = campaignHelper
+                .buildCampaignCriterionOperationList(mapping, shouldCreate);
+
+        criterionRepository.performCriterionOperations(customerId, campaignCriterionOperationList);
     }
 
     /**
@@ -92,6 +103,11 @@ public class CampaignServiceImpl implements CampaignService {
 
             // assign the budget details object to the campaign details object
             campaignDetails.setBudgetDetails(budgetDetails);
+
+            List<CriterionDetails> criterionDetailsList = criterionRepository.fetchCampaignCriterionDetails(customerId,
+                    campaignDetails.getCampaignResourceName());
+
+            campaignDetails.setCampaignCriteriaList(criterionDetailsList);
         }
         return campaignDetailsList;
     }
@@ -199,5 +215,18 @@ public class CampaignServiceImpl implements CampaignService {
                         validationErrorResponse.getErrorMessage());
 
         }
+    }
+
+    private Map<String, List<CriterionDetails>> buildCampaignResNameToCriterionMapping(List<String> campaignResourceNameList,
+                                                                                       List<CampaignDetails> campaignDetailsList) {
+        Map<String, List<CriterionDetails>> mapping = new HashMap<>();
+        if (campaignDetailsList.size() != campaignResourceNameList.size()) return mapping;
+
+        for (int i = 0; i < campaignResourceNameList.size(); i++) {
+
+            mapping.put(campaignResourceNameList.get(i), campaignDetailsList.get(i).getCampaignCriteriaList());
+        }
+
+        return mapping;
     }
 }

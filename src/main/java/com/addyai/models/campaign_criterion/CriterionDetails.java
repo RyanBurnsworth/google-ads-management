@@ -32,6 +32,8 @@ public abstract class CriterionDetails {
 
     private String campaignResourceName = "";
 
+    private String criterionResourceName = "";
+
     private boolean isNegative = false;
 
     private float bidModifier = 0.0f;
@@ -46,6 +48,14 @@ public abstract class CriterionDetails {
 
     public void setCampaignCriterionId(long campaignCriterionId) {
         this.campaignCriterionId = campaignCriterionId;
+    }
+
+    public String getCriterionResourceName() {
+        return criterionResourceName;
+    }
+
+    public void setCriterionResourceName(String criterionResourceName) {
+        this.criterionResourceName = criterionResourceName;
     }
 
     public String getCampaignResourceName() {

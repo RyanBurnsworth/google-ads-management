@@ -25,5 +25,5 @@ public interface CampaignRepository {
 
     CampaignDetails fetchCampaignDetailsByName(long customerId, String campaignName) throws Exception;
 
-    void performCampaignOperations(long customerId, List<CampaignOperation> campaignOperations) throws Exception;
+    List<String> performCampaignOperations(long customerId, List<CampaignOperation> campaignOperations) throws Exception;
 }

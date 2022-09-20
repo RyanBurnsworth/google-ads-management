@@ -22,6 +22,8 @@ public class Constants {
 
     public static final int DEFAULT_ADDITIONAL_YEARS_CAMPAIGN_END_DATE = 10;
 
+    public static final int NUM_CRITERION_CLASSES_SUPPORTED = 6;
+
     public static final String DEFAULT_LOCALE = "en";
     public static final String DEFAULT_COUNTRY_CODE = "US";
     public static final String LANGUAGE_CONSTANT_EN = "languageConstants/1000";
