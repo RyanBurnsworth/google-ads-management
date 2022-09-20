@@ -31,22 +31,26 @@ import java.util.List;
 
 @Repository
 public class CampaignBudgetRepositoryImpl implements CampaignBudgetRepository {
-    private final GoogleAdsServiceClient googleAdsServiceClient;
     private final StreamRequest requestBuilder;
+
+    private final CampaignBudgetServiceClient campaignBudgetServiceClient;
 
     public CampaignBudgetRepositoryImpl() {
         GoogleAdsClientBuilder googleAdsClientBuilder = GoogleAdsClientBuilder.INSTANCE;
 
-        this.googleAdsServiceClient = googleAdsClientBuilder
+        GoogleAdsServiceClient googleAdsServiceClient = googleAdsClientBuilder
                 .getGoogleAdsClient()
                 .getLatestVersion()
                 .createGoogleAdsServiceClient();
 
         this.requestBuilder = new StreamRequestImpl(googleAdsServiceClient);
+
+        campaignBudgetServiceClient = googleAdsClientBuilder.getGoogleAdsClient()
+                .getLatestVersion().createCampaignBudgetServiceClient();
     }
 
     @Override
-    public List<BudgetDetails> fetchAllCampaignBudgetDetails(long customerId) throws Exception {
+    public List<BudgetDetails> fetchAllBudgetDetails(long customerId) throws Exception {
         try {
             String query = GAQLHelper.getCampaignBudgetQuery();
 
@@ -61,14 +65,9 @@ public class CampaignBudgetRepositoryImpl implements CampaignBudgetRepository {
     }
 
     @Override
-    public List<String> createOrUpdateBudgets(long customerId, List<CampaignBudgetOperation> campaignBudgetOperationList) throws Exception {
+    public List<String> performCampaignBudgetOperations(long customerId, List<CampaignBudgetOperation> campaignBudgetOperationList) throws Exception {
         List<String> budgetResourceNameList = new ArrayList<>();
         try {
-            GoogleAdsClientBuilder googleAdsClientBuilder = GoogleAdsClientBuilder.INSTANCE;
-
-            CampaignBudgetServiceClient campaignBudgetServiceClient = googleAdsClientBuilder.getGoogleAdsClient()
-                    .getLatestVersion().createCampaignBudgetServiceClient();
-
             // At this time we are going to assume the response is OK if no exception is thrown
             MutateCampaignBudgetsResponse budgetsResponse = campaignBudgetServiceClient
                     .mutateCampaignBudgets(Long.toString(customerId), campaignBudgetOperationList);
@@ -82,10 +81,5 @@ public class CampaignBudgetRepositoryImpl implements CampaignBudgetRepository {
         }
 
         return budgetResourceNameList;
-    }
-
-    @Override
-    public void deleteCampaignBudgets(long customerId, List<Long> budgetIds) {
-
     }
 }

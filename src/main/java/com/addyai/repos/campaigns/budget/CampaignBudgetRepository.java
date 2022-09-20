@@ -21,9 +21,7 @@ import com.google.ads.googleads.v11.services.CampaignBudgetOperation;
 import java.util.List;
 
 public interface CampaignBudgetRepository {
-    List<BudgetDetails> fetchAllCampaignBudgetDetails(long customerId) throws Exception;
+    List<BudgetDetails> fetchAllBudgetDetails(long customerId) throws Exception;
 
-    List<String> createOrUpdateBudgets(long customerId, List<CampaignBudgetOperation> campaignBudgetOperationList) throws Exception;
-
-    void deleteCampaignBudgets(long customerId, List<Long> budgetIds);
+    List<String> performCampaignBudgetOperations(long customerId, List<CampaignBudgetOperation> campaignBudgetOperationList) throws Exception;
 }

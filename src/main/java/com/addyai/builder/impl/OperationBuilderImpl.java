@@ -13,19 +13,16 @@
  *
  */
 
-package com.addyai.utils.helpers.impl;
+package com.addyai.builder.impl;
 
 import com.addyai.enums.OperationType;
 import com.addyai.models.BudgetDetails;
 import com.addyai.models.CampaignDetails;
 import com.addyai.models.campaign_criterion.*;
-import com.addyai.utils.helpers.CampaignHelper;
+import com.addyai.builder.OperationBuilder;
 import com.google.ads.googleads.lib.utils.FieldMasks;
 import com.google.ads.googleads.v11.common.*;
-import com.google.ads.googleads.v11.enums.AdvertisingChannelTypeEnum;
-import com.google.ads.googleads.v11.enums.CampaignStatusEnum;
-import com.google.ads.googleads.v11.enums.NegativeGeoTargetTypeEnum;
-import com.google.ads.googleads.v11.enums.PositiveGeoTargetTypeEnum;
+import com.google.ads.googleads.v11.enums.*;
 import com.google.ads.googleads.v11.resources.Campaign;
 import com.google.ads.googleads.v11.resources.CampaignBudget;
 import com.google.ads.googleads.v11.resources.CampaignCriterion;
@@ -39,7 +36,7 @@ import java.util.Map;
 
 import static com.addyai.utils.misc.Constants.MICRO_FACTOR;
 
-public class CampaignHelperImpl implements CampaignHelper {
+public class OperationBuilderImpl implements OperationBuilder {
     @Override
     public List<CampaignOperation> buildCampaignOperationList(List<CampaignDetails> campaignDetailsList,
                                                               OperationType operationType) {
@@ -76,11 +73,12 @@ public class CampaignHelperImpl implements CampaignHelper {
      * Build [CampaignBudgetOperation] to be used for creating or updating campaign budgets
      *
      * @param budgetDetailsList [BudgetDetails] to create budgets from
-     * @param shouldCreate      true if it should create budget, false if it should update
+     * @param operationType     true if it should create budget, false if it should update //TODO update javadoc
      * @return [CampaignBudgetOperation]
      */
     @Override
-    public List<CampaignBudgetOperation> buildCampaignBudgetOperationList(List<BudgetDetails> budgetDetailsList, boolean shouldCreate) {
+    public List<CampaignBudgetOperation> buildCampaignBudgetOperationList(List<BudgetDetails> budgetDetailsList,
+                                                                          OperationType operationType) {
         List<CampaignBudgetOperation> campaignBudgetOperations = new ArrayList<>();
 
         // create and store a budget operation for each budget detail given
@@ -90,23 +88,25 @@ public class CampaignHelperImpl implements CampaignHelper {
 
             // set the general budget fields
             budgetBuilder
-                    .setName(budgetDetails.getName())
                     .setAmountMicros(budgetDetails.getDailyBudgetAmount() * MICRO_FACTOR)
                     .setStatusValue(budgetDetails.getStatus())
                     .setDeliveryMethodValue(budgetDetails.getDeliveryMethod());
 
             // set the explicitly shared flag when creating budgets
             // set the budget resource name when updating budgets
-            if (shouldCreate) {
+            if (operationType.equals(OperationType.CREATE)) {
+                budgetBuilder.setName(budgetDetails.getName());
                 budgetBuilder.setExplicitlyShared(budgetDetails.isShared());
                 budgetOperationBuilder.setCreate(budgetBuilder.build());
-            } else {
+            } else if (operationType.equals(OperationType.UPDATE)) {
                 budgetBuilder.setResourceName(budgetDetails.getResourceName());
 
                 CampaignBudget budget = budgetBuilder.build();
 
                 budgetOperationBuilder.setUpdate(budget);
                 budgetOperationBuilder.setUpdateMask(FieldMasks.allSetFieldsOf(budget));
+            } else if (operationType.equals(OperationType.REMOVE)) {
+                budgetOperationBuilder.setRemove(budgetDetails.getResourceName());
             }
 
             // add the budget operation to the list of operations
@@ -119,13 +119,13 @@ public class CampaignHelperImpl implements CampaignHelper {
     /**
      * Build [CampaignCriterionOperation] to be used for creating or updating campaign criterion.
      *
-     * @param criterionDetailsList [CampaignCriterionDetails] to create operations from
-     * @param shouldCreate         true if it should create, false if it should update
+     * @param criterionMapping a mapping of campaign resource name to a list of CriterionDetails
+     * @param operationType    true if it should create, false if it should update // TODO update javadoc
      * @return [CampaignCriterionOperations]
      */
     @Override
-    public List<CampaignCriterionOperation> buildCampaignCriterionOperationList(Map<String, List<CriterionDetails>> criterionMapping,
-                                                                                boolean shouldCreate) {
+    public List<CampaignCriterionOperation> buildCampaignCriterionOperationList(Map<String,
+            List<CriterionDetails>> criterionMapping, OperationType operationType) {
         List<CampaignCriterionOperation> campaignCriterionOperationList = new ArrayList<>();
 
         criterionMapping.forEach((campaignResourceName, criterionDetailsList) -> {
@@ -153,7 +153,6 @@ public class CampaignHelperImpl implements CampaignHelper {
 
                     campaignCriterionBuilder
                             .setKeyword(keywordInfo)
-                            .setCampaign(criterionDetails.getCampaignResourceName())
                             .setNegative(criterionDetails.isNegative()); // always true for keywordInfo
 
                 } else if (criterionDetails instanceof LanguageDetails) {
@@ -194,7 +193,7 @@ public class CampaignHelperImpl implements CampaignHelper {
                         campaignCriterionBuilder.setNegative(true);
 
                     // if needed, update the bid modifier
-                    if (locationDetails.getBidModifier() != 0.0)
+                    if (locationDetails.getBidModifier() > 0.0)
                         campaignCriterionBuilder.setBidModifier(locationDetails.getBidModifier());
 
                     campaignCriterionBuilder
@@ -221,19 +220,22 @@ public class CampaignHelperImpl implements CampaignHelper {
                 // build campaign criterion object
                 CampaignCriterion campaignCriterion = campaignCriterionBuilder
                         .setCampaign(campaignResourceName)
+                        .setStatus(CampaignCriterionStatusEnum.CampaignCriterionStatus.ENABLED)
                         .build();
 
                 // build a create or update campaignCriterionOperation
                 CampaignCriterionOperation.Builder campaignCriterionOperationBuilder = CampaignCriterionOperation.newBuilder();
 
                 // set create or update flag for campaign criterion operation
-                if (shouldCreate)
+                if (operationType.equals(OperationType.CREATE))
                     campaignCriterionOperationBuilder
                             .setCreate(campaignCriterion);
-                else
+                else if (operationType.equals(OperationType.UPDATE))
                     campaignCriterionOperationBuilder
                             .setUpdate(campaignCriterion)
                             .setUpdateMask(FieldMasks.allSetFieldsOf(campaignCriterion));
+                else if (operationType.equals(OperationType.REMOVE))
+                    campaignCriterionOperationBuilder.setRemove(campaignCriterion.getResourceName());
 
                 // add CampaignCriterionOperation to list
                 campaignCriterionOperationList.add(campaignCriterionOperationBuilder.build());
@@ -329,20 +331,20 @@ public class CampaignHelperImpl implements CampaignHelper {
     /**
      * Build a Networking Settings object for use in creating/updating campaigns
      *
-     * @param isTargetingContentNetwork       is this campaign targeting the content network
-     * @param isTargetingPartnerSearchNetwork is this campaign targeting the partner search network
-     * @param isTargetingSearchNetwork        is this campaign targeting search networking
+     * @param isTargetingContentNetwork      is this campaign targeting the content network
+     * @param isTargetingGoogleSearchNetwork is this campaign targeting the Google search network
+     * @param isTargetingSearchNetwork       is this campaign targeting search networking (includes partners)
      * @return completed [Campaign.NetworkSettings]
      */
     private Campaign.NetworkSettings buildNetworkSettings(
             boolean isTargetingContentNetwork,
-            boolean isTargetingPartnerSearchNetwork,
+            boolean isTargetingGoogleSearchNetwork,
             boolean isTargetingSearchNetwork
     ) {
         return Campaign.NetworkSettings.newBuilder()
                 .setTargetContentNetwork(isTargetingContentNetwork)
+                .setTargetGoogleSearch(isTargetingGoogleSearchNetwork)
                 .setTargetSearchNetwork(isTargetingSearchNetwork)
-                .setTargetGoogleSearch(isTargetingPartnerSearchNetwork)
                 .build();
     }
 

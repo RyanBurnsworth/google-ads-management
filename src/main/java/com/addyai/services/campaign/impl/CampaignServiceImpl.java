@@ -25,8 +25,8 @@ import com.addyai.repos.campaigns.CampaignRepository;
 import com.addyai.repos.campaigns.budget.CampaignBudgetRepository;
 import com.addyai.repos.campaigns.criterion.CriterionRepository;
 import com.addyai.services.campaign.CampaignService;
-import com.addyai.utils.helpers.CampaignHelper;
-import com.addyai.utils.helpers.impl.CampaignHelperImpl;
+import com.addyai.builder.OperationBuilder;
+import com.addyai.builder.impl.OperationBuilderImpl;
 import com.addyai.utils.validators.EntityValidator;
 import com.google.ads.googleads.v11.services.CampaignBudgetOperation;
 import com.google.ads.googleads.v11.services.CampaignCriterionOperation;
@@ -46,7 +46,7 @@ public class CampaignServiceImpl implements CampaignService {
 
     private final CriterionRepository criterionRepository;
 
-    private final CampaignHelper campaignHelper;
+    private final OperationBuilder operationBuilder;
 
     public CampaignServiceImpl(CampaignRepository campaignRepository,
                                CampaignBudgetRepository campaignBudgetRepository,
@@ -54,18 +54,18 @@ public class CampaignServiceImpl implements CampaignService {
         this.campaignRepository = campaignRepository;
         this.campaignBudgetRepository = campaignBudgetRepository;
         this.criterionRepository = criterionRepository;
-        this.campaignHelper = new CampaignHelperImpl();
+        this.operationBuilder = new OperationBuilderImpl();
     }
 
     @Override
     public void upsertCampaigns(long customerId, List<CampaignDetails> campaignDetailsList, boolean shouldCreate) throws Exception {
         validateCampaignDetails(campaignDetailsList);
 
-        campaignDetailsList = associateBudgetsToCampaigns(customerId, campaignDetailsList);
-
         OperationType operationType = shouldCreate ? OperationType.CREATE : OperationType.UPDATE;
 
-        List<CampaignOperation> campaignOperationList = campaignHelper
+        campaignDetailsList = associateBudgetsToCampaigns(customerId, campaignDetailsList, operationType);
+
+        List<CampaignOperation> campaignOperationList = operationBuilder
                 .buildCampaignOperationList(campaignDetailsList, operationType);
 
         List<String> campaignResourceNameList =
@@ -76,8 +76,8 @@ public class CampaignServiceImpl implements CampaignService {
         Map<String, List<CriterionDetails>> mapping =
                 buildCampaignResNameToCriterionMapping(campaignResourceNameList, campaignDetailsList);
 
-        List<CampaignCriterionOperation> campaignCriterionOperationList = campaignHelper
-                .buildCampaignCriterionOperationList(mapping, shouldCreate);
+        List<CampaignCriterionOperation> campaignCriterionOperationList = operationBuilder
+                .buildCampaignCriterionOperationList(mapping, operationType);
 
         criterionRepository.performCriterionOperations(customerId, campaignCriterionOperationList);
     }
@@ -94,7 +94,7 @@ public class CampaignServiceImpl implements CampaignService {
         List<CampaignDetails> campaignDetailsList = campaignRepository.fetchAllCampaignDetails(customerId);
 
         // fetch all campaign budget details from the client account
-        List<BudgetDetails> existingBudgets = campaignBudgetRepository.fetchAllCampaignBudgetDetails(customerId);
+        List<BudgetDetails> existingBudgets = campaignBudgetRepository.fetchAllBudgetDetails(customerId);
 
         // associate the budget details to its campaign details
         for (CampaignDetails campaignDetails : campaignDetailsList) {
@@ -131,7 +131,7 @@ public class CampaignServiceImpl implements CampaignService {
 
         // TODO create an endpoint to grab a single budget details object by id or name
         // fetch all the campaign budgets from the client's account
-        List<BudgetDetails> existingBudgets = campaignBudgetRepository.fetchAllCampaignBudgetDetails(customerId);
+        List<BudgetDetails> existingBudgets = campaignBudgetRepository.fetchAllBudgetDetails(customerId);
 
         // find the specific budget details object for this campaign
         BudgetDetails budgetDetails = findBudgetDetailsByName(campaignName, existingBudgets);
@@ -158,17 +158,18 @@ public class CampaignServiceImpl implements CampaignService {
     }
 
     private List<CampaignDetails> associateBudgetsToCampaigns(long customerId,
-                                                              List<CampaignDetails> campaignDetailsList) throws Exception {
+                                                              List<CampaignDetails> campaignDetailsList,
+                                                              OperationType operationType) throws Exception {
         List<CampaignDetails> updateCampaignDetailsList = new ArrayList<>();
         for (CampaignDetails campaignDetails : campaignDetailsList) {
             // create a campaign budget operation for this individual budget
             List<BudgetDetails> singleBudgetDetailsList = Collections.singletonList(campaignDetails.getBudgetDetails());
             List<CampaignBudgetOperation> campaignBudgetOperations =
-                    campaignHelper.buildCampaignBudgetOperationList(singleBudgetDetailsList, true);
+                    operationBuilder.buildCampaignBudgetOperationList(singleBudgetDetailsList, operationType);
 
             // create the budget and extract the budget resource name
             String budgetResourceName =
-                    campaignBudgetRepository.createOrUpdateBudgets(customerId, campaignBudgetOperations).get(0);
+                    campaignBudgetRepository.performCampaignBudgetOperations(customerId, campaignBudgetOperations).get(0);
 
             // associated the newly created budget with campaign
             campaignDetails.setBudgetResourceName(budgetResourceName);
@@ -213,7 +214,6 @@ public class CampaignServiceImpl implements CampaignService {
                 throw new InvalidRequestException(
                         validationErrorResponse.getErrorCode(),
                         validationErrorResponse.getErrorMessage());
-
         }
     }
 

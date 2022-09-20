@@ -13,7 +13,7 @@
  *
  */
 
-package com.addyai.utils.helpers;
+package com.addyai.builder;
 
 import com.addyai.enums.OperationType;
 import com.addyai.models.BudgetDetails;
@@ -26,13 +26,13 @@ import com.google.ads.googleads.v11.services.CampaignOperation;
 import java.util.List;
 import java.util.Map;
 
-public interface CampaignHelper {
+public interface OperationBuilder {
     List<CampaignOperation> buildCampaignOperationList(List<CampaignDetails> campaignDetailsList,
                                                        OperationType operationType);
 
     List<CampaignBudgetOperation> buildCampaignBudgetOperationList(List<BudgetDetails> budgetDetailsList,
-                                                                   boolean shouldCreate);
+                                                                   OperationType operationType);
 
     List<CampaignCriterionOperation> buildCampaignCriterionOperationList(Map<String, List<CriterionDetails>> criterionMapper,
-                                                                         boolean shouldCreate);
+                                                                         OperationType operationType);
 }

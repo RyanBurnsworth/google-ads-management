@@ -44,7 +44,7 @@ public class GAQLHelper {
                 " campaign.end_date," +
                 " campaign.campaign_budget, " +
                 " campaign.network_settings.target_content_network," +
-                " campaign.network_settings.target_partner_search_network," +
+                " campaign.network_settings.target_google_search," +
                 " campaign.network_settings.target_search_network" +
                 " FROM campaign WHERE campaign.status IN ('ENABLED', 'PAUSED') ORDER BY campaign.id";
     }
@@ -96,7 +96,9 @@ public class GAQLHelper {
                 "  campaign_criterion.ad_schedule.day_of_week, " +
                 "  campaign_criterion.ad_schedule.end_hour, " +
                 "  campaign_criterion.bid_modifier " +
-                "FROM campaign_criterion WHERE campaign_criterion.status = 'ENABLED' AND campaign_criterion.campaign ='" + campaign + "'";
+                "FROM campaign_criterion WHERE campaign_criterion.status = 'ENABLED' AND " +
+                "campaign_criterion.campaign = '" + campaign + "' AND campaign_criterion.ad_schedule.day_of_week IN " +
+                "('MONDAY', 'TUESDAY', 'WEDNESDAY', 'THURSDAY', 'FRIDAY', 'SATURDAY', 'SUNDAY')";
     }
 
     public static String getNegativeKeywordQuery(String campaign) {
@@ -109,7 +111,9 @@ public class GAQLHelper {
                 "  campaign_criterion.negative, " +
                 "  campaign_criterion.keyword.text, " +
                 "  campaign_criterion.keyword.match_type " +
-                "FROM campaign_criterion WHERE campaign_criterion.status = 'ENABLED' AND campaign_criterion.campaign ='" + campaign + "'";
+                "FROM campaign_criterion WHERE campaign_criterion.status = 'ENABLED' AND " +
+                "campaign_criterion.campaign ='" + campaign + "' AND campaign_criterion.keyword.text != '' AND " +
+                "campaign_criterion.negative = True";
     }
 
     public static String getProximityQuery(String campaign) {
@@ -130,7 +134,8 @@ public class GAQLHelper {
                 "  campaign_criterion.proximity.geo_point.longitude_in_micro_degrees, " +
                 "  campaign_criterion.proximity.radius, " +
                 "  campaign_criterion.proximity.radius_units " +
-                "FROM campaign_criterion WHERE campaign_criterion.status = 'ENABLED' AND campaign_criterion.campaign ='" + campaign + "'";
+                "FROM campaign_criterion WHERE campaign_criterion.status = 'ENABLED' AND " +
+                "campaign_criterion.campaign ='" + campaign + "' AND campaign_criterion.proximity.radius != 0";
     }
 
     public static String getDeviceQuery(String campaign) {
@@ -142,7 +147,9 @@ public class GAQLHelper {
                 "  campaign_criterion.status, " +
                 "  campaign_criterion.negative, " +
                 "  campaign_criterion.device.type " +
-                "FROM campaign_criterion WHERE campaign_criterion.status = 'ENABLED' AND campaign_criterion.campaign ='" + campaign + "'";
+                "FROM campaign_criterion WHERE campaign_criterion.status = 'ENABLED' AND " +
+                "campaign_criterion.campaign ='" + campaign + "' AND campaign_criterion.device.type " +
+                "IN ('DESKTOP', 'MOBILE', 'TABLET')";
     }
 
     public static String getLanguageQuery(String campaign) {
@@ -154,7 +161,8 @@ public class GAQLHelper {
                 "  campaign_criterion.status, " +
                 "  campaign_criterion.negative, " +
                 "  campaign_criterion.language.language_constant " +
-                "FROM campaign_criterion WHERE campaign_criterion.status = 'ENABLED' AND campaign_criterion.campaign ='" + campaign + "'";
+                "FROM campaign_criterion WHERE campaign_criterion.status = 'ENABLED' AND " +
+                "campaign_criterion.campaign ='" + campaign + "'";
     }
 
     public static String getLocationQuery(String campaign) {
@@ -166,7 +174,8 @@ public class GAQLHelper {
                 "  campaign_criterion.status, " +
                 "  campaign_criterion.negative, " +
                 "  campaign_criterion.location.geo_target_constant " +
-                "FROM campaign_criterion WHERE campaign_criterion.status = 'ENABLED' AND campaign_criterion.campaign ='" + campaign + "'";
+                "FROM campaign_criterion WHERE campaign_criterion.status = 'ENABLED' AND " +
+                "campaign_criterion.campaign ='" + campaign + "'";
     }
 
     public static List<CampaignDetails> convertStreamResponseToCampaignDetailsList(ServerStream<SearchGoogleAdsStreamResponse> streamResponse) {
