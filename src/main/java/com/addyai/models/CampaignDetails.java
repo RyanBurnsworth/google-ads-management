@@ -24,36 +24,112 @@ import java.util.List;
 import static com.addyai.utils.misc.Constants.*;
 
 public class CampaignDetails {
+
+    /**
+     * The identifier for the campaign. Auto-generates when the campaign is created.
+     */
     private long campaignId = 0L;
 
+    /**
+     * The name of the campaign.
+     */
     private String campaignName = "";
 
+    /**
+     * The resource name of the campaign. Auto-generates when the campaign is created.
+     * Format: <b>/customers/{customerId}/campaigns/{campaignId}</b>
+     */
     private String campaignResourceName = "";
 
-    private String status = "PAUSED";
+    /**
+     * The current status of the campaign.
+     * This status can be "ENABLED", "PAUSED" or "REMOVED".
+     * Defaults to "PAUSED"
+     */
+    private String status = "PAUSED"; // TODO: update to use integer value
 
-    private String advertisingChannelType = ADVERTISING_TYPE_SEARCH;
+    /**
+     * The advertising channel type for the campaign.
+     *
+     * @see <a href="https://developers.google.com/google-ads/api/reference/rpc/v11/AdvertisingChannelTypeEnum.AdvertisingChannelType">Advertising Channel Types</a>
+     * Defaults to "SEARCH"
+     */
+    private String advertisingChannelType = ADVERTISING_TYPE_SEARCH; //TODO: update to use integer value
 
+    /**
+     * The setting for including the showing of ads to those who are located within
+     * or interested in the campaign's targeted areas or only located within the targeted area.
+     * Defaults to PositiveGeoTargetTypeEnum.PositiveGeoTargetType.PRESENCE_OR_INTEREST_VALUE
+     *
+     * @see com.google.ads.googleads.v11.enums.PositiveGeoTargetTypeEnum.PositiveGeoTargetType
+     */
     private int positiveGeoTargetType = POSITIVE_GEO_TARGET_TYPE_PRESENCE_OR_INTEREST;
 
+    /**
+     * The setting for excluding the showing of ads to those who are located within
+     * or interested in the campaign's targeted areas or only located within the targeted area.
+     * Defaults to NegativeGeoTargetTypeEnum.NegativeGeoTargetType.PRESENCE
+     *
+     * @see com.google.ads.googleads.v11.enums.NegativeGeoTargetTypeEnum.NegativeGeoTargetType
+     */
     private int negativeGeoTargetType = NEGATIVE_GEO_TARGET_TYPE_PRESENCE;
 
+    /**
+     * The setting for enabling/disabling enhanced cost-per-click for the campaign.
+     * Defaults to false
+     */
     private boolean isEnhancedCpcEnabled = false;
 
+    /**
+     * The start date of the campaign.
+     * Format: yyyy-MM-dd
+     * Defaults to current date
+     */
     private String startDate = DateHelper.getCurrentDate();
 
+    /**
+     * The end date of the campaign.
+     * Format: yyyy-MM-dd
+     * Defaults to current date + 10 years
+     */
     private String endDate = DateHelper.getCurrentDatePlusYears(DEFAULT_ADDITIONAL_YEARS_CAMPAIGN_END_DATE);
 
-    private boolean isTargetingSearchNetwork = true;
+    /**
+     * Enabled if the campaign is to show ads on Google partner sites.
+     * If enabled, isTargetingGoogleSearchNetwork must also be true
+     * Defaults to false
+     */
+    private boolean isTargetingSearchNetwork = false;
 
+    /**
+     * Enabled if the campaign is to show ads on the Google Display network.
+     * Defaults to false
+     */
     private boolean isTargetingContentNetwork = false;
 
+    /**
+     * Enabled if the campaign will show ads on Google's search engine.
+     * Defaults to true
+     */
     private boolean isTargetingGoogleSearchNetwork = true;
 
+    /**
+     * The name of the budget resource. Auto-generates when the budget is created.
+     */
     private String budgetResourceName = "";
 
+    /**
+     * The details of the budget for the campaign
+     *
+     * @see BudgetDetails
+     */
     private BudgetDetails budgetDetails = new BudgetDetails();
 
+    /**
+     * The details of the targeting criterion for the campaign
+     *
+     * @see CriterionDetails
+     */
     private List<CriterionDetails> criterionDetailsList = new ArrayList<>();
 
     public long getCampaignId() {

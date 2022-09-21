@@ -19,6 +19,12 @@ import static com.addyai.utils.misc.Constants.CRITERION_TYPE_DEVICE;
 import static com.addyai.utils.misc.Constants.DEVICE_TYPE_DESKTOP;
 
 public class DeviceDetails extends CriterionDetails {
+    /**
+     * The type of device to be targeted.
+     * Defaults to DeviceEnum.Device.DESKTOP_VALUE
+     *
+     * @see com.google.ads.googleads.v11.enums.DeviceEnum.Device
+     */
     private int deviceType = DEVICE_TYPE_DESKTOP;
 
     @Override

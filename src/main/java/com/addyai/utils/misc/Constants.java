@@ -33,6 +33,8 @@ public class Constants {
     public static final String UNKNOWN_SERVICE_ERROR = "UNKNOWN_SERVICE_ERROR";
     public static final String RECORD_NOT_FOUND = "RECORD_NOT_FOUND";
 
+    public static final String MISSING_CUSTOMER_ID_ERR_CODE = "MISSING_CUSTOMER_ID";
+    public static final String MISSING_CUSTOMER_ID_ERR_MSG = "Customer ID is required";
     public static final String MISSING_PARAMS = "Missing Parameters";
 
     public static final String CAMPAIGN_ENABLED_STATUS = "ENABLED";

@@ -18,6 +18,13 @@ package com.addyai.models.campaign_criterion;
 import static com.addyai.utils.misc.Constants.LANGUAGE_CONSTANT_EN;
 
 public class LanguageDetails extends CriterionDetails {
+    /**
+     * The language code representing the target language.
+     * Defaults to "languagesConstants/1000" - English
+     * Format: languageConstants/{languageConstant}
+     *
+     * @see com.google.ads.googleads.v11.resources.LanguageConstant
+     */
     private String languageCode = LANGUAGE_CONSTANT_EN;
 
     public String getLanguageCode() {

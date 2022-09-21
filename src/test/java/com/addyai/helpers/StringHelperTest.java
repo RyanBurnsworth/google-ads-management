@@ -32,10 +32,26 @@ public class StringHelperTest {
     }
 
     @Test
+    void testFindPositionOfCharInStringReturnsUnsuccessful() {
+        String testString = "NestleQuik";
+        int positionOfQ = StringHelper.findPositionOfCharInString(testString, 'K');
+
+        assertEquals(-1, positionOfQ);
+    }
+
+    @Test
     void testCleanErrorCode() {
         String errorCodeString = "campaignError: Duplicate campaign name\n";
         String cleanString = StringHelper.doCleanErrorCode(errorCodeString);
 
         assertEquals("Duplicate campaign name", cleanString);
+    }
+
+    @Test
+    void testCleanErrorCodeReturnsEmptyStringWhenInvalidErrorCode() {
+        String errorCodeString = "this is an invalid error code";
+        String cleanString = StringHelper.doCleanErrorCode(errorCodeString);
+
+        assertEquals("", cleanString);
     }
 }

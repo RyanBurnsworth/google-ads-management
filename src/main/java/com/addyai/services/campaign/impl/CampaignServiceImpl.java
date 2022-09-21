@@ -15,6 +15,8 @@
 
 package com.addyai.services.campaign.impl;
 
+import com.addyai.builder.OperationBuilder;
+import com.addyai.builder.impl.OperationBuilderImpl;
 import com.addyai.enums.OperationType;
 import com.addyai.error_handling.ValidationErrorResponse;
 import com.addyai.error_handling.exceptions.InvalidRequestException;
@@ -25,8 +27,6 @@ import com.addyai.repos.campaigns.CampaignRepository;
 import com.addyai.repos.campaigns.budget.CampaignBudgetRepository;
 import com.addyai.repos.campaigns.criterion.CriterionRepository;
 import com.addyai.services.campaign.CampaignService;
-import com.addyai.builder.OperationBuilder;
-import com.addyai.builder.impl.OperationBuilderImpl;
 import com.addyai.utils.validators.EntityValidator;
 import com.google.ads.googleads.v11.services.CampaignBudgetOperation;
 import com.google.ads.googleads.v11.services.CampaignCriterionOperation;

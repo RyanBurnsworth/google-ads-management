@@ -21,18 +21,51 @@ import static com.addyai.utils.misc.Constants.BUDGET_DELIVERY_METHOD_STANDARD;
 import static com.addyai.utils.misc.Constants.BUDGET_STATUS_ENABLED;
 
 public class BudgetDetails {
+    /**
+     * The identifier for the budget. Auto-generates when the budget is created.
+     */
     private long budgetId = 0L;
 
+    /**
+     * The name of the budget.
+     * Defaults to current time as epoch string
+     */
     private String name = DateHelper.getCurrentEpochTimeAsString();
 
+    /**
+     * The budget's resource name. Auto-generates when the budget is created.
+     * Format: <b>/customers/{customerId}/campaignBudgets/{campaignBudgetId}</b>
+     */
     private String resourceName = "";
 
+    /**
+     * The ad delivery method. STANDARD spreads the showing of the campaign's ads
+     * throughout the day to refrain from quickly exhausting the budget. ACCELERATED
+     * will show ads at every chance until the budget is exhausted for the day.
+     * Defaults to BudgetDeliveryMethodEnum.BudgetDeliveryMethod.STANDARD_VALUE
+     *
+     * @see com.google.ads.googleads.v11.enums.BudgetDeliveryMethodEnum.BudgetDeliveryMethod
+     */
     private int deliveryMethod = BUDGET_DELIVERY_METHOD_STANDARD;
 
+    /**
+     * Enabled if this budget is shared by multiple campaigns.
+     * Disabled if this budget is only used by one campaign.
+     * Default is false (disabled)
+     */
     private boolean isShared = false;
 
+    /**
+     * The amount of daily budget for the campaign.
+     */
     private int dailyBudgetAmount = 0;
 
+    /**
+     * The status of the budget
+     * Default is BudgetStatusEnum.BudgetStatus.ENABLED_VALUE
+     *
+     * @see com.google.ads.googleads.v11.enums.BudgetStatusEnum.BudgetStatus
+     */
     private int status = BUDGET_STATUS_ENABLED;
 
     public long getBudgetId() {

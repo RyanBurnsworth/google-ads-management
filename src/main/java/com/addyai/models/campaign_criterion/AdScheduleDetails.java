@@ -18,16 +18,42 @@ package com.addyai.models.campaign_criterion;
 import static com.addyai.utils.misc.Constants.*;
 
 public class AdScheduleDetails extends CriterionDetails {
-    private int dayOfWeek = DAY_OF_WEEK_SUNDAY;
+    /**
+     * The day of the week the ad scheduling is targeting.
+     * Defaults to DayOfWeekEnum.DayOfWeek.THURSDAY_VALUE
+     *
+     * @see com.google.ads.googleads.v11.enums.DayOfWeekEnum.DayOfWeek
+     */
+    private int dayOfWeek = DAY_OF_WEEK_THURSDAY;
 
-    // Must be between 0 and 24
+    /**
+     * The hour the ad schedule should start targeting.
+     * Must be a value between 0 and 23
+     * Defaults to 0
+     */
     private int startHour = 0;
 
-    // must be between 0 and 24
+    /**
+     * The hour the ad scheduling should stop targeting.
+     * Must be a value between 0 and 23
+     * Defaults to 23
+     */
     private int endHour = 23;
 
+    /**
+     * The minute the ad scheduling should start targeting.
+     * Defaults to MinuteOfHourEnum.MinuteOfHour.ZERO_VALUE
+     *
+     * @see com.google.ads.googleads.v11.enums.MinuteOfHourEnum.MinuteOfHour
+     */
     private int startMinute = MINUTE_OF_HOUR_ZERO;
 
+    /**
+     * The minute the ad scheduling should stop targeting..
+     * Defaults to MinuteOfHourEnum.MinuteOfHour.FORTY_FIVE_VALUE
+     *
+     * @see com.google.ads.googleads.v11.enums.MinuteOfHourEnum.MinuteOfHour
+     */
     private int endMinute = MINUTE_OF_HOUR_FORTY_FIVE;
 
     @Override
