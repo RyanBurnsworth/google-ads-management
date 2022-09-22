@@ -360,8 +360,7 @@ public class EntityValidator {
                     INVALID_PROXIMITY_DETAILS_ERR_CODE,
                     GENERAL_BID_MODIFIER_PLUS_NEGATIVE);
         } else if ((proximityDetails.getMicroLatitude() > 0 && proximityDetails.getMicroLongitude() == 0) ||
-                (proximityDetails.getMicroLatitude() == 0 && proximityDetails.getMicroLongitude() > 0) ||
-                proximityDetails.getMicroLongitude() < 0 || proximityDetails.getMicroLatitude() < 0) {
+                (proximityDetails.getMicroLatitude() == 0 && proximityDetails.getMicroLongitude() > 0)) {
             return new ValidationErrorResponse(
                     INVALID_PROXIMITY_DETAILS_ERR_CODE,
                     INVALID_PROXIMITY_LONGITUDE_LATITUDE_ERR_MSG);

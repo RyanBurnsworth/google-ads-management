@@ -666,52 +666,6 @@ public class EntityValidatorTest {
     }
 
     @Test
-    void testProximityDetailsInvalidCoordinates3ReturnValidationError() {
-        List<CriterionDetails> criterionDetailsList =
-                testUtils.getMockCriterionMapping().get(MOCK_CAMPAIGN_RESOURCE_NAME);
-
-        List<CriterionDetails> singleCriterionDetailsList = new ArrayList<>();
-
-        ProximityDetails proximityDetails = ((ProximityDetails) criterionDetailsList.get(3));
-        proximityDetails.setStreetAddress("");
-        proximityDetails.setPostalCode("");
-        proximityDetails.setCityName("");
-        proximityDetails.setMicroLatitude(-10);
-        proximityDetails.setMicroLongitude(10);
-        singleCriterionDetailsList.add(proximityDetails);
-
-        ValidationErrorResponse validationErrorResponse =
-                EntityValidator.isCriterionDetailsValid(singleCriterionDetailsList);
-
-        assert validationErrorResponse != null;
-        assertEquals(INVALID_PROXIMITY_DETAILS_ERR_CODE, validationErrorResponse.getErrorCode());
-        assertEquals(INVALID_PROXIMITY_LONGITUDE_LATITUDE_ERR_MSG, validationErrorResponse.getErrorMessage());
-    }
-
-    @Test
-    void testProximityDetailsInvalidCoordinates4ReturnValidationError() {
-        List<CriterionDetails> criterionDetailsList =
-                testUtils.getMockCriterionMapping().get(MOCK_CAMPAIGN_RESOURCE_NAME);
-
-        List<CriterionDetails> singleCriterionDetailsList = new ArrayList<>();
-
-        ProximityDetails proximityDetails = ((ProximityDetails) criterionDetailsList.get(3));
-        proximityDetails.setStreetAddress("");
-        proximityDetails.setPostalCode("");
-        proximityDetails.setCityName("");
-        proximityDetails.setMicroLatitude(0);
-        proximityDetails.setMicroLongitude(-10);
-        singleCriterionDetailsList.add(proximityDetails);
-
-        ValidationErrorResponse validationErrorResponse =
-                EntityValidator.isCriterionDetailsValid(singleCriterionDetailsList);
-
-        assert validationErrorResponse != null;
-        assertEquals(INVALID_PROXIMITY_DETAILS_ERR_CODE, validationErrorResponse.getErrorCode());
-        assertEquals(INVALID_PROXIMITY_LONGITUDE_LATITUDE_ERR_MSG, validationErrorResponse.getErrorMessage());
-    }
-
-    @Test
     void testNegativeKeywordDetailsInvalidStatusReturnValidationError() {
         List<CriterionDetails> criterionDetailsList =
                 testUtils.getMockCriterionMapping().get(MOCK_CAMPAIGN_RESOURCE_NAME);
