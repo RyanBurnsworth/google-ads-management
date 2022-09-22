@@ -136,7 +136,7 @@ public class GoogleAdsRowAdapterImplTest {
         assertEquals(proximityDetails.getProvinceName(), MOCK_PROVINCE_NAME);
         assertEquals(proximityDetails.getRadius(), PROXIMITY_RADIUS);
         assertEquals(proximityDetails.getRadiusUnits(), RADIUS_UNITS_MILES);
-        assertEquals(proximityDetails.getMicroLatitude(), MOCK_LATITUDE);
+        assertEquals(MOCK_LATITUDE, proximityDetails.getMicroLatitude());
         assertEquals(proximityDetails.getMicroLongitude(), MOCK_LONGITUDE);
     }
 

@@ -56,8 +56,8 @@ public class TestUtils {
     public static final String MOCK_PROVINCE_NAME = "Codeland";
     public static final String MOCK_STREET_ADDR = "123 Programming Lane";
     public static final String MOCK_POSTAL_CODE = "12345";
-    public static final int MOCK_LATITUDE = 80;
-    public static final int MOCK_LONGITUDE = 80;
+    public static final float MOCK_LATITUDE = 80.0f;
+    public static final float MOCK_LONGITUDE = 80.0f;
 
     public static final String MOCK_LOCATION_GEO_TARGET_CONSTANT = "locations/1000";
 
@@ -336,8 +336,8 @@ public class TestUtils {
 
     private GeoPointInfo getMockGeoPointInfo() {
         return GeoPointInfo.newBuilder()
-                .setLatitudeInMicroDegrees(MOCK_LATITUDE)
-                .setLongitudeInMicroDegrees(MOCK_LONGITUDE)
+                .setLatitudeInMicroDegrees(Math.round(MOCK_LATITUDE * MICRO_FACTOR))
+                .setLongitudeInMicroDegrees(Math.round(MOCK_LONGITUDE * MICRO_FACTOR))
                 .build();
     }
 }

@@ -68,7 +68,6 @@ public class EntityValidator {
     public static final String INVALID_EMPTY_LOCATION_ERR_MSG = "Location cannot be empty";
     public static final String INVALID_LOCATION_VALUE_ERR_MSG = "Invalid location value";
     public static final String INVALID_PROXIMITY_LONGITUDE_LATITUDE_ERR_MSG = "Invalid values for microLongitude and/or microLatitude";
-    public static final String INVALID_PROXIMITY_COORDS_ADDRESS_SIMULTANEOUS_ERR_MSG = "Cannot set proximity target for geo coordinates and address at the same time";
     public static final String INVALID_PROXIMITY_CITY_NAME_VALUE_ERR_MSG = "Invalid city name value";
     public static final String INVALID_PROXIMITY_POSTAL_CODE_VALUE_ERR_MSG = "Invalid postal code value";
     public static final String INVALID_PROXIMITY_GEO_COORDS_ERR_MSG = "Invalid longitude or latitude coordinates";
@@ -364,12 +363,6 @@ public class EntityValidator {
             return new ValidationErrorResponse(
                     INVALID_PROXIMITY_DETAILS_ERR_CODE,
                     INVALID_PROXIMITY_LONGITUDE_LATITUDE_ERR_MSG);
-        } else if ((proximityDetails.getMicroLongitude() != 0 || proximityDetails.getMicroLatitude() != 0) &&
-                (!proximityDetails.getStreetAddress().isEmpty() || !proximityDetails.getCityName().isEmpty() ||
-                        !proximityDetails.getProvinceName().isEmpty() || !proximityDetails.getPostalCode().isEmpty())) {
-            return new ValidationErrorResponse(
-                    INVALID_PROXIMITY_DETAILS_ERR_CODE,
-                    INVALID_PROXIMITY_COORDS_ADDRESS_SIMULTANEOUS_ERR_MSG);
         } else if (!proximityDetails.getCityName().isEmpty() &&
                 NumberValidator.containsDigits(proximityDetails.getCityName())) {
             return new ValidationErrorResponse(

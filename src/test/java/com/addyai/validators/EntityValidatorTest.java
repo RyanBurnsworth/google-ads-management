@@ -503,26 +503,6 @@ public class EntityValidatorTest {
     }
 
     @Test
-    void testProximityDetailsInvalidCoordsAndLocationReturnValidationError() {
-        List<CriterionDetails> criterionDetailsList =
-                testUtils.getMockCriterionMapping().get(MOCK_CAMPAIGN_RESOURCE_NAME);
-
-        List<CriterionDetails> singleCriterionDetailsList = new ArrayList<>();
-
-        ProximityDetails proximityDetails = ((ProximityDetails) criterionDetailsList.get(3));
-        proximityDetails.setMicroLongitude(75);
-        proximityDetails.setMicroLatitude(75);
-        singleCriterionDetailsList.add(proximityDetails);
-
-        ValidationErrorResponse validationErrorResponse =
-                EntityValidator.isCriterionDetailsValid(singleCriterionDetailsList);
-
-        assert validationErrorResponse != null;
-        assertEquals(INVALID_PROXIMITY_DETAILS_ERR_CODE, validationErrorResponse.getErrorCode());
-        assertEquals(INVALID_PROXIMITY_COORDS_ADDRESS_SIMULTANEOUS_ERR_MSG, validationErrorResponse.getErrorMessage());
-    }
-
-    @Test
     void testProximityDetailsMissingLocationDetailsReturnValidationError() {
         List<CriterionDetails> criterionDetailsList =
                 testUtils.getMockCriterionMapping().get(MOCK_CAMPAIGN_RESOURCE_NAME);

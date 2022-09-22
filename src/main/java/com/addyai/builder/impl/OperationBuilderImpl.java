@@ -141,8 +141,7 @@ public class OperationBuilderImpl implements OperationBuilder {
                         campaignCriterionBuilder.setBidModifier(criterionDetails.getBidModifier());
 
                     campaignCriterionBuilder
-                            .setAdSchedule(adScheduleInfo)
-                            .setCampaign(criterionDetails.getCampaignResourceName());
+                            .setAdSchedule(adScheduleInfo);
 
                 } else if (criterionDetails instanceof NegativeKeywordDetails) {
                     // create a keyword info object for campaign criterion
@@ -168,8 +167,7 @@ public class OperationBuilderImpl implements OperationBuilder {
                         campaignCriterionBuilder.setNegative(true);
 
                     campaignCriterionBuilder
-                            .setLanguage(languageInfo)
-                            .setCampaign(criterionDetails.getCampaignResourceName());
+                            .setLanguage(languageInfo);
 
                 } else if (criterionDetails instanceof DeviceDetails) {
                     // create device info object for campaign criterion
@@ -177,8 +175,7 @@ public class OperationBuilderImpl implements OperationBuilder {
 
                     campaignCriterionBuilder
                             .setDevice(deviceInfo)
-                            .setBidModifier(criterionDetails.getBidModifier()) // always set for DeviceInfo
-                            .setCampaign(criterionDetails.getCampaignResourceName());
+                            .setBidModifier(criterionDetails.getBidModifier()); // always set for DeviceInfo
 
                 } else if (criterionDetails instanceof LocationDetails) {
                     // create location info object for campaign criterion
@@ -197,8 +194,7 @@ public class OperationBuilderImpl implements OperationBuilder {
                         campaignCriterionBuilder.setBidModifier(locationDetails.getBidModifier());
 
                     campaignCriterionBuilder
-                            .setLocation(locationInfo)
-                            .setCampaign(criterionDetails.getCampaignResourceName());
+                            .setLocation(locationInfo);
 
                 } else if (criterionDetails instanceof ProximityDetails) {
                     // create proximity info for campaign criterion
@@ -213,13 +209,16 @@ public class OperationBuilderImpl implements OperationBuilder {
 
                     // create the campaign criterion object from the details
                     campaignCriterionBuilder
-                            .setCampaign(criterionDetails.getCampaignResourceName())
                             .setProximity(proximityInfoBuilder.build());
                 }
 
+                if (operationType.equals(OperationType.CREATE))
+                    campaignCriterionBuilder.setCampaign(campaignResourceName);
+                else if (operationType.equals(OperationType.UPDATE))
+                    campaignCriterionBuilder.setResourceName(criterionDetails.getCriterionResourceName());
+
                 // build campaign criterion object
                 CampaignCriterion campaignCriterion = campaignCriterionBuilder
-                        .setCampaign(campaignResourceName)
                         .setStatus(CampaignCriterionStatusEnum.CampaignCriterionStatus.ENABLED)
                         .build();
 
@@ -412,9 +411,10 @@ public class OperationBuilderImpl implements OperationBuilder {
             proximityInfoBuilder.setAddress(addressInfoBuilder.build());
         }
 
-        // if the latitude and longitude are set, create and set the geopoints info object
+        // if the latitude and longitude are set and the address is not set, create and set the geopoints info object
         if (proximityDetails.getMicroLatitude() != 0 &&
-                proximityDetails.getMicroLongitude() != 0) {
+                proximityDetails.getMicroLongitude() != 0 &&
+                !proximityInfoBuilder.hasAddress()) {
 
             // convert longitude and latitude to micro degrees
             int longitude = Math.round(proximityDetails.getMicroLongitude() * MICRO_FACTOR);

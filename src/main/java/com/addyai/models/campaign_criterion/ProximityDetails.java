@@ -90,7 +90,7 @@ public class ProximityDetails extends CriterionDetails {
         return microLongitude;
     }
 
-    public void setMicroLongitude(int microLongitude) {
+    public void setMicroLongitude(float microLongitude) {
         this.microLongitude = microLongitude;
     }
 
@@ -98,7 +98,7 @@ public class ProximityDetails extends CriterionDetails {
         return microLatitude;
     }
 
-    public void setMicroLatitude(int microLatitude) {
+    public void setMicroLatitude(float microLatitude) {
         this.microLatitude = microLatitude;
     }
 

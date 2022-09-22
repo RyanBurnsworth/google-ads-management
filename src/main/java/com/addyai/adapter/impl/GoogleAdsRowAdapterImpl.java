@@ -108,8 +108,18 @@ public class GoogleAdsRowAdapterImpl implements GoogleAdsRowAdapter {
         proximityDetails.setPostalCode(googleAdsRow.getCampaignCriterion().getProximity().getAddress().getPostalCode());
         proximityDetails.setProvinceCode(googleAdsRow.getCampaignCriterion().getProximity().getAddress().getProvinceCode());
         proximityDetails.setCountryCode(googleAdsRow.getCampaignCriterion().getProximity().getAddress().getCountryCode());
-        proximityDetails.setMicroLongitude(googleAdsRow.getCampaignCriterion().getProximity().getGeoPoint().getLongitudeInMicroDegrees());
-        proximityDetails.setMicroLatitude(googleAdsRow.getCampaignCriterion().getProximity().getGeoPoint().getLatitudeInMicroDegrees());
+        proximityDetails.setMicroLongitude(
+                Math.round((float) googleAdsRow
+                                .getCampaignCriterion()
+                                .getProximity()
+                                .getGeoPoint()
+                                .getLongitudeInMicroDegrees() / MICRO_FACTOR));
+        proximityDetails.setMicroLatitude(
+                Math.round((float) googleAdsRow
+                                .getCampaignCriterion()
+                                .getProximity()
+                                .getGeoPoint()
+                                .getLatitudeInMicroDegrees() / MICRO_FACTOR));
         proximityDetails.setRadius(googleAdsRow.getCampaignCriterion().getProximity().getRadius());
         proximityDetails.setRadiusUnits(googleAdsRow.getCampaignCriterion().getProximity().getRadiusUnitsValue());
 
@@ -127,6 +137,11 @@ public class GoogleAdsRowAdapterImpl implements GoogleAdsRowAdapter {
         locationDetails.setNegative(googleAdsRow.getCampaignCriterion().getNegative());
         locationDetails.setGeoTargetingConstant(googleAdsRow.getCampaignCriterion().getLocation().getGeoTargetConstant());
 
+        // Google Ads adds location targets that the user doesn't specify. These cannot be removed or updated.
+        // These will have an empty geo-targeting constant. Do not add to list to refrain from confusion.
+        if (locationDetails.getGeoTargetingConstant().isEmpty())
+            return null;
+
         return locationDetails;
     }
 
@@ -139,6 +154,11 @@ public class GoogleAdsRowAdapterImpl implements GoogleAdsRowAdapter {
         languageDetails.setCampaignResourceName(googleAdsRow.getCampaignCriterion().getCampaign());
         languageDetails.setStatus(googleAdsRow.getCampaignCriterion().getStatusValue());
         languageDetails.setLanguageCode(googleAdsRow.getCampaignCriterion().getLanguage().getLanguageConstant());
+
+        // Google Ads adds language targets that the user doesn't specify. These cannot be removed or updated.
+        // These will have an empty language code. Do not add to list to refrain from confusion.
+        if (languageDetails.getLanguageCode().isEmpty())
+            return null;
 
         return languageDetails;
     }

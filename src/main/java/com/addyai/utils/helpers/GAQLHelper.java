@@ -227,14 +227,17 @@ public class GAQLHelper {
                         break;
                     case LANGUAGE:
                         LanguageDetails languageDetails = googleAdsRowAdapter.getLanguageDetails(googleAdsRow);
-                        criterionDetailsList.add(languageDetails);
+                        if (languageDetails != null)
+                            criterionDetailsList.add(languageDetails);
                         break;
                     case LOCATION:
                         LocationDetails locationDetails = googleAdsRowAdapter.getLocationDetails(googleAdsRow);
-                        criterionDetailsList.add(locationDetails);
+                        if (locationDetails != null)
+                            criterionDetailsList.add(locationDetails);
                         break;
                     case PROXIMITY:
-                        ProximityDetails proximityDetails = googleAdsRowAdapter.getProximityDetails(googleAdsRow);
+                        ProximityDetails proximityDetails =
+                                googleAdsRowAdapter.getProximityDetails(googleAdsRow);
                         criterionDetailsList.add(proximityDetails);
                         break;
                     default:

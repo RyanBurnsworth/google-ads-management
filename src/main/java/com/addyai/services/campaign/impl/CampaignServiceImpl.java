@@ -23,6 +23,7 @@ import com.addyai.error_handling.exceptions.InvalidRequestException;
 import com.addyai.models.BudgetDetails;
 import com.addyai.models.CampaignDetails;
 import com.addyai.models.campaign_criterion.CriterionDetails;
+import com.addyai.models.campaign_criterion.DeviceDetails;
 import com.addyai.repos.campaigns.CampaignRepository;
 import com.addyai.repos.campaigns.budget.CampaignBudgetRepository;
 import com.addyai.repos.campaigns.criterion.CriterionRepository;
@@ -71,15 +72,7 @@ public class CampaignServiceImpl implements CampaignService {
         List<String> campaignResourceNameList =
                 campaignRepository.performCampaignOperations(customerId, campaignOperationList);
 
-        // TODO: update location geo target
-
-        Map<String, List<CriterionDetails>> mapping =
-                buildCampaignResNameToCriterionMapping(campaignResourceNameList, campaignDetailsList);
-
-        List<CampaignCriterionOperation> campaignCriterionOperationList = operationBuilder
-                .buildCampaignCriterionOperationList(mapping, operationType);
-
-        criterionRepository.performCriterionOperations(customerId, campaignCriterionOperationList);
+        associateCriterionToCampaigns(customerId, campaignDetailsList, campaignResourceNameList, operationType);
     }
 
     /**
@@ -176,6 +169,56 @@ public class CampaignServiceImpl implements CampaignService {
             updateCampaignDetailsList.add(campaignDetails);
         }
         return updateCampaignDetailsList;
+    }
+
+    private void associateCriterionToCampaigns(long customerId,
+                                               List<CampaignDetails> campaignDetailsList,
+                                               List<String> campaignResourceNameList,
+                                               OperationType operationType) throws Exception {
+        // to update criterion, first delete all user-created criterion and created new from list
+        if (operationType.equals(OperationType.UPDATE)) {
+            List<String> criterionResourceNameList = new ArrayList<>();
+
+            // gather the resource names of user-created criterion to be removed from campaigns
+            campaignResourceNameList.forEach((resourceName) -> {
+                // fetch the existing criterion for the given campaign
+                List<CriterionDetails> criterionDetailsList = criterionRepository.fetchCampaignCriterionDetails(
+                        customerId, resourceName);
+
+                // for each object that is not DeviceDetails, add its resource name to the list for removal
+                criterionDetailsList.forEach((criterionDetails) -> {
+                    if (!(criterionDetails instanceof DeviceDetails))
+                        criterionResourceNameList.add(criterionDetails.getCriterionResourceName());
+                });
+            });
+
+            // create a list of campaign criterion operations to remove the non-device criterion from campaigns
+            List<CampaignCriterionOperation> campaignCriterionOperationList = new ArrayList<>();
+            criterionResourceNameList.forEach((resName) -> {
+                CampaignCriterionOperation campaignCriterionOperation = CampaignCriterionOperation.newBuilder()
+                        .setRemove(resName)
+                        .build();
+                campaignCriterionOperationList.add(campaignCriterionOperation);
+            });
+
+            // perform the criterion removal operations
+            if (!campaignCriterionOperationList.isEmpty())
+                criterionRepository.performCriterionOperations(customerId, campaignCriterionOperationList);
+
+            // update the operation type to CREATE the new campaign criterion
+            operationType = OperationType.CREATE;
+        }
+
+        // create a mapping from campaignResourceName -> campaignCriterionList
+        Map<String, List<CriterionDetails>> mapping =
+                buildCampaignResNameToCriterionMapping(campaignResourceNameList, campaignDetailsList);
+
+        // create a list of campaign criterion CREATE operations
+        List<CampaignCriterionOperation> campaignCriterionOperationList = operationBuilder
+                .buildCampaignCriterionOperationList(mapping, operationType);
+
+        // perform the criterion CREATE operations
+        criterionRepository.performCriterionOperations(customerId, campaignCriterionOperationList);
     }
 
     private BudgetDetails findBudgetDetailsByResourceName(String resourceName, List<BudgetDetails> budgetDetailsList) {
