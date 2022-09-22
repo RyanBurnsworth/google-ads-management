@@ -17,6 +17,8 @@ package com.addyai.models;
 
 import com.addyai.models.campaign_criterion.CriterionDetails;
 import com.addyai.utils.helpers.DateHelper;
+import com.google.ads.googleads.v11.enums.AdvertisingChannelTypeEnum;
+import com.google.ads.googleads.v11.enums.CampaignStatusEnum;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -46,7 +48,7 @@ public class CampaignDetails {
      * This status can be "ENABLED", "PAUSED" or "REMOVED".
      * Defaults to "PAUSED"
      */
-    private String status = "PAUSED"; // TODO: update to use integer value
+    private int status = CampaignStatusEnum.CampaignStatus.ENABLED_VALUE;
 
     /**
      * The advertising channel type for the campaign.
@@ -54,7 +56,7 @@ public class CampaignDetails {
      * @see <a href="https://developers.google.com/google-ads/api/reference/rpc/v11/AdvertisingChannelTypeEnum.AdvertisingChannelType">Advertising Channel Types</a>
      * Defaults to "SEARCH"
      */
-    private String advertisingChannelType = ADVERTISING_TYPE_SEARCH; //TODO: update to use integer value
+    private int advertisingChannelType = AdvertisingChannelTypeEnum.AdvertisingChannelType.SEARCH_VALUE;
 
     /**
      * The setting for including the showing of ads to those who are located within
@@ -156,19 +158,19 @@ public class CampaignDetails {
         this.campaignResourceName = campaignResourceName;
     }
 
-    public String getStatus() {
+    public int getStatus() {
         return status;
     }
 
-    public void setStatus(String status) {
+    public void setStatus(int status) {
         this.status = status;
     }
 
-    public String getAdvertisingChannelType() {
+    public int getAdvertisingChannelType() {
         return advertisingChannelType;
     }
 
-    public void setAdvertisingChannelType(String advertisingChannelType) {
+    public void setAdvertisingChannelType(int advertisingChannelType) {
         this.advertisingChannelType = advertisingChannelType;
     }
 

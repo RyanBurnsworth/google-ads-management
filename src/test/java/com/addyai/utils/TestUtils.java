@@ -187,10 +187,10 @@ public class TestUtils {
     public CampaignDetails getMockCampaignDetails() {
         CampaignDetails mockCampaignDetails = new CampaignDetails();
         mockCampaignDetails.setCampaignName(MOCK_CAMPAIGN_NAME);
-        mockCampaignDetails.setStatus(CAMPAIGN_ENABLED_STATUS);
+        mockCampaignDetails.setStatus(CampaignStatusEnum.CampaignStatus.ENABLED_VALUE);
         mockCampaignDetails.setNegativeGeoTargetType(NegativeGeoTargetTypeEnum.NegativeGeoTargetType.PRESENCE_VALUE);
         mockCampaignDetails.setPositiveGeoTargetType(PositiveGeoTargetTypeEnum.PositiveGeoTargetType.PRESENCE_VALUE);
-        mockCampaignDetails.setAdvertisingChannelType(ADVERTISING_TYPE_SEARCH);
+        mockCampaignDetails.setAdvertisingChannelType(AdvertisingChannelTypeEnum.AdvertisingChannelType.SEARCH_VALUE);
         mockCampaignDetails.setTargetingContentNetwork(false);
         mockCampaignDetails.setTargetingSearchNetwork(true);
         mockCampaignDetails.setTargetingGoogleSearchNetwork(true);
@@ -227,6 +227,7 @@ public class TestUtils {
         List<CriterionDetails> criterionDetailsList = new ArrayList<>();
 
         AdScheduleDetails adScheduleDetails = new AdScheduleDetails();
+        adScheduleDetails.setCriterionType(CRITERION_TYPE_AD_SCHEDULE);
         adScheduleDetails.setDayOfWeek(DAY_OF_WEEK_MONDAY);
         adScheduleDetails.setStartHour(0);
         adScheduleDetails.setEndHour(23);
@@ -239,6 +240,7 @@ public class TestUtils {
         criterionDetailsList.add(adScheduleDetails);
 
         AdScheduleDetails adScheduleDetails2 = new AdScheduleDetails();
+        adScheduleDetails.setCriterionType(CRITERION_TYPE_AD_SCHEDULE);
         adScheduleDetails2.setDayOfWeek(DAY_OF_WEEK_TUESDAY);
         adScheduleDetails2.setStartHour(0);
         adScheduleDetails2.setEndHour(23);
@@ -248,11 +250,13 @@ public class TestUtils {
         criterionDetailsList.add(adScheduleDetails2);
 
         NegativeKeywordDetails negativeKeywordDetails = new NegativeKeywordDetails();
+        negativeKeywordDetails.setCriterionType(CRITERION_TYPE_KEYWORD);
         negativeKeywordDetails.setKeywordText(MOCK_KEYWORD_TEXT);
         negativeKeywordDetails.setKeywordMatchType(KEYWORD_MATCH_TYPE_BROAD);
         criterionDetailsList.add(negativeKeywordDetails);
 
         ProximityDetails proximityDetails1 = new ProximityDetails();
+        proximityDetails1.setCriterionType(CRITERION_TYPE_PROXIMITY);
         proximityDetails1.setBidModifier(MOCK_BID_MODIFIER);
         proximityDetails1.setCountryCode("US");
         proximityDetails1.setRadius(10);
@@ -264,6 +268,7 @@ public class TestUtils {
         criterionDetailsList.add(proximityDetails1);
 
         ProximityDetails proximityDetails2 = new ProximityDetails();
+        proximityDetails2.setCriterionType(CRITERION_TYPE_PROXIMITY);
         proximityDetails2.setCountryCode("US");
         proximityDetails2.setRadius(10);
         proximityDetails2.setRadiusUnits(RADIUS_UNITS_MILES);
@@ -277,10 +282,12 @@ public class TestUtils {
         criterionDetailsList.add(deviceDetails);
 
         LanguageDetails languageDetails = new LanguageDetails();
+        languageDetails.setCriterionType(CRITERION_TYPE_LANGUAGE);
         languageDetails.setLanguageCode(MOCK_LANGUAGE_CONSTANT);
         criterionDetailsList.add(languageDetails);
 
         LocationDetails locationDetails = new LocationDetails();
+        locationDetails.setCriterionType(CRITERION_TYPE_LOCATION);
         locationDetails.setNegative(true);
         locationDetails.setGeoTargetingConstant(MOCK_LOCATION_GEO_TARGET_CONSTANT);
         locationDetails.setLocale("en");
@@ -288,6 +295,7 @@ public class TestUtils {
         criterionDetailsList.add(locationDetails);
 
         LocationDetails locationDetails2 = new LocationDetails();
+        locationDetails2.setCriterionType(CRITERION_TYPE_LOCATION);
         locationDetails2.setNegative(false);
         locationDetails2.setGeoTargetingConstant(MOCK_LOCATION_GEO_TARGET_CONSTANT);
         locationDetails2.setLocale("en");

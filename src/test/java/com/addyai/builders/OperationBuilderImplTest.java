@@ -61,7 +61,7 @@ public class OperationBuilderImplTest {
         Campaign actualCampaign = campaignOperationList.get(0).getCreate();
 
         assertEquals(MOCK_CAMPAIGN_NAME, actualCampaign.getName());
-        assertEquals(ADVERTISING_TYPE_SEARCH, actualCampaign.getAdvertisingChannelType().toString()); // ONLY IN CREATE
+        assertEquals(ADVERTISING_CHANNEL_TYPE_SEARCH, actualCampaign.getAdvertisingChannelTypeValue()); // ONLY IN CREATE
         assertEquals(MOCK_CAMPAIGN_START_DATE, actualCampaign.getStartDate());
         assertEquals(MOCK_CAMPAIGN_END_DATE, actualCampaign.getEndDate());
         assertEquals(PRESENCE, actualCampaign.getGeoTargetTypeSetting().getPositiveGeoTargetType());

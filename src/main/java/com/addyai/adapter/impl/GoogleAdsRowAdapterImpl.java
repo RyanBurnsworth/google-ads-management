@@ -31,8 +31,8 @@ public class GoogleAdsRowAdapterImpl implements GoogleAdsRowAdapter {
         details.setCampaignId(googleAdsRow.getCampaign().getId());
         details.setCampaignName(googleAdsRow.getCampaign().getName());
         details.setCampaignResourceName(googleAdsRow.getCampaign().getResourceName());
-        details.setStatus(googleAdsRow.getCampaign().getStatus().toString());
-        details.setAdvertisingChannelType(googleAdsRow.getCampaign().getAdvertisingChannelType().toString());
+        details.setStatus(googleAdsRow.getCampaign().getStatusValue());
+        details.setAdvertisingChannelType(googleAdsRow.getCampaign().getAdvertisingChannelTypeValue());
         details.setPositiveGeoTargetType(googleAdsRow.getCampaign().getGeoTargetTypeSetting().getPositiveGeoTargetTypeValue());
         details.setNegativeGeoTargetType(googleAdsRow.getCampaign().getGeoTargetTypeSetting().getNegativeGeoTargetTypeValue());
         details.setEnhancedCpcEnabled(googleAdsRow.getCampaign().getManualCpc().getEnhancedCpcEnabled());

@@ -19,6 +19,7 @@ import com.addyai.error_handling.ValidationErrorResponse;
 import com.addyai.models.BudgetDetails;
 import com.addyai.models.CampaignDetails;
 import com.addyai.models.campaign_criterion.*;
+import com.google.ads.googleads.v11.enums.CampaignStatusEnum;
 
 import java.time.format.DateTimeFormatter;
 import java.time.format.ResolverStyle;
@@ -39,7 +40,6 @@ public class EntityValidator {
 
     public static final String GENERAL_NAME_EMPTY_ERR_MSG = "Name field cannot be empty";
     public static final String GENERAL_INVALID_STATUS_ERR_MSG = "Status field is invalid";
-    public static final String GENERAL_INVALID_CRITERION_TYPE_ERR_MSG = "Invalid criterion type";
     public static final String GENERAL_BID_MODIFIER_OUT_OF_RANGE = "Bid modifier out of range. Must be between 0.0 and 10.0";
     public static final String GENERAL_BID_MODIFIER_PLUS_NEGATIVE = "Cannot set a bid-modifier on a negative target";
 
@@ -57,7 +57,7 @@ public class EntityValidator {
     public static final String NEGATIVE_KEYWORD_TEXT_EMPTY_ERR_MSG = "Negative keyword text cannot be empty";
     public static final String NEGATIVE_KEYWORD_INVALID_MATCH_TYPE_ERR_MSG = "Invalid match type. Must be BROAD, PHRASE OR EXACT";
 
-    public static final String INVALID_DEVICE_DETAILS_ERR_MSG = "Missing device type";
+    public static final String INVALID_DEVICE_TYPE_DETAILS_ERR_MSG = "Missing device type";
 
     public static final String INVALID_DAY_OF_WEEK_ERR_MSG = "Invalid Day Of Week Value Provided";
     public static final String INVALID_HOUR_VALUE_ERR_MSG = "Ad schedule start and end hour must be between 0 and 23";
@@ -71,7 +71,6 @@ public class EntityValidator {
     public static final String INVALID_PROXIMITY_COORDS_ADDRESS_SIMULTANEOUS_ERR_MSG = "Cannot set proximity target for geo coordinates and address at the same time";
     public static final String INVALID_PROXIMITY_CITY_NAME_VALUE_ERR_MSG = "Invalid city name value";
     public static final String INVALID_PROXIMITY_POSTAL_CODE_VALUE_ERR_MSG = "Invalid postal code value";
-    public static final String INVALID_PROXIMITY_PROVINCE_NAME_VALUE_ERR_MSG = "Invalid state/province name value";
     public static final String INVALID_PROXIMITY_GEO_COORDS_ERR_MSG = "Invalid longitude or latitude coordinates";
     public static final String INVALID_PROXIMITY_RADIUS_VALUE_ERR_MSG = "Invalid radius value";
     public static final String INVALID_PROXIMITY_RADIUS_UNIT_VALUE_ERR_MSG = "Invalid radius units value";
@@ -93,13 +92,14 @@ public class EntityValidator {
             return new ValidationErrorResponse(
                     INVALID_CAMPAIGN_DETAILS_ERR_CODE,
                     GENERAL_NAME_EMPTY_ERR_MSG);
-        else if (!campaignDetails.getStatus().equals(CAMPAIGN_PAUSED_STATUS) &&
-                !campaignDetails.getStatus().equals(CAMPAIGN_ENABLED_STATUS)) {
+        else if (campaignDetails.getStatus() != CampaignStatusEnum.CampaignStatus.ENABLED_VALUE &&
+                campaignDetails.getStatus() != CampaignStatusEnum.CampaignStatus.PAUSED_VALUE) {
             return new ValidationErrorResponse(
                     INVALID_CAMPAIGN_DETAILS_ERR_CODE,
                     GENERAL_INVALID_STATUS_ERR_MSG);
-        } else if (!campaignDetails.getAdvertisingChannelType().equals(CAMPAIGN_ADVERTISING_CHANNEL_SEARCH) &&
-                !campaignDetails.getAdvertisingChannelType().equals(CAMPAIGN_ADVERTISING_CHANNEL_CONTENT)) {
+        } else if (campaignDetails.getAdvertisingChannelType() != ADVERTISING_CHANNEL_TYPE_SEARCH &&
+                campaignDetails.getAdvertisingChannelType() != ADVERTISING_CHANNEL_TYPE_DISPLAY &&
+                campaignDetails.getAdvertisingChannelType() != ADVERTISING_CHANNEL_TYPE_MULTI_CHANNEL) {
             return new ValidationErrorResponse(
                     INVALID_CAMPAIGN_DETAILS_ERR_CODE,
                     INVALID_ADVERTISING_CHANNEL_ERR_MSG);
@@ -215,11 +215,7 @@ public class EntityValidator {
     }
 
     private static ValidationErrorResponse isKeywordDetailsValid(NegativeKeywordDetails negativeKeywordDetails) {
-        if (negativeKeywordDetails.getCriterionType() != CRITERION_TYPE_KEYWORD) {
-            return new ValidationErrorResponse(
-                    INVALID_NEGATIVE_KEYWORD_DETAILS_ERR_CODE,
-                    GENERAL_INVALID_CRITERION_TYPE_ERR_MSG);
-        } else if (negativeKeywordDetails.getStatus() != CRITERION_STATUS_ENABLED &&
+        if (negativeKeywordDetails.getStatus() != CRITERION_STATUS_ENABLED &&
                 negativeKeywordDetails.getStatus() != CRITERION_STATUS_PAUSED &&
                 negativeKeywordDetails.getStatus() != CRITERION_STATUS_REMOVED) {
             return new ValidationErrorResponse(
@@ -240,11 +236,7 @@ public class EntityValidator {
     }
 
     private static ValidationErrorResponse isAdScheduledDetailsValid(AdScheduleDetails adScheduleDetails) {
-        if (adScheduleDetails.getCriterionType() != CRITERION_TYPE_AD_SCHEDULE) {
-            return new ValidationErrorResponse(
-                    INVALID_AD_SCHEDULE_DETAILS_ERR_CODE,
-                    GENERAL_INVALID_CRITERION_TYPE_ERR_MSG);
-        } else if (adScheduleDetails.getStatus() != CRITERION_STATUS_ENABLED &&
+        if (adScheduleDetails.getStatus() != CRITERION_STATUS_ENABLED &&
                 adScheduleDetails.getStatus() != CRITERION_STATUS_PAUSED &&
                 adScheduleDetails.getStatus() != CRITERION_STATUS_REMOVED) {
             return new ValidationErrorResponse(
@@ -264,7 +256,7 @@ public class EntityValidator {
             return new ValidationErrorResponse(
                     INVALID_AD_SCHEDULE_DETAILS_ERR_CODE,
                     GENERAL_BID_MODIFIER_OUT_OF_RANGE);
-        } else if (adScheduleDetails.getStartHour() < 0 || adScheduleDetails.getStartHour() > 23 &&
+        } else if (adScheduleDetails.getStartHour() < 0 || adScheduleDetails.getStartHour() > 23 ||
                 adScheduleDetails.getEndHour() < 0 || adScheduleDetails.getEndHour() > 23) {
             return new ValidationErrorResponse(
                     INVALID_AD_SCHEDULE_DETAILS_ERR_CODE,
@@ -272,11 +264,11 @@ public class EntityValidator {
         } else if (adScheduleDetails.getStartMinute() != MINUTE_OF_HOUR_ZERO &&
                 adScheduleDetails.getStartMinute() != MINUTE_OF_HOUR_FIFTEEN &&
                 adScheduleDetails.getStartMinute() != MINUTE_OF_HOUR_THIRTY &&
-                adScheduleDetails.getStartMinute() != MINUTE_OF_HOUR_FORTY_FIVE &&
+                adScheduleDetails.getStartMinute() != MINUTE_OF_HOUR_FORTY_FIVE ||
                 adScheduleDetails.getEndMinute() != MINUTE_OF_HOUR_ZERO &&
-                adScheduleDetails.getEndMinute() != MINUTE_OF_HOUR_FIFTEEN &&
-                adScheduleDetails.getEndMinute() != MINUTE_OF_HOUR_THIRTY &&
-                adScheduleDetails.getEndMinute() != MINUTE_OF_HOUR_FORTY_FIVE) {
+                        adScheduleDetails.getEndMinute() != MINUTE_OF_HOUR_FIFTEEN &&
+                        adScheduleDetails.getEndMinute() != MINUTE_OF_HOUR_THIRTY &&
+                        adScheduleDetails.getEndMinute() != MINUTE_OF_HOUR_FORTY_FIVE) {
             return new ValidationErrorResponse(
                     INVALID_AD_SCHEDULE_DETAILS_ERR_CODE,
                     INVALID_MINUTE_VALUE_ERR_MSG);
@@ -285,11 +277,7 @@ public class EntityValidator {
     }
 
     private static ValidationErrorResponse isDeviceDetailsValid(DeviceDetails deviceDetails) {
-        if (deviceDetails.getCriterionType() != CRITERION_TYPE_DEVICE) {
-            return new ValidationErrorResponse(
-                    INVALID_DEVICE_DETAILS_ERR_CODE,
-                    GENERAL_INVALID_CRITERION_TYPE_ERR_MSG);
-        } else if (deviceDetails.getStatus() != CRITERION_STATUS_ENABLED &&
+        if (deviceDetails.getStatus() != CRITERION_STATUS_ENABLED &&
                 deviceDetails.getStatus() != CRITERION_STATUS_PAUSED &&
                 deviceDetails.getStatus() != CRITERION_STATUS_REMOVED) {
             return new ValidationErrorResponse(
@@ -304,7 +292,7 @@ public class EntityValidator {
                 deviceDetails.getDeviceType() != DEVICE_TYPE_TABLET) {
             return new ValidationErrorResponse(
                     INVALID_DEVICE_DETAILS_ERR_CODE,
-                    INVALID_DEVICE_DETAILS_ERR_MSG);
+                    INVALID_DEVICE_TYPE_DETAILS_ERR_MSG);
         }
         return null;
     }
@@ -312,18 +300,15 @@ public class EntityValidator {
     private static ValidationErrorResponse isLanguageDetailsValid(LanguageDetails languageDetails) {
         String languageCodeValue = languageDetails.getLanguageCode().replace(LANGUAGE_CODE_PREFIX, "");
 
-        if (languageDetails.getCriterionType() != CRITERION_TYPE_LANGUAGE) {
-            return new ValidationErrorResponse(
-                    INVALID_LANGUAGE_DETAILS_ERR_CODE,
-                    GENERAL_INVALID_CRITERION_TYPE_ERR_MSG);
-        } else if (languageDetails.getStatus() != CRITERION_STATUS_ENABLED &&
+        if (languageDetails.getStatus() != CRITERION_STATUS_ENABLED &&
                 languageDetails.getStatus() != CRITERION_STATUS_PAUSED &&
                 languageDetails.getStatus() != CRITERION_STATUS_REMOVED) {
             return new ValidationErrorResponse(
                     INVALID_LANGUAGE_DETAILS_ERR_CODE,
                     GENERAL_INVALID_STATUS_ERR_MSG);
-        } else if (languageDetails.getLanguageCode().contains(LANGUAGE_CODE_PREFIX) &&
-                !NumberValidator.isNumeric(languageCodeValue)) {
+        } else if (languageDetails.getLanguageCode().isEmpty() ||
+                languageDetails.getLanguageCode().contains(LANGUAGE_CODE_PREFIX) &&
+                        !NumberValidator.isNumeric(languageCodeValue)) {
             return new ValidationErrorResponse(
                     INVALID_LANGUAGE_DETAILS_ERR_CODE,
                     INVALID_LANGUAGE_CODE_ERR_MSG);
@@ -333,11 +318,7 @@ public class EntityValidator {
     }
 
     private static ValidationErrorResponse isLocationDetailsValid(LocationDetails locationDetails) {
-        if (locationDetails.getCriterionType() != CRITERION_TYPE_LOCATION) {
-            return new ValidationErrorResponse(
-                    INVALID_LOCATION_DETAILS_ERR_CODE,
-                    GENERAL_INVALID_CRITERION_TYPE_ERR_MSG);
-        } else if (locationDetails.getStatus() != CRITERION_STATUS_ENABLED &&
+        if (locationDetails.getStatus() != CRITERION_STATUS_ENABLED &&
                 locationDetails.getStatus() != CRITERION_STATUS_PAUSED &&
                 locationDetails.getStatus() != CRITERION_STATUS_REMOVED) {
             return new ValidationErrorResponse(
@@ -364,11 +345,7 @@ public class EntityValidator {
     }
 
     private static ValidationErrorResponse isProximityDetailsValid(ProximityDetails proximityDetails) {
-        if (proximityDetails.getCriterionType() != CRITERION_TYPE_PROXIMITY) {
-            return new ValidationErrorResponse(
-                    INVALID_PROXIMITY_DETAILS_ERR_CODE,
-                    GENERAL_INVALID_CRITERION_TYPE_ERR_MSG);
-        } else if (proximityDetails.getStatus() != CRITERION_STATUS_ENABLED &&
+        if (proximityDetails.getStatus() != CRITERION_STATUS_ENABLED &&
                 proximityDetails.getStatus() != CRITERION_STATUS_PAUSED &&
                 proximityDetails.getStatus() != CRITERION_STATUS_REMOVED) {
             return new ValidationErrorResponse(
@@ -383,7 +360,8 @@ public class EntityValidator {
                     INVALID_PROXIMITY_DETAILS_ERR_CODE,
                     GENERAL_BID_MODIFIER_PLUS_NEGATIVE);
         } else if ((proximityDetails.getMicroLatitude() > 0 && proximityDetails.getMicroLongitude() == 0) ||
-                (proximityDetails.getMicroLatitude() == 0 && proximityDetails.getMicroLongitude() > 0)) {
+                (proximityDetails.getMicroLatitude() == 0 && proximityDetails.getMicroLongitude() > 0) ||
+                proximityDetails.getMicroLongitude() < 0 || proximityDetails.getMicroLatitude() < 0) {
             return new ValidationErrorResponse(
                     INVALID_PROXIMITY_DETAILS_ERR_CODE,
                     INVALID_PROXIMITY_LONGITUDE_LATITUDE_ERR_MSG);
@@ -398,11 +376,6 @@ public class EntityValidator {
             return new ValidationErrorResponse(
                     INVALID_PROXIMITY_DETAILS_ERR_CODE,
                     INVALID_PROXIMITY_CITY_NAME_VALUE_ERR_MSG);
-        } else if (!proximityDetails.getProvinceName().isEmpty() &&
-                NumberValidator.containsDigits(proximityDetails.getProvinceName())) {
-            return new ValidationErrorResponse(
-                    INVALID_PROXIMITY_DETAILS_ERR_CODE,
-                    INVALID_PROXIMITY_PROVINCE_NAME_VALUE_ERR_MSG);
         } else if (!proximityDetails.getPostalCode().isEmpty() &&
                 !NumberValidator.isNumeric(proximityDetails.getPostalCode())) {
             return new ValidationErrorResponse(
@@ -414,26 +387,21 @@ public class EntityValidator {
                     INVALID_PROXIMITY_DETAILS_ERR_CODE,
                     INVALID_PROXIMITY_GEO_COORDS_ERR_MSG);
         } else if (!proximityDetails.getStreetAddress().isEmpty() && (proximityDetails.getPostalCode().isEmpty() ||
-                proximityDetails.getCityName().isEmpty() || proximityDetails.getProvinceName().isEmpty())) {
+                proximityDetails.getCityName().isEmpty())) {
             return new ValidationErrorResponse(
                     INVALID_PROXIMITY_DETAILS_ERR_CODE,
                     INVALID_PROXIMITY_MISSING_ADDRESS_FIELDS_ERR_MSG);
-        } else if (!proximityDetails.getProvinceName().isEmpty() && (proximityDetails.getPostalCode().isEmpty() ||
-                proximityDetails.getCityName().isEmpty() || proximityDetails.getStreetAddress().isEmpty())) {
+        } else if (!proximityDetails.getPostalCode().isEmpty() && (proximityDetails.getCityName().isEmpty() ||
+                proximityDetails.getStreetAddress().isEmpty())) {
             return new ValidationErrorResponse(
                     INVALID_PROXIMITY_DETAILS_ERR_CODE,
                     INVALID_PROXIMITY_MISSING_ADDRESS_FIELDS_ERR_MSG);
         } else if (!proximityDetails.getCityName().isEmpty() && (proximityDetails.getPostalCode().isEmpty() ||
-                proximityDetails.getStreetAddress().isEmpty() || proximityDetails.getProvinceName().isEmpty())) {
+                proximityDetails.getStreetAddress().isEmpty())) {
             return new ValidationErrorResponse(
                     INVALID_PROXIMITY_DETAILS_ERR_CODE,
                     INVALID_PROXIMITY_MISSING_ADDRESS_FIELDS_ERR_MSG);
-        } else if (!proximityDetails.getPostalCode().isEmpty() && (proximityDetails.getStreetAddress().isEmpty() ||
-                proximityDetails.getCityName().isEmpty() || proximityDetails.getProvinceName().isEmpty())) {
-            return new ValidationErrorResponse(
-                    INVALID_PROXIMITY_DETAILS_ERR_CODE,
-                    INVALID_PROXIMITY_MISSING_ADDRESS_FIELDS_ERR_MSG);
-        } else if (proximityDetails.getRadius() == 0) {
+        } else if (proximityDetails.getRadius() <= 0) {
             return new ValidationErrorResponse(
                     INVALID_PROXIMITY_DETAILS_ERR_CODE,
                     INVALID_PROXIMITY_RADIUS_VALUE_ERR_MSG);

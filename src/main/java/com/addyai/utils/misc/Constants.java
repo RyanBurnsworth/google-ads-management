@@ -27,7 +27,7 @@ public class Constants {
     public static final String DEFAULT_LOCALE = "en";
     public static final String DEFAULT_COUNTRY_CODE = "US";
     public static final String LANGUAGE_CONSTANT_EN = "languageConstants/1000";
-    public static final String ADVERTISING_TYPE_SEARCH = "SEARCH";
+
     public static final String INVALID_REQUEST_ERROR = "INVALID_REQUEST";
     public static final String INTERNAL_ERROR = "INTERNAL_ERROR";
     public static final String UNKNOWN_SERVICE_ERROR = "UNKNOWN_SERVICE_ERROR";
@@ -37,16 +37,18 @@ public class Constants {
     public static final String MISSING_CUSTOMER_ID_ERR_MSG = "Customer ID is required";
     public static final String MISSING_PARAMS = "Missing Parameters";
 
-    public static final String CAMPAIGN_ENABLED_STATUS = "ENABLED";
-    public static final String CAMPAIGN_PAUSED_STATUS = "PAUSED";
-    public static final String CAMPAIGN_ADVERTISING_CHANNEL_SEARCH = "SEARCH";
-    public static final String CAMPAIGN_ADVERTISING_CHANNEL_CONTENT = "CONTENT";
-
     public static final String LANGUAGE_CODE_PREFIX = "languageConstants/";
 
     public static final String NOT_FOUND_ERR_CODE = "NOT_FOUND";
 
     public static final String NOT_FOUND_CAMPAIGN = "Campaign not found";
+
+    public static final int ADVERTISING_CHANNEL_TYPE_SEARCH
+            = AdvertisingChannelTypeEnum.AdvertisingChannelType.SEARCH_VALUE;
+    public static final int ADVERTISING_CHANNEL_TYPE_DISPLAY
+            = AdvertisingChannelTypeEnum.AdvertisingChannelType.DISPLAY_VALUE;
+    public static final int ADVERTISING_CHANNEL_TYPE_MULTI_CHANNEL
+            = AdvertisingChannelTypeEnum.AdvertisingChannelType.MULTI_CHANNEL_VALUE;
     public static final int POSITIVE_GEO_TARGET_TYPE_PRESENCE_OR_INTEREST
             = PositiveGeoTargetTypeEnum.PositiveGeoTargetType.PRESENCE_OR_INTEREST_VALUE;
     public static final int POSITIVE_GEO_TARGET_TYPE_SEARCH_INTEREST
