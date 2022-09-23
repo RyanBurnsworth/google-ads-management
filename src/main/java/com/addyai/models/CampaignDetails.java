@@ -16,7 +16,7 @@
 package com.addyai.models;
 
 import com.addyai.models.campaign_criterion.CriterionDetails;
-import com.addyai.utils.helpers.DateHelper;
+import com.addyai.utils.helpers.DateTimeHelper;
 import com.google.ads.googleads.v11.enums.AdvertisingChannelTypeEnum;
 import com.google.ads.googleads.v11.enums.CampaignStatusEnum;
 
@@ -87,14 +87,14 @@ public class CampaignDetails {
      * Format: yyyy-MM-dd
      * Defaults to current date
      */
-    private String startDate = DateHelper.getCurrentDate();
+    private String startDate = DateTimeHelper.getCurrentDate();
 
     /**
      * The end date of the campaign.
      * Format: yyyy-MM-dd
      * Defaults to current date + 10 years
      */
-    private String endDate = DateHelper.getCurrentDatePlusYears(DEFAULT_ADDITIONAL_YEARS_CAMPAIGN_END_DATE);
+    private String endDate = DateTimeHelper.getCurrentDatePlusYears(DEFAULT_ADDITIONAL_YEARS_CAMPAIGN_END_DATE);
 
     /**
      * Enabled if the campaign is to show ads on Google partner sites.

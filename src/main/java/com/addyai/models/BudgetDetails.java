@@ -15,7 +15,7 @@
 
 package com.addyai.models;
 
-import com.addyai.utils.helpers.DateHelper;
+import com.addyai.utils.helpers.DateTimeHelper;
 
 import static com.addyai.utils.misc.Constants.BUDGET_DELIVERY_METHOD_STANDARD;
 import static com.addyai.utils.misc.Constants.BUDGET_STATUS_ENABLED;
@@ -30,7 +30,7 @@ public class BudgetDetails {
      * The name of the budget.
      * Defaults to current time as epoch string
      */
-    private String name = DateHelper.getCurrentEpochTimeAsString();
+    private String name = DateTimeHelper.getCurrentEpochTimeAsString();
 
     /**
      * The budget's resource name. Auto-generates when the budget is created.

@@ -15,7 +15,8 @@
 
 package com.addyai.error_handling;
 
-import java.sql.Timestamp;
+import com.addyai.utils.helpers.DateTimeHelper;
+
 import java.util.Date;
 
 public class ApiErrorResponse {
@@ -25,9 +26,8 @@ public class ApiErrorResponse {
 
     public ApiErrorResponse(String errorCode, String errorMessage) {
         super();
-        Date date = new Date();
 
-        this.timeStamp = new Timestamp(date.getTime());
+        this.timeStamp = DateTimeHelper.getCurrentTimestamp();
         this.errorCode = errorCode;
         this.errorMessage = errorMessage;
     }

@@ -15,12 +15,13 @@
 
 package com.addyai.utils.helpers;
 
+import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Date;
 import java.util.Locale;
 
-public class DateHelper {
+public class DateTimeHelper {
     private static final Date date = new Date();
 
     public static String getCurrentEpochTimeAsString() {
@@ -39,5 +40,9 @@ public class DateHelper {
         DateTimeFormatter format1 = DateTimeFormatter.ofPattern("yyyy-MM-dd", Locale.ENGLISH);
 
         return format1.format(ldt);
+    }
+
+    public static Timestamp getCurrentTimestamp() {
+        return new Timestamp(date.getTime());
     }
 }

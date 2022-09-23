@@ -15,7 +15,7 @@
 
 package com.addyai.helpers;
 
-import com.addyai.utils.helpers.DateHelper;
+import com.addyai.utils.helpers.DateTimeHelper;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
@@ -23,13 +23,14 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Locale;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 
-@SpringBootTest(classes = DateHelper.class)
-public class DateHelperTest {
+@SpringBootTest(classes = DateTimeHelper.class)
+public class DateTimeHelperTest {
     @Test
     void testGetEpochTimeAsStringIsValid() {
-        assertFalse(DateHelper.getCurrentEpochTimeAsString().isEmpty());
+        assertFalse(DateTimeHelper.getCurrentEpochTimeAsString().isEmpty());
     }
 
     @Test
@@ -42,7 +43,7 @@ public class DateHelperTest {
         String currentDate = format1.format(ldt);
         String futureDate = format1.format(ldt2);
 
-        String year = currentDate.substring(0,4);
+        String year = currentDate.substring(0, 4);
         int yearPlus10 = Integer.parseInt(year) + 10;
         String newYear = String.valueOf(yearPlus10);
 

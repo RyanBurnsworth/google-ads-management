@@ -175,8 +175,17 @@ public class CampaignServiceImpl implements CampaignService {
      */
     @Override
     public void deleteCampaigns(long customerId, List<CampaignDetails> campaignDetailsList) throws Exception {
+        // ensure each campaign details object has at least a campaign resource name set
+        ValidationErrorResponse validationErrorResponse = EntityValidator
+                .validateNonEmptyCampaignResourceNames(campaignDetailsList);
+
+        if (validationErrorResponse != null)
+            throw new InvalidRequestException(validationErrorResponse.getErrorCode(),
+                    validationErrorResponse.getErrorMessage());
+
         List<CampaignOperation> campaignOperationList =
                 operationBuilder.buildCampaignOperationList(campaignDetailsList, OperationType.REMOVE);
+
         campaignRepository.performCampaignOperations(customerId, campaignOperationList);
     }
 

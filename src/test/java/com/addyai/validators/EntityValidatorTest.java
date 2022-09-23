@@ -29,7 +29,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static com.addyai.utils.TestUtils.MOCK_CAMPAIGN_RESOURCE_NAME;
-import static com.addyai.utils.misc.Constants.LANGUAGE_CODE_PREFIX;
+import static com.addyai.utils.misc.Constants.*;
 import static com.addyai.utils.validators.EntityValidator.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
@@ -989,5 +989,27 @@ public class EntityValidatorTest {
         assert validationErrorResponse != null;
         assertEquals(INVALID_BUDGET_DETAILS_ERR_CODE, validationErrorResponse.getErrorCode());
         assertEquals(GENERAL_RES_NAME_EMPTY_ERR_MSG, validationErrorResponse.getErrorMessage());
+    }
+
+    @Test
+    void testValidateNonEmptyCampaignResourceNamesReturnsNull() {
+        List<CampaignDetails> campaignDetailsList = testUtils.getMockCampaignDetailsList();
+
+        ValidationErrorResponse validationErrorResponse =
+                EntityValidator.validateNonEmptyCampaignResourceNames(campaignDetailsList);
+
+        assertNull(validationErrorResponse);
+    }
+
+    @Test
+    void testValidateEmptyCampaignResourceNamesReturnsValidationError() {
+        List<CampaignDetails> campaignDetailsList = testUtils.getMockCampaignDetailsList();
+        campaignDetailsList.get(0).setCampaignResourceName("");
+
+        ValidationErrorResponse validationErrorResponse =
+                EntityValidator.validateNonEmptyCampaignResourceNames(campaignDetailsList);
+
+        assertEquals(INVALID_REQUEST_ERROR, validationErrorResponse.getErrorCode());
+        assertEquals(MISSING_PARAMS, validationErrorResponse.getErrorMessage());
     }
 }

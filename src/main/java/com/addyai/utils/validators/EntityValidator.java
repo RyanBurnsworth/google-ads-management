@@ -90,8 +90,7 @@ public class EntityValidator {
                 .withResolverStyle(ResolverStyle.STRICT);
 
         DateValidator dateValidator = new DateValidator(dateTimeFormatter);
-        if ((operationType.equals(OperationType.UPDATE) || operationType.equals(OperationType.REMOVE)) &&
-                campaignDetails.getCampaignResourceName().isEmpty()) {
+        if (operationType.equals(OperationType.UPDATE) && campaignDetails.getCampaignResourceName().isEmpty()) {
             return new ValidationErrorResponse(
                     INVALID_CAMPAIGN_DETAILS_ERR_CODE,
                     GENERAL_RES_NAME_EMPTY_ERR_MSG);
@@ -415,6 +414,17 @@ public class EntityValidator {
             return new ValidationErrorResponse(
                     INVALID_PROXIMITY_DETAILS_ERR_CODE,
                     INVALID_PROXIMITY_RADIUS_UNIT_VALUE_ERR_MSG);
+        }
+        return null;
+    }
+
+    public static ValidationErrorResponse validateNonEmptyCampaignResourceNames(List<CampaignDetails> campaignDetailsList) {
+        for (CampaignDetails campaignDetails : campaignDetailsList) {
+            if (campaignDetails.getCampaignResourceName().isEmpty()) {
+                return new ValidationErrorResponse(
+                        INVALID_REQUEST_ERROR,
+                        MISSING_PARAMS);
+            }
         }
         return null;
     }
