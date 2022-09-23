@@ -21,7 +21,6 @@ import com.addyai.enums.OperationType;
 import com.addyai.error_handling.ValidationErrorResponse;
 import com.addyai.error_handling.exceptions.InvalidRequestException;
 import com.addyai.error_handling.exceptions.NotFoundException;
-import com.addyai.error_handling.exceptions.ServiceFailureException;
 import com.addyai.models.BudgetDetails;
 import com.addyai.models.CampaignDetails;
 import com.addyai.models.campaign_criterion.CriterionDetails;
@@ -75,7 +74,7 @@ public class CampaignServiceImpl implements CampaignService {
     public void upsertCampaigns(long customerId, List<CampaignDetails> campaignDetailsList, boolean shouldCreate) throws Exception {
         OperationType operationType = shouldCreate ? OperationType.CREATE : OperationType.UPDATE;
 
-        validateCampaignDetails(campaignDetailsList);
+        validateCampaignDetails(campaignDetailsList, operationType);
 
         // create the budget from budget details on the account, then associate the budget to the campaign.
         campaignDetailsList = associateBudgetsToCampaigns(customerId, campaignDetailsList, operationType);
@@ -237,16 +236,16 @@ public class CampaignServiceImpl implements CampaignService {
         return null;
     }
 
-    private void validateCampaignDetails(List<CampaignDetails> campaignDetailsList) {
+    private void validateCampaignDetails(List<CampaignDetails> campaignDetailsList, OperationType operationType) {
         ValidationErrorResponse validationErrorResponse;
         for (CampaignDetails campaignDetails : campaignDetailsList) {
-            validationErrorResponse = EntityValidator.isCampaignDetailsValid(campaignDetails);
+            validationErrorResponse = EntityValidator.isCampaignDetailsValid(campaignDetails, operationType);
             if (validationErrorResponse != null)
                 throw new InvalidRequestException(
                         validationErrorResponse.getErrorCode(),
                         validationErrorResponse.getErrorMessage());
 
-            validationErrorResponse = EntityValidator.isBudgetDetailsValid(campaignDetails.getBudgetDetails());
+            validationErrorResponse = EntityValidator.isBudgetDetailsValid(campaignDetails.getBudgetDetails(), operationType);
             if (validationErrorResponse != null)
                 throw new InvalidRequestException(
                         validationErrorResponse.getErrorCode(),

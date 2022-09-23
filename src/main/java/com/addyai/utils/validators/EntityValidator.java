@@ -15,6 +15,7 @@
 
 package com.addyai.utils.validators;
 
+import com.addyai.enums.OperationType;
 import com.addyai.error_handling.ValidationErrorResponse;
 import com.addyai.models.BudgetDetails;
 import com.addyai.models.CampaignDetails;
@@ -39,6 +40,7 @@ public class EntityValidator {
     public static final String INVALID_PROXIMITY_DETAILS_ERR_CODE = "INVALID_PROXIMITY_DETAILS";
 
     public static final String GENERAL_NAME_EMPTY_ERR_MSG = "Name field cannot be empty";
+    public static final String GENERAL_RES_NAME_EMPTY_ERR_MSG = "Resource name cannot be empty for update operations";
     public static final String GENERAL_INVALID_STATUS_ERR_MSG = "Status field is invalid";
     public static final String GENERAL_BID_MODIFIER_OUT_OF_RANGE = "Bid modifier out of range. Must be between 0.0 and 10.0";
     public static final String GENERAL_BID_MODIFIER_PLUS_NEGATIVE = "Cannot set a bid-modifier on a negative target";
@@ -81,13 +83,18 @@ public class EntityValidator {
      * @param campaignDetails CampaignDetails object to be validated
      * @return if invalid return a ValidationResponseError, else return null
      */
-    public static ValidationErrorResponse isCampaignDetailsValid(CampaignDetails campaignDetails) {
+    public static ValidationErrorResponse isCampaignDetailsValid(CampaignDetails campaignDetails,
+                                                                 OperationType operationType) {
         DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("uuuu-MM-dd", Locale.US)
                 .withResolverStyle(ResolverStyle.STRICT);
 
         DateValidator dateValidator = new DateValidator(dateTimeFormatter);
-
-        if (campaignDetails.getCampaignName().isEmpty())
+        if (operationType.equals(OperationType.UPDATE) && campaignDetails.getCampaignResourceName().isEmpty()) {
+            return new ValidationErrorResponse(
+                    INVALID_CAMPAIGN_DETAILS_ERR_CODE,
+                    GENERAL_RES_NAME_EMPTY_ERR_MSG
+            );
+        } else if (campaignDetails.getCampaignName().isEmpty())
             return new ValidationErrorResponse(
                     INVALID_CAMPAIGN_DETAILS_ERR_CODE,
                     GENERAL_NAME_EMPTY_ERR_MSG);
@@ -140,8 +147,13 @@ public class EntityValidator {
      * @param budgetDetails BudgetDetails to be validated
      * @return if invalid return a ValidationResponseError, else return null
      */
-    public static ValidationErrorResponse isBudgetDetailsValid(BudgetDetails budgetDetails) {
-        if (budgetDetails.getDailyBudgetAmount() <= 0) {
+    public static ValidationErrorResponse isBudgetDetailsValid(BudgetDetails budgetDetails, OperationType operationType) {
+        if (operationType.equals(OperationType.UPDATE) && budgetDetails.getResourceName().isEmpty()) {
+            return new ValidationErrorResponse(
+                    INVALID_BUDGET_DETAILS_ERR_CODE,
+                    GENERAL_RES_NAME_EMPTY_ERR_MSG
+            );
+        } else if (budgetDetails.getDailyBudgetAmount() <= 0) {
             return new ValidationErrorResponse(
                     INVALID_BUDGET_DETAILS_ERR_CODE,
                     BUDGET_TOO_LOW_ERR_MSG);

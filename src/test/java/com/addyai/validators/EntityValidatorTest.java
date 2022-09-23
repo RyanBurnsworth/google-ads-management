@@ -15,6 +15,7 @@
 
 package com.addyai.validators;
 
+import com.addyai.enums.OperationType;
 import com.addyai.error_handling.ValidationErrorResponse;
 import com.addyai.models.BudgetDetails;
 import com.addyai.models.CampaignDetails;
@@ -40,7 +41,7 @@ public class EntityValidatorTest {
     @Test
     void testValidCampaignReturnsNullValidationErrorResponse() {
         ValidationErrorResponse validationErrorResponse =
-                EntityValidator.isCampaignDetailsValid(testUtils.getMockCampaignDetails());
+                EntityValidator.isCampaignDetailsValid(testUtils.getMockCampaignDetails(), OperationType.CREATE);
         assertNull(validationErrorResponse);
     }
 
@@ -50,7 +51,7 @@ public class EntityValidatorTest {
         campaignDetails.setCampaignName("");
 
         ValidationErrorResponse validationErrorResponse =
-                EntityValidator.isCampaignDetailsValid(campaignDetails);
+                EntityValidator.isCampaignDetailsValid(campaignDetails, OperationType.CREATE);
 
         assert validationErrorResponse != null;
         assertEquals(INVALID_CAMPAIGN_DETAILS_ERR_CODE, validationErrorResponse.getErrorCode());
@@ -63,7 +64,7 @@ public class EntityValidatorTest {
         campaignDetails.setStatus(-1);
 
         ValidationErrorResponse validationErrorResponse =
-                EntityValidator.isCampaignDetailsValid(campaignDetails);
+                EntityValidator.isCampaignDetailsValid(campaignDetails, OperationType.CREATE);
 
         assert validationErrorResponse != null;
         assertEquals(INVALID_CAMPAIGN_DETAILS_ERR_CODE, validationErrorResponse.getErrorCode());
@@ -76,7 +77,7 @@ public class EntityValidatorTest {
         campaignDetails.setAdvertisingChannelType(-1);
 
         ValidationErrorResponse validationErrorResponse =
-                EntityValidator.isCampaignDetailsValid(campaignDetails);
+                EntityValidator.isCampaignDetailsValid(campaignDetails, OperationType.CREATE);
 
         assert validationErrorResponse != null;
         assertEquals(INVALID_CAMPAIGN_DETAILS_ERR_CODE, validationErrorResponse.getErrorCode());
@@ -89,7 +90,7 @@ public class EntityValidatorTest {
         campaignDetails.setPositiveGeoTargetType(100);
 
         ValidationErrorResponse validationErrorResponse =
-                EntityValidator.isCampaignDetailsValid(campaignDetails);
+                EntityValidator.isCampaignDetailsValid(campaignDetails, OperationType.CREATE);
 
         assert validationErrorResponse != null;
         assertEquals(INVALID_CAMPAIGN_DETAILS_ERR_CODE, validationErrorResponse.getErrorCode());
@@ -102,7 +103,7 @@ public class EntityValidatorTest {
         campaignDetails.setNegativeGeoTargetType(100);
 
         ValidationErrorResponse validationErrorResponse =
-                EntityValidator.isCampaignDetailsValid(campaignDetails);
+                EntityValidator.isCampaignDetailsValid(campaignDetails, OperationType.CREATE);
 
         assert validationErrorResponse != null;
         assertEquals(INVALID_CAMPAIGN_DETAILS_ERR_CODE, validationErrorResponse.getErrorCode());
@@ -115,7 +116,7 @@ public class EntityValidatorTest {
         campaignDetails.setStartDate("12-20-2022");
 
         ValidationErrorResponse validationErrorResponse =
-                EntityValidator.isCampaignDetailsValid(campaignDetails);
+                EntityValidator.isCampaignDetailsValid(campaignDetails, OperationType.CREATE);
 
         assert validationErrorResponse != null;
         assertEquals(INVALID_CAMPAIGN_DETAILS_ERR_CODE, validationErrorResponse.getErrorCode());
@@ -128,7 +129,7 @@ public class EntityValidatorTest {
         campaignDetails.setEndDate("12-20-2022");
 
         ValidationErrorResponse validationErrorResponse =
-                EntityValidator.isCampaignDetailsValid(campaignDetails);
+                EntityValidator.isCampaignDetailsValid(campaignDetails, OperationType.CREATE);
 
         assert validationErrorResponse != null;
         assertEquals(INVALID_CAMPAIGN_DETAILS_ERR_CODE, validationErrorResponse.getErrorCode());
@@ -143,7 +144,7 @@ public class EntityValidatorTest {
         campaignDetails.setTargetingContentNetwork(false);
 
         ValidationErrorResponse validationErrorResponse =
-                EntityValidator.isCampaignDetailsValid(campaignDetails);
+                EntityValidator.isCampaignDetailsValid(campaignDetails, OperationType.CREATE);
 
         assert validationErrorResponse != null;
         assertEquals(INVALID_CAMPAIGN_DETAILS_ERR_CODE, validationErrorResponse.getErrorCode());
@@ -158,7 +159,7 @@ public class EntityValidatorTest {
         campaignDetails.setTargetingContentNetwork(false);
 
         ValidationErrorResponse validationErrorResponse =
-                EntityValidator.isCampaignDetailsValid(campaignDetails);
+                EntityValidator.isCampaignDetailsValid(campaignDetails, OperationType.CREATE);
 
         assert validationErrorResponse != null;
         assertEquals(INVALID_CAMPAIGN_DETAILS_ERR_CODE, validationErrorResponse.getErrorCode());
@@ -169,7 +170,7 @@ public class EntityValidatorTest {
     void testValidBudgetDetailsReturnsNullValidationError() {
         BudgetDetails budgetDetails = testUtils.getMockBudgetDetails();
         ValidationErrorResponse validationErrorResponse =
-                EntityValidator.isBudgetDetailsValid(budgetDetails);
+                EntityValidator.isBudgetDetailsValid(budgetDetails, OperationType.CREATE);
 
         assertNull(validationErrorResponse);
     }
@@ -180,7 +181,7 @@ public class EntityValidatorTest {
         budgetDetails.setDailyBudgetAmount(0);
 
         ValidationErrorResponse validationErrorResponse =
-                EntityValidator.isBudgetDetailsValid(budgetDetails);
+                EntityValidator.isBudgetDetailsValid(budgetDetails, OperationType.CREATE);
 
         assert validationErrorResponse != null;
         assertEquals(INVALID_BUDGET_DETAILS_ERR_CODE, validationErrorResponse.getErrorCode());
@@ -193,7 +194,7 @@ public class EntityValidatorTest {
         budgetDetails.setName("");
 
         ValidationErrorResponse validationErrorResponse =
-                EntityValidator.isBudgetDetailsValid(budgetDetails);
+                EntityValidator.isBudgetDetailsValid(budgetDetails, OperationType.CREATE);
 
         assert validationErrorResponse != null;
         assertEquals(INVALID_BUDGET_DETAILS_ERR_CODE, validationErrorResponse.getErrorCode());
@@ -206,7 +207,7 @@ public class EntityValidatorTest {
         budgetDetails.setStatus(100);
 
         ValidationErrorResponse validationErrorResponse =
-                EntityValidator.isBudgetDetailsValid(budgetDetails);
+                EntityValidator.isBudgetDetailsValid(budgetDetails, OperationType.CREATE);
 
         assert validationErrorResponse != null;
         assertEquals(INVALID_BUDGET_DETAILS_ERR_CODE, validationErrorResponse.getErrorCode());
@@ -219,7 +220,7 @@ public class EntityValidatorTest {
         budgetDetails.setDeliveryMethod(100);
 
         ValidationErrorResponse validationErrorResponse =
-                EntityValidator.isBudgetDetailsValid(budgetDetails);
+                EntityValidator.isBudgetDetailsValid(budgetDetails, OperationType.CREATE);
 
         assert validationErrorResponse != null;
         assertEquals(INVALID_BUDGET_DETAILS_ERR_CODE, validationErrorResponse.getErrorCode());
@@ -946,5 +947,47 @@ public class EntityValidatorTest {
         assert validationErrorResponse != null;
         assertEquals(INVALID_LOCATION_DETAILS_ERR_CODE, validationErrorResponse.getErrorCode());
         assertEquals(INVALID_LOCATION_VALUE_ERR_MSG, validationErrorResponse.getErrorMessage());
+    }
+
+    @Test
+    void testValidUpdateCampaignReturnsNullValidationErrorResponse() {
+        ValidationErrorResponse validationErrorResponse =
+                EntityValidator.isCampaignDetailsValid(testUtils.getMockCampaignDetails(), OperationType.UPDATE);
+        assertNull(validationErrorResponse);
+    }
+
+    @Test
+    void testUpdateCampaignDetailsWithMissingResNameReturnValidationError() {
+        CampaignDetails campaignDetails = testUtils.getMockCampaignDetails();
+        campaignDetails.setCampaignResourceName("");
+
+        ValidationErrorResponse validationErrorResponse =
+                EntityValidator.isCampaignDetailsValid(campaignDetails, OperationType.UPDATE);
+
+        assert validationErrorResponse != null;
+        assertEquals(INVALID_CAMPAIGN_DETAILS_ERR_CODE, validationErrorResponse.getErrorCode());
+        assertEquals(GENERAL_RES_NAME_EMPTY_ERR_MSG, validationErrorResponse.getErrorMessage());
+    }
+
+    @Test
+    void testValidUpdateBudgetDetailsReturnsNullValidationError() {
+        BudgetDetails budgetDetails = testUtils.getMockBudgetDetails();
+        ValidationErrorResponse validationErrorResponse =
+                EntityValidator.isBudgetDetailsValid(budgetDetails, OperationType.UPDATE);
+
+        assertNull(validationErrorResponse);
+    }
+
+    @Test
+    void testUpdateBudgetDetailsMissingResNameReturnsValidationError() {
+        BudgetDetails budgetDetails = testUtils.getMockBudgetDetails();
+        budgetDetails.setResourceName("");
+
+        ValidationErrorResponse validationErrorResponse =
+                EntityValidator.isBudgetDetailsValid(budgetDetails, OperationType.UPDATE);
+
+        assert validationErrorResponse != null;
+        assertEquals(INVALID_BUDGET_DETAILS_ERR_CODE, validationErrorResponse.getErrorCode());
+        assertEquals(GENERAL_RES_NAME_EMPTY_ERR_MSG, validationErrorResponse.getErrorMessage());
     }
 }

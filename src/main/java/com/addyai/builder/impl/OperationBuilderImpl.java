@@ -17,6 +17,7 @@ package com.addyai.builder.impl;
 
 import com.addyai.builder.OperationBuilder;
 import com.addyai.enums.OperationType;
+import com.addyai.error_handling.exceptions.InvalidRequestException;
 import com.addyai.models.BudgetDetails;
 import com.addyai.models.CampaignDetails;
 import com.addyai.models.campaign_criterion.*;
