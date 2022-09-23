@@ -20,12 +20,15 @@ import com.addyai.builder.impl.OperationBuilderImpl;
 import com.addyai.enums.OperationType;
 import com.addyai.error_handling.ValidationErrorResponse;
 import com.addyai.error_handling.exceptions.InvalidRequestException;
+import com.addyai.error_handling.exceptions.NotFoundException;
+import com.addyai.error_handling.exceptions.ServiceFailureException;
 import com.addyai.models.BudgetDetails;
 import com.addyai.models.CampaignDetails;
 import com.addyai.models.campaign_criterion.CriterionDetails;
 import com.addyai.models.campaign_criterion.DeviceDetails;
+import com.addyai.models.campaign_criterion.LocationDetails;
 import com.addyai.repos.campaigns.CampaignRepository;
-import com.addyai.repos.campaigns.budget.CampaignBudgetRepository;
+import com.addyai.repos.campaigns.budget.BudgetRepository;
 import com.addyai.repos.campaigns.criterion.CriterionRepository;
 import com.addyai.services.campaign.CampaignService;
 import com.addyai.utils.validators.EntityValidator;
@@ -36,50 +39,66 @@ import org.springframework.stereotype.Service;
 
 import java.util.*;
 
-import static com.addyai.utils.misc.Constants.INVALID_REQUEST_ERROR;
-import static com.addyai.utils.misc.Constants.MISSING_PARAMS;
+import static com.addyai.utils.misc.Constants.*;
 
 @Service
 public class CampaignServiceImpl implements CampaignService {
     private final CampaignRepository campaignRepository;
 
-    private final CampaignBudgetRepository campaignBudgetRepository;
+    private final BudgetRepository budgetRepository;
 
     private final CriterionRepository criterionRepository;
 
     private final OperationBuilder operationBuilder;
 
     public CampaignServiceImpl(CampaignRepository campaignRepository,
-                               CampaignBudgetRepository campaignBudgetRepository,
+                               BudgetRepository budgetRepository,
                                CriterionRepository criterionRepository) {
         this.campaignRepository = campaignRepository;
-        this.campaignBudgetRepository = campaignBudgetRepository;
+        this.budgetRepository = budgetRepository;
         this.criterionRepository = criterionRepository;
         this.operationBuilder = new OperationBuilderImpl();
     }
 
+    /**
+     * Update or insert campaigns with in a client's account.
+     * <p>Creating a campaign will create the associated budget and criterion.
+     * Updating a campaign will update the campaign, <b>remove existing criterion and create
+     * new criterion with values contained in CampaignDetails.criterionDetailsList</b>.</p>
+     *
+     * @param customerId          the customerId of the client account
+     * @param campaignDetailsList [CampaignDetails] containing values to create/update campaigns with
+     * @param shouldCreate        true if create and false if updating
+     * @throws InvalidRequestException if an error occurs during the creating/updating of campaigns
+     */
     @Override
     public void upsertCampaigns(long customerId, List<CampaignDetails> campaignDetailsList, boolean shouldCreate) throws Exception {
-        validateCampaignDetails(campaignDetailsList);
-
         OperationType operationType = shouldCreate ? OperationType.CREATE : OperationType.UPDATE;
 
+        validateCampaignDetails(campaignDetailsList);
+
+        // create the budget from budget details on the account, then associate the budget to the campaign.
         campaignDetailsList = associateBudgetsToCampaigns(customerId, campaignDetailsList, operationType);
 
         List<CampaignOperation> campaignOperationList = operationBuilder
                 .buildCampaignOperationList(campaignDetailsList, operationType);
 
+        // create or update the campaigns on the client account.
         List<String> campaignResourceNameList =
                 campaignRepository.performCampaignOperations(customerId, campaignOperationList);
 
+        // create campaign criterion on the account and associate to the appropriate campaign.
         associateCriterionToCampaigns(customerId, campaignDetailsList, campaignResourceNameList, operationType);
     }
 
     /**
-     * Fetch all campaigns from a client account
+     * Fetch all campaigns from a client account.
+     * Each campaign includes associated campaign budget and list of campaign criterion.
      *
      * @param customerId the customer id of the client account
      * @return a list of all [CampaignDetails] in a client's account
+     * @throws InvalidRequestException if an error occurs during the retrieval of campaigns
+     * @throws
      */
     @Override
     public List<CampaignDetails> findAllCampaignDetails(long customerId) throws Exception {
@@ -87,7 +106,7 @@ public class CampaignServiceImpl implements CampaignService {
         List<CampaignDetails> campaignDetailsList = campaignRepository.fetchAllCampaignDetails(customerId);
 
         // fetch all campaign budget details from the client account
-        List<BudgetDetails> existingBudgets = campaignBudgetRepository.fetchAllBudgetDetails(customerId);
+        List<BudgetDetails> existingBudgets = budgetRepository.fetchAllBudgetDetails(customerId);
 
         // associate the budget details to its campaign details
         for (CampaignDetails campaignDetails : campaignDetailsList) {
@@ -106,12 +125,14 @@ public class CampaignServiceImpl implements CampaignService {
     }
 
     /**
-     * Fetch a single CampaignDetails by name
+     * Fetch a single CampaignDetails by name.
+     * The campaign includes associated campaign budget and list of campaign criterion.
      *
      * @param customerId   the customer id of the client account
      * @param campaignName the name of the campaign to fetch
-     * @return CampaignDetails
-     * @throws Exception
+     * @return CampaignDetails containing the values from the
+     * @throws InvalidRequestException if an error occurs during the retrieval of campaign by name
+     * @throws NotFoundException       if campaign is not found
      */
     @Override
     public CampaignDetails findCampaignDetailsByName(long customerId, String campaignName) throws Exception {
@@ -121,10 +142,12 @@ public class CampaignServiceImpl implements CampaignService {
 
         // fetch the campaign details from the client account using the campaign name
         CampaignDetails campaignDetails = campaignRepository.fetchCampaignDetailsByName(customerId, campaignName);
+        if (campaignDetails == null)
+            throw new NotFoundException("", ""); // TODO
 
         // TODO create an endpoint to grab a single budget details object by id or name
         // fetch all the campaign budgets from the client's account
-        List<BudgetDetails> existingBudgets = campaignBudgetRepository.fetchAllBudgetDetails(customerId);
+        List<BudgetDetails> existingBudgets = budgetRepository.fetchAllBudgetDetails(customerId);
 
         // find the specific budget details object for this campaign
         BudgetDetails budgetDetails = findBudgetDetailsByName(campaignName, existingBudgets);
@@ -136,18 +159,17 @@ public class CampaignServiceImpl implements CampaignService {
     }
 
     /**
-     * Delete campaigns from a client's account
+     * Remove campaigns from a client's account.
      *
-     * @param customerId  the customer id of the client account
-     * @param campaignIds the ids of the campaigns to be deleted
+     * @param customerId          the customer id of the client account
+     * @param campaignDetailsList the campaigns to be deleted.
+     * @throws InvalidRequestException if an error occurs during the removal of campaigns
      */
     @Override
-    public void deleteCampaigns(long customerId, List<Long> campaignIds) throws Exception {
-        //campaignRepository.deleteCampaigns(customerId, campaignIds);
-    }
-
-    private String getGeoTargetConstant(String locale, String countryCode, String location) throws Exception {
-        return criterionRepository.getGeoTargetConstant(locale, countryCode, location);
+    public void deleteCampaigns(long customerId, List<CampaignDetails> campaignDetailsList) throws Exception {
+        List<CampaignOperation> campaignOperationList =
+                operationBuilder.buildCampaignOperationList(campaignDetailsList, OperationType.REMOVE);
+        campaignRepository.performCampaignOperations(customerId, campaignOperationList);
     }
 
     private List<CampaignDetails> associateBudgetsToCampaigns(long customerId,
@@ -162,7 +184,7 @@ public class CampaignServiceImpl implements CampaignService {
 
             // create the budget and extract the budget resource name
             String budgetResourceName =
-                    campaignBudgetRepository.performCampaignBudgetOperations(customerId, campaignBudgetOperations).get(0);
+                    budgetRepository.performCampaignBudgetOperations(customerId, campaignBudgetOperations).get(0);
 
             // associated the newly created budget with campaign
             campaignDetails.setBudgetResourceName(budgetResourceName);
@@ -175,35 +197,13 @@ public class CampaignServiceImpl implements CampaignService {
                                                List<CampaignDetails> campaignDetailsList,
                                                List<String> campaignResourceNameList,
                                                OperationType operationType) throws Exception {
+
+        // associate geotarget codes to location criterion
+        associateGeoTargetConstantToLocation(campaignDetailsList);
+
         // to update criterion, first delete all user-created criterion and created new from list
         if (operationType.equals(OperationType.UPDATE)) {
-            List<String> criterionResourceNameList = new ArrayList<>();
-
-            // gather the resource names of user-created criterion to be removed from campaigns
-            campaignResourceNameList.forEach((resourceName) -> {
-                // fetch the existing criterion for the given campaign
-                List<CriterionDetails> criterionDetailsList = criterionRepository.fetchCampaignCriterionDetails(
-                        customerId, resourceName);
-
-                // for each object that is not DeviceDetails, add its resource name to the list for removal
-                criterionDetailsList.forEach((criterionDetails) -> {
-                    if (!(criterionDetails instanceof DeviceDetails))
-                        criterionResourceNameList.add(criterionDetails.getCriterionResourceName());
-                });
-            });
-
-            // create a list of campaign criterion operations to remove the non-device criterion from campaigns
-            List<CampaignCriterionOperation> campaignCriterionOperationList = new ArrayList<>();
-            criterionResourceNameList.forEach((resName) -> {
-                CampaignCriterionOperation campaignCriterionOperation = CampaignCriterionOperation.newBuilder()
-                        .setRemove(resName)
-                        .build();
-                campaignCriterionOperationList.add(campaignCriterionOperation);
-            });
-
-            // perform the criterion removal operations
-            if (!campaignCriterionOperationList.isEmpty())
-                criterionRepository.performCriterionOperations(customerId, campaignCriterionOperationList);
+            deleteAllCriterionForCampaigns(customerId, campaignResourceNameList);
 
             // update the operation type to CREATE the new campaign criterion
             operationType = OperationType.CREATE;
@@ -266,10 +266,56 @@ public class CampaignServiceImpl implements CampaignService {
         if (campaignDetailsList.size() != campaignResourceNameList.size()) return mapping;
 
         for (int i = 0; i < campaignResourceNameList.size(); i++) {
-
             mapping.put(campaignResourceNameList.get(i), campaignDetailsList.get(i).getCampaignCriteriaList());
         }
-
         return mapping;
+    }
+
+    private void deleteAllCriterionForCampaigns(long customerId, List<String> campaignResourceNameList) throws Exception {
+        List<String> criterionResourceNameList = new ArrayList<>();
+
+        // gather the resource names of user-created criterion to be removed from campaigns
+        campaignResourceNameList.forEach((resourceName) -> {
+            // fetch the existing criterion for the given campaign
+            List<CriterionDetails> criterionDetailsList = criterionRepository.fetchCampaignCriterionDetails(
+                    customerId, resourceName);
+
+            // for each object that is not DeviceDetails, add its resource name to the list for removal
+            criterionDetailsList.forEach((criterionDetails) -> {
+                if (!(criterionDetails instanceof DeviceDetails))
+                    criterionResourceNameList.add(criterionDetails.getCriterionResourceName());
+            });
+        });
+
+        // create a list of campaign criterion operations to remove the non-device criterion from campaigns
+        List<CampaignCriterionOperation> campaignCriterionOperationList = new ArrayList<>();
+        criterionResourceNameList.forEach((resName) -> {
+            CampaignCriterionOperation campaignCriterionOperation = CampaignCriterionOperation.newBuilder()
+                    .setRemove(resName)
+                    .build();
+            campaignCriterionOperationList.add(campaignCriterionOperation);
+        });
+
+        // perform the criterion removal operations
+        if (!campaignCriterionOperationList.isEmpty())
+            criterionRepository.performCriterionOperations(customerId, campaignCriterionOperationList);
+    }
+
+    private void associateGeoTargetConstantToLocation(List<CampaignDetails> campaignDetailsList) {
+        campaignDetailsList.forEach((campaignDetails -> {
+            campaignDetails.getCampaignCriteriaList().forEach((campaignCriterion -> {
+                if (campaignCriterion instanceof LocationDetails) {
+                    LocationDetails locationDetails = ((LocationDetails) campaignCriterion);
+
+                    try {
+                        String geotargetConstant = criterionRepository.getGeoTargetConstant(
+                                DEFAULT_LOCALE, DEFAULT_COUNTRY_CODE, locationDetails.getLocation());
+                        locationDetails.setGeoTargetingConstant(geotargetConstant);
+                    } catch (Exception e) {
+                        throw new InvalidRequestException("", ""); //TODO
+                    }
+                }
+            }));
+        }));
     }
 }

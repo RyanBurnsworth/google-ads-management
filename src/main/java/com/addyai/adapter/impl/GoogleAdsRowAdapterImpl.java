@@ -110,16 +110,16 @@ public class GoogleAdsRowAdapterImpl implements GoogleAdsRowAdapter {
         proximityDetails.setCountryCode(googleAdsRow.getCampaignCriterion().getProximity().getAddress().getCountryCode());
         proximityDetails.setMicroLongitude(
                 Math.round((float) googleAdsRow
-                                .getCampaignCriterion()
-                                .getProximity()
-                                .getGeoPoint()
-                                .getLongitudeInMicroDegrees() / MICRO_FACTOR));
+                        .getCampaignCriterion()
+                        .getProximity()
+                        .getGeoPoint()
+                        .getLongitudeInMicroDegrees() / MICRO_FACTOR));
         proximityDetails.setMicroLatitude(
                 Math.round((float) googleAdsRow
-                                .getCampaignCriterion()
-                                .getProximity()
-                                .getGeoPoint()
-                                .getLatitudeInMicroDegrees() / MICRO_FACTOR));
+                        .getCampaignCriterion()
+                        .getProximity()
+                        .getGeoPoint()
+                        .getLatitudeInMicroDegrees() / MICRO_FACTOR));
         proximityDetails.setRadius(googleAdsRow.getCampaignCriterion().getProximity().getRadius());
         proximityDetails.setRadiusUnits(googleAdsRow.getCampaignCriterion().getProximity().getRadiusUnitsValue());
 

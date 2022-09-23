@@ -20,7 +20,7 @@ import com.google.ads.googleads.v11.services.CampaignBudgetOperation;
 
 import java.util.List;
 
-public interface CampaignBudgetRepository {
+public interface BudgetRepository {
     List<BudgetDetails> fetchAllBudgetDetails(long customerId) throws Exception;
 
     List<String> performCampaignBudgetOperations(long customerId, List<CampaignBudgetOperation> campaignBudgetOperationList) throws Exception;

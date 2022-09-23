@@ -23,7 +23,7 @@ public interface CampaignService {
 
     void upsertCampaigns(long customerId, List<CampaignDetails> campaignDetailsList, boolean shouldCreate) throws Exception;
 
-    void deleteCampaigns(long customerId, List<Long> campaignIds) throws Exception;
+    void deleteCampaigns(long customerId, List<CampaignDetails> campaignDetailsList) throws Exception;
 
     List<CampaignDetails> findAllCampaignDetails(long customerId) throws Exception;
 

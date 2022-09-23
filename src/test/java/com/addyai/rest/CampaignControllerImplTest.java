@@ -35,6 +35,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.addyai.utils.TestUtils.MOCK_CAMPAIGN_RESOURCE_NAME;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
@@ -131,5 +132,18 @@ public class CampaignControllerImplTest {
                         .contentType(APPLICATION_JSON_UTF8)
                         .content(gson.toJson(campaignDetailsList)))
                 .andExpect(status().is2xxSuccessful());
+    }
+
+    @Test
+    void testDeleteCampaignIsSuccessful() throws Exception {
+        List<CampaignDetails> campaignDetailsList = new ArrayList<>();
+        CampaignDetails campaignDetails = new CampaignDetails();
+        campaignDetails.setCampaignResourceName(MOCK_CAMPAIGN_RESOURCE_NAME);
+        campaignDetailsList.add(campaignDetails);
+
+        mockMvc.perform(post(BASE_URL + "remove")
+                .contentType(APPLICATION_JSON_UTF8)
+                .content(gson.toJson(campaignDetailsList)))
+                .andExpect(status().isOk());
     }
 }

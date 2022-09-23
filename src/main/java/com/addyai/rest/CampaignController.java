@@ -33,5 +33,5 @@ public interface CampaignController {
                                          List<CampaignDetails> campaignDetails) throws Exception;
 
     ResponseEntity<Void> deleteCampaigns(String customerId,
-                                         List<Long> campaignIds) throws Exception;
+                                         List<CampaignDetails> campaignDetails) throws Exception;
 }

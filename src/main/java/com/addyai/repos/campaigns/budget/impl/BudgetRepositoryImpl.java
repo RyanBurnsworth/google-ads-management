@@ -18,7 +18,7 @@ package com.addyai.repos.campaigns.budget.impl;
 import com.addyai.builder.GoogleAdsClientBuilder;
 import com.addyai.error_handling.ApiExceptionResolver;
 import com.addyai.models.BudgetDetails;
-import com.addyai.repos.campaigns.budget.CampaignBudgetRepository;
+import com.addyai.repos.campaigns.budget.BudgetRepository;
 import com.addyai.repos.requests.StreamRequest;
 import com.addyai.repos.requests.impl.StreamRequestImpl;
 import com.addyai.utils.helpers.GAQLHelper;
@@ -30,12 +30,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Repository
-public class CampaignBudgetRepositoryImpl implements CampaignBudgetRepository {
+public class BudgetRepositoryImpl implements BudgetRepository {
     private final StreamRequest requestBuilder;
 
     private final CampaignBudgetServiceClient campaignBudgetServiceClient;
 
-    public CampaignBudgetRepositoryImpl() {
+    public BudgetRepositoryImpl() {
         GoogleAdsClientBuilder googleAdsClientBuilder = GoogleAdsClientBuilder.INSTANCE;
 
         GoogleAdsServiceClient googleAdsServiceClient = googleAdsClientBuilder

@@ -69,8 +69,8 @@ public class CampaignControllerImpl implements CampaignController {
     @Override
     @PostMapping("/remove")
     public ResponseEntity<Void> deleteCampaigns(@PathVariable String customerId,
-                                                @RequestBody List<Long> campaignIds) throws Exception {
-        campaignService.deleteCampaigns(Long.parseLong(customerId), campaignIds);
+                                                @RequestBody List<CampaignDetails> campaignDetails) throws Exception {
+        campaignService.deleteCampaigns(Long.parseLong(customerId), campaignDetails);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 }
