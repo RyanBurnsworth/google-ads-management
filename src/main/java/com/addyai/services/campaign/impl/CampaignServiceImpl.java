@@ -21,6 +21,7 @@ import com.addyai.enums.OperationType;
 import com.addyai.error_handling.ValidationErrorResponse;
 import com.addyai.error_handling.exceptions.InvalidRequestException;
 import com.addyai.error_handling.exceptions.NotFoundException;
+import com.addyai.error_handling.exceptions.ServiceFailureException;
 import com.addyai.models.BudgetDetails;
 import com.addyai.models.CampaignDetails;
 import com.addyai.models.campaign_criterion.CriterionDetails;
@@ -69,18 +70,25 @@ public class CampaignServiceImpl implements CampaignService {
      * @param campaignDetailsList [CampaignDetails] containing values to create/update campaigns with
      * @param shouldCreate        true if create and false if updating
      * @throws InvalidRequestException if an error occurs during the creating/updating of campaigns
+     * @throws ServiceFailureException if an error occurs while creating campaign operations
      */
     @Override
     public void upsertCampaigns(long customerId, List<CampaignDetails> campaignDetailsList, boolean shouldCreate) throws Exception {
         OperationType operationType = shouldCreate ? OperationType.CREATE : OperationType.UPDATE;
 
-        validateCampaignDetails(campaignDetailsList, operationType);
+        // validate CampaignDetails, BudgetDetails and CriterionDetails objects before proceeding
+        validateDetails(campaignDetailsList, operationType);
 
         // create the budget from budget details on the account, then associate the budget to the campaign.
         campaignDetailsList = associateBudgetsToCampaigns(customerId, campaignDetailsList, operationType);
 
+        // build a list of campaign operations based on the operation type
         List<CampaignOperation> campaignOperationList = operationBuilder
                 .buildCampaignOperationList(campaignDetailsList, operationType);
+
+        // if the campaignOperationsList is empty there was a problem creating operations
+        if (campaignOperationList.isEmpty())
+            throw new ServiceFailureException(INTERNAL_SERVICE_ERROR, CAMPAIGN_OPERATIONS_FAILED_ERROR_MSG);
 
         // create or update the campaigns on the client account.
         List<String> campaignResourceNameList =
@@ -97,7 +105,6 @@ public class CampaignServiceImpl implements CampaignService {
      * @param customerId the customer id of the client account
      * @return a list of all [CampaignDetails] in a client's account
      * @throws InvalidRequestException if an error occurs during the retrieval of campaigns
-     * @throws
      */
     @Override
     public List<CampaignDetails> findAllCampaignDetails(long customerId) throws Exception {
@@ -115,9 +122,11 @@ public class CampaignServiceImpl implements CampaignService {
             // assign the budget details object to the campaign details object
             campaignDetails.setBudgetDetails(budgetDetails);
 
+            // retrieve the campaign criterion from the account
             List<CriterionDetails> criterionDetailsList = criterionRepository.fetchCampaignCriterionDetails(customerId,
                     campaignDetails.getCampaignResourceName());
 
+            // update the CriterionDetails list in the CampaignDetails object
             campaignDetails.setCampaignCriteriaList(criterionDetailsList);
         }
         return campaignDetailsList;
@@ -131,7 +140,7 @@ public class CampaignServiceImpl implements CampaignService {
      * @param campaignName the name of the campaign to fetch
      * @return CampaignDetails containing the values from the
      * @throws InvalidRequestException if an error occurs during the retrieval of campaign by name
-     * @throws NotFoundException       if campaign is not found
+     * @throws NotFoundException       if the requested campaign is not found
      */
     @Override
     public CampaignDetails findCampaignDetailsByName(long customerId, String campaignName) throws Exception {
@@ -142,7 +151,7 @@ public class CampaignServiceImpl implements CampaignService {
         // fetch the campaign details from the client account using the campaign name
         CampaignDetails campaignDetails = campaignRepository.fetchCampaignDetailsByName(customerId, campaignName);
         if (campaignDetails == null)
-            throw new NotFoundException("", ""); // TODO
+            throw new NotFoundException(RESOURCE_NOT_FOUND_ERR_CODE, RESOURCE_NOT_FOUND_ERROR_MSG);
 
         // TODO create an endpoint to grab a single budget details object by id or name
         // fetch all the campaign budgets from the client's account
@@ -171,6 +180,16 @@ public class CampaignServiceImpl implements CampaignService {
         campaignRepository.performCampaignOperations(customerId, campaignOperationList);
     }
 
+    /**
+     * Create or update budgets on the client account and associate the budget with its appropriate campaign.
+     *
+     * @param customerId          the customer id of the client account
+     * @param campaignDetailsList the campaignDetails that include budget details to be created or updated
+     * @param operationType       the type of operation to be performed on the budgets (CREATE or UPDATE)
+     * @return the list of campaign details with newly created or updated budgets associated
+     * @throws InvalidRequestException if an error occurs during the associating of budgets to campaigns
+     * @throws ServiceFailureException if an error occurs while creating the budget operations
+     */
     private List<CampaignDetails> associateBudgetsToCampaigns(long customerId,
                                                               List<CampaignDetails> campaignDetailsList,
                                                               OperationType operationType) throws Exception {
@@ -180,6 +199,10 @@ public class CampaignServiceImpl implements CampaignService {
             List<BudgetDetails> singleBudgetDetailsList = Collections.singletonList(campaignDetails.getBudgetDetails());
             List<CampaignBudgetOperation> campaignBudgetOperations =
                     operationBuilder.buildCampaignBudgetOperationList(singleBudgetDetailsList, operationType);
+
+            // if the campaignBudgetOperations is empty there was a problem creating operations
+            if (campaignBudgetOperations.isEmpty())
+                throw new ServiceFailureException(INTERNAL_SERVICE_ERROR, BUDGET_OPERATIONS_FAILED_ERROR_MSG);
 
             // create the budget and extract the budget resource name
             String budgetResourceName =
@@ -192,10 +215,25 @@ public class CampaignServiceImpl implements CampaignService {
         return updateCampaignDetailsList;
     }
 
+    /**
+     * Create or update criterion and associate to the appropriate campaign associated by the campaign's resource name.
+     * When updating campaign criterion, the existing criterion for the campaign will be deleted and the list of
+     * criterion contained in campaignDetails will be added to the campaign.
+     *
+     * @param customerId               the customer id of the client account
+     * @param campaignDetailsList      a list of campaign details containing a list of criterion details to be created or updated
+     * @param campaignResourceNameList a list of each campaign's resource name have its criterion created or updated
+     * @param operationType            the type of operation to be performed on the budgets (CREATE or UPDATE)
+     * @throws InvalidRequestException if an error occurs during the associating of criterion to campaigns
+     * @throws ServiceFailureException if an error occurs while creating the criterion operations
+     */
     private void associateCriterionToCampaigns(long customerId,
                                                List<CampaignDetails> campaignDetailsList,
                                                List<String> campaignResourceNameList,
                                                OperationType operationType) throws Exception {
+
+        // if campaign resource names or details list are empty then continue
+        if (campaignDetailsList.isEmpty() || campaignResourceNameList.isEmpty()) return;
 
         // associate geotarget codes to location criterion
         associateGeoTargetConstantToLocation(campaignDetailsList);
@@ -215,6 +253,10 @@ public class CampaignServiceImpl implements CampaignService {
         // create a list of campaign criterion CREATE operations
         List<CampaignCriterionOperation> campaignCriterionOperationList = operationBuilder
                 .buildCampaignCriterionOperationList(mapping, operationType);
+
+        // if the campaignCriterionOperationList there was a problem creating a mapping or operations
+        if (campaignCriterionOperationList.isEmpty())
+            throw new ServiceFailureException(INTERNAL_SERVICE_ERROR, CRITERION_OPERATIONS_FAILED_ERROR_MSG);
 
         // perform the criterion CREATE operations
         criterionRepository.performCriterionOperations(customerId, campaignCriterionOperationList);
@@ -236,7 +278,15 @@ public class CampaignServiceImpl implements CampaignService {
         return null;
     }
 
-    private void validateCampaignDetails(List<CampaignDetails> campaignDetailsList, OperationType operationType) {
+    /**
+     * Validate each CampaignDetails object in the list including its BudgetDetails object and list of CriterionDetails.
+     * Validate necessary fields are complete based on the operation type.
+     *
+     * @param campaignDetailsList a list of campaignDetails to be validated
+     * @param operationType       the type of operation being validated against
+     */
+    private void validateDetails(List<CampaignDetails> campaignDetailsList, OperationType operationType) {
+        // validate the CampaignDetails
         ValidationErrorResponse validationErrorResponse;
         for (CampaignDetails campaignDetails : campaignDetailsList) {
             validationErrorResponse = EntityValidator.isCampaignDetailsValid(campaignDetails, operationType);
@@ -245,12 +295,14 @@ public class CampaignServiceImpl implements CampaignService {
                         validationErrorResponse.getErrorCode(),
                         validationErrorResponse.getErrorMessage());
 
+            // validate the BudgetDetails
             validationErrorResponse = EntityValidator.isBudgetDetailsValid(campaignDetails.getBudgetDetails(), operationType);
             if (validationErrorResponse != null)
                 throw new InvalidRequestException(
                         validationErrorResponse.getErrorCode(),
                         validationErrorResponse.getErrorMessage());
 
+            // validate the CriterionDetails
             validationErrorResponse = EntityValidator.isCriterionDetailsValid(campaignDetails.getCampaignCriteriaList());
             if (validationErrorResponse != null)
                 throw new InvalidRequestException(
@@ -259,9 +311,17 @@ public class CampaignServiceImpl implements CampaignService {
         }
     }
 
+    /**
+     * Create a mapping from a campaign resource to each of its associated criterion.
+     *
+     * @param campaignResourceNameList a list of campaign resource names to map to criterion
+     * @param campaignDetailsList      a list of campaign details containing a list of criterion details
+     * @return a one-to-one mapping of campaign resource name to a list of the campaign's associated criterionDetails
+     */
     private Map<String, List<CriterionDetails>> buildCampaignResNameToCriterionMapping(List<String> campaignResourceNameList,
                                                                                        List<CampaignDetails> campaignDetailsList) {
         Map<String, List<CriterionDetails>> mapping = new HashMap<>();
+        // a one-to-one mapping must existing
         if (campaignDetailsList.size() != campaignResourceNameList.size()) return mapping;
 
         for (int i = 0; i < campaignResourceNameList.size(); i++) {
@@ -270,6 +330,14 @@ public class CampaignServiceImpl implements CampaignService {
         return mapping;
     }
 
+    /**
+     * Delete all criterion associated with a campaign
+     *
+     * @param customerId               the customer id of the client account
+     * @param campaignResourceNameList a list of campaign resource names each of which will have their criterion removed.
+     * @throws InvalidRequestException if an error occurs during the associating of criterion to campaigns
+     * @throws ServiceFailureException if an error occurs while creating the criterion operations
+     */
     private void deleteAllCriterionForCampaigns(long customerId, List<String> campaignResourceNameList) throws Exception {
         List<String> criterionResourceNameList = new ArrayList<>();
 
@@ -295,23 +363,39 @@ public class CampaignServiceImpl implements CampaignService {
             campaignCriterionOperationList.add(campaignCriterionOperation);
         });
 
+        // if the campaignCriterionOperationList there was a problem creating a mapping or operations
+        if (campaignCriterionOperationList.isEmpty())
+            throw new ServiceFailureException(INTERNAL_SERVICE_ERROR, CRITERION_OPERATIONS_FAILED_ERROR_MSG);
+
         // perform the criterion removal operations
-        if (!campaignCriterionOperationList.isEmpty())
-            criterionRepository.performCriterionOperations(customerId, campaignCriterionOperationList);
+        criterionRepository.performCriterionOperations(customerId, campaignCriterionOperationList);
     }
 
+    /**
+     * Update the geo target constant with each of the campaignDetails.criterionDetailsList
+     * LocationDetails objects using the location string it contains.
+     *
+     * @param campaignDetailsList a list of campaignDetails contains
+     *                            criterionDetailsLists with LocationDetails objects
+     * @throws ServiceFailureException if the geo target constant is not found
+     */
     private void associateGeoTargetConstantToLocation(List<CampaignDetails> campaignDetailsList) {
+        // parse through each list of CriterionDetails in each of the CampaignDetails campaignDetailsList has
         campaignDetailsList.forEach((campaignDetails -> {
             campaignDetails.getCampaignCriteriaList().forEach((campaignCriterion -> {
+                // update only the LocationDetails objects
                 if (campaignCriterion instanceof LocationDetails) {
                     LocationDetails locationDetails = ((LocationDetails) campaignCriterion);
 
                     try {
+                        // get the geo target constant using the location from Google Ads
                         String geotargetConstant = criterionRepository.getGeoTargetConstant(
                                 DEFAULT_LOCALE, DEFAULT_COUNTRY_CODE, locationDetails.getLocation());
+
+                        // update the LocationDetails object
                         locationDetails.setGeoTargetingConstant(geotargetConstant);
                     } catch (Exception e) {
-                        throw new InvalidRequestException("", ""); //TODO
+                        throw new ServiceFailureException(INTERNAL_SERVICE_ERROR, LOCATION_NOT_FOUND_ERROR_MSG);
                     }
                 }
             }));

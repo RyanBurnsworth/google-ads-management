@@ -29,19 +29,17 @@ public class Constants {
     public static final String LANGUAGE_CONSTANT_EN = "languageConstants/1000";
 
     public static final String INVALID_REQUEST_ERROR = "INVALID_REQUEST";
-    public static final String INTERNAL_ERROR = "INTERNAL_ERROR";
+    public static final String INTERNAL_SERVICE_ERROR = "INTERNAL_SERVICE_ERROR";
     public static final String UNKNOWN_SERVICE_ERROR = "UNKNOWN_SERVICE_ERROR";
-    public static final String RECORD_NOT_FOUND = "RECORD_NOT_FOUND";
-
-    public static final String MISSING_CUSTOMER_ID_ERR_CODE = "MISSING_CUSTOMER_ID";
-    public static final String MISSING_CUSTOMER_ID_ERR_MSG = "Customer ID is required";
-    public static final String MISSING_PARAMS = "Missing Parameters";
+    public static final String RESOURCE_NOT_FOUND_ERR_CODE = "RESOURCE_NOT_FOUND";
+    public static final String RESOURCE_NOT_FOUND_ERROR_MSG = "The requested resource was not found";
+    public static final String LOCATION_NOT_FOUND_ERROR_MSG = "Geo target code could not be found for location";
+    public static final String CAMPAIGN_OPERATIONS_FAILED_ERROR_MSG = "Failed to perform operations on campaigns";
+    public static final String BUDGET_OPERATIONS_FAILED_ERROR_MSG = "Failed to perform operations on campaign budgets";
+    public static final String CRITERION_OPERATIONS_FAILED_ERROR_MSG = "Failed to perform operations on campaign criterion";
+    public static final String MISSING_PARAMS = "Parameters are missing from the request query";
 
     public static final String LANGUAGE_CODE_PREFIX = "languageConstants/";
-
-    public static final String NOT_FOUND_ERR_CODE = "NOT_FOUND";
-
-    public static final String NOT_FOUND_CAMPAIGN = "Campaign not found";
 
     public static final int ADVERTISING_CHANNEL_TYPE_SEARCH
             = AdvertisingChannelTypeEnum.AdvertisingChannelType.SEARCH_VALUE;

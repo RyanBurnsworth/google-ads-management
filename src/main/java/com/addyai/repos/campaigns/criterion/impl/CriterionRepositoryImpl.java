@@ -35,7 +35,6 @@ import static com.addyai.utils.misc.Constants.NUM_CRITERION_CLASSES_SUPPORTED;
 
 @Repository
 public class CriterionRepositoryImpl implements CriterionRepository {
-    private final GoogleAdsServiceClient googleAdsServiceClient;
     private final StreamRequest requestBuilder;
 
     private final CampaignCriterionServiceClient campaignCriterionServiceClient;
@@ -43,7 +42,7 @@ public class CriterionRepositoryImpl implements CriterionRepository {
     public CriterionRepositoryImpl() {
         GoogleAdsClientBuilder googleAdsClientBuilder = GoogleAdsClientBuilder.INSTANCE;
 
-        this.googleAdsServiceClient = googleAdsClientBuilder
+        GoogleAdsServiceClient googleAdsServiceClient = googleAdsClientBuilder
                 .getGoogleAdsClient()
                 .getLatestVersion()
                 .createGoogleAdsServiceClient();

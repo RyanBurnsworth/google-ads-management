@@ -81,6 +81,7 @@ public class EntityValidator {
      * Validate the fields of the CampaignDetails object
      *
      * @param campaignDetails CampaignDetails object to be validated
+     * @param operationType   the type of operation being validated against
      * @return if invalid return a ValidationResponseError, else return null
      */
     public static ValidationErrorResponse isCampaignDetailsValid(CampaignDetails campaignDetails,
@@ -89,11 +90,11 @@ public class EntityValidator {
                 .withResolverStyle(ResolverStyle.STRICT);
 
         DateValidator dateValidator = new DateValidator(dateTimeFormatter);
-        if (operationType.equals(OperationType.UPDATE) && campaignDetails.getCampaignResourceName().isEmpty()) {
+        if ((operationType.equals(OperationType.UPDATE) || operationType.equals(OperationType.REMOVE)) &&
+                campaignDetails.getCampaignResourceName().isEmpty()) {
             return new ValidationErrorResponse(
                     INVALID_CAMPAIGN_DETAILS_ERR_CODE,
-                    GENERAL_RES_NAME_EMPTY_ERR_MSG
-            );
+                    GENERAL_RES_NAME_EMPTY_ERR_MSG);
         } else if (campaignDetails.getCampaignName().isEmpty())
             return new ValidationErrorResponse(
                     INVALID_CAMPAIGN_DETAILS_ERR_CODE,
@@ -145,14 +146,14 @@ public class EntityValidator {
      * Validate the fields of the BudgetDetails object
      *
      * @param budgetDetails BudgetDetails to be validated
+     * @param operationType the type of operation being validated against
      * @return if invalid return a ValidationResponseError, else return null
      */
     public static ValidationErrorResponse isBudgetDetailsValid(BudgetDetails budgetDetails, OperationType operationType) {
         if (operationType.equals(OperationType.UPDATE) && budgetDetails.getResourceName().isEmpty()) {
             return new ValidationErrorResponse(
                     INVALID_BUDGET_DETAILS_ERR_CODE,
-                    GENERAL_RES_NAME_EMPTY_ERR_MSG
-            );
+                    GENERAL_RES_NAME_EMPTY_ERR_MSG);
         } else if (budgetDetails.getDailyBudgetAmount() <= 0) {
             return new ValidationErrorResponse(
                     INVALID_BUDGET_DETAILS_ERR_CODE,

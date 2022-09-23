@@ -17,7 +17,6 @@ package com.addyai.builder.impl;
 
 import com.addyai.builder.OperationBuilder;
 import com.addyai.enums.OperationType;
-import com.addyai.error_handling.exceptions.InvalidRequestException;
 import com.addyai.models.BudgetDetails;
 import com.addyai.models.CampaignDetails;
 import com.addyai.models.campaign_criterion.*;
@@ -74,7 +73,7 @@ public class OperationBuilderImpl implements OperationBuilder {
      * Build [CampaignBudgetOperation] to be used for creating or updating campaign budgets
      *
      * @param budgetDetailsList [BudgetDetails] to create budgets from
-     * @param operationType     true if it should create budget, false if it should update //TODO update javadoc
+     * @param operationType     the OperationType to be performed
      * @return [CampaignBudgetOperation]
      */
     @Override
@@ -121,7 +120,7 @@ public class OperationBuilderImpl implements OperationBuilder {
      * Build [CampaignCriterionOperation] to be used for creating or updating campaign criterion.
      *
      * @param criterionMapping a mapping of campaign resource name to a list of CriterionDetails
-     * @param operationType    true if it should create, false if it should update // TODO update javadoc
+     * @param operationType    the OperationType to be performed
      * @return [CampaignCriterionOperations]
      */
     @Override
