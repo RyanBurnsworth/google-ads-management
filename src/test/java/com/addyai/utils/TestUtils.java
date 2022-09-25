@@ -199,8 +199,8 @@ public class TestUtils {
         mockCampaignDetails.setCampaignResourceName(MOCK_CAMPAIGN_RESOURCE_NAME);
         mockCampaignDetails.setBudgetResourceName(MOCK_BUDGET_RESOURCE_NAME);
         mockCampaignDetails.setEnhancedCpcEnabled(true);
-        mockCampaignDetails.setCampaignCriteriaList(new ArrayList<>());
-        mockCampaignDetails.setBudgetDetails(new BudgetDetails());
+        mockCampaignDetails.setCampaignCriteriaList(new ArrayList<>()); //TODO:
+        mockCampaignDetails.setBudgetDetails(getMockBudgetDetails());
 
         return mockCampaignDetails;
     }
@@ -272,8 +272,8 @@ public class TestUtils {
         proximityDetails2.setCountryCode("US");
         proximityDetails2.setRadius(10);
         proximityDetails2.setRadiusUnits(RADIUS_UNITS_MILES);
-        proximityDetails2.setMicroLatitude(MOCK_LATITUDE);
-        proximityDetails2.setMicroLongitude(MOCK_LONGITUDE);
+        proximityDetails2.setLatitude(MOCK_LATITUDE);
+        proximityDetails2.setLongitude(MOCK_LONGITUDE);
         criterionDetailsList.add(proximityDetails2);
 
         DeviceDetails deviceDetails = new DeviceDetails();

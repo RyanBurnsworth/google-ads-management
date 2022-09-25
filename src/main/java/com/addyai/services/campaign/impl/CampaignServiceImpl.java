@@ -73,7 +73,8 @@ public class CampaignServiceImpl implements CampaignService {
      * @throws ServiceFailureException if an error occurs while creating campaign operations
      */
     @Override
-    public void upsertCampaigns(long customerId, List<CampaignDetails> campaignDetailsList, boolean shouldCreate) throws Exception {
+    public void upsertCampaigns(long customerId, List<CampaignDetails> campaignDetailsList,
+                                boolean shouldCreate) throws Exception {
         OperationType operationType = shouldCreate ? OperationType.CREATE : OperationType.UPDATE;
 
         // validate CampaignDetails, BudgetDetails and CriterionDetails objects before proceeding
@@ -179,13 +180,16 @@ public class CampaignServiceImpl implements CampaignService {
         ValidationErrorResponse validationErrorResponse = EntityValidator
                 .validateNonEmptyCampaignResourceNames(campaignDetailsList);
 
+        // throw an exception if there are missing campaign resource ids
         if (validationErrorResponse != null)
             throw new InvalidRequestException(validationErrorResponse.getErrorCode(),
                     validationErrorResponse.getErrorMessage());
 
+        // build delete campaigns operation list
         List<CampaignOperation> campaignOperationList =
                 operationBuilder.buildCampaignOperationList(campaignDetailsList, OperationType.REMOVE);
 
+        // perform delete campaigns operations on the client's account
         campaignRepository.performCampaignOperations(customerId, campaignOperationList);
     }
 

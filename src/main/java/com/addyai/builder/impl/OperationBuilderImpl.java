@@ -412,13 +412,13 @@ public class OperationBuilderImpl implements OperationBuilder {
         }
 
         // if the latitude and longitude are set and the address is not set, create and set the geopoints info object
-        if (proximityDetails.getMicroLatitude() != 0 &&
-                proximityDetails.getMicroLongitude() != 0 &&
+        if (proximityDetails.getLatitude() != 0 &&
+                proximityDetails.getLongitude() != 0 &&
                 !proximityInfoBuilder.hasAddress()) {
 
             // convert longitude and latitude to micro degrees
-            int longitude = Math.round(proximityDetails.getMicroLongitude() * MICRO_FACTOR);
-            int latitude = Math.round(proximityDetails.getMicroLatitude() * MICRO_FACTOR);
+            int longitude = Math.round(proximityDetails.getLongitude() * MICRO_FACTOR);
+            int latitude = Math.round(proximityDetails.getLatitude() * MICRO_FACTOR);
 
             // set the longitude and latitude geo points in the builder
             GeoPointInfo geoPointInfo = GeoPointInfo.newBuilder()

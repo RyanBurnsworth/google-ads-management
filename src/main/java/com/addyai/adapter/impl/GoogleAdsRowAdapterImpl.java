@@ -67,13 +67,17 @@ public class GoogleAdsRowAdapterImpl implements GoogleAdsRowAdapter {
         adScheduleDetails.setCriterionResourceName(googleAdsRow.getCampaignCriterion().getResourceName());
         adScheduleDetails.setCampaignCriterionId(googleAdsRow.getCampaignCriterion().getCriterionId());
         adScheduleDetails.setCampaignResourceName(googleAdsRow.getCampaignCriterion().getCampaign());
-        adScheduleDetails.setBidModifier(googleAdsRow.getCampaignCriterion().getBidModifier());
         adScheduleDetails.setStatus(googleAdsRow.getCampaignCriterion().getStatusValue());
         adScheduleDetails.setDayOfWeek(googleAdsRow.getCampaignCriterion().getAdSchedule().getDayOfWeekValue());
         adScheduleDetails.setStartHour(googleAdsRow.getCampaignCriterion().getAdSchedule().getStartHour());
         adScheduleDetails.setEndHour(googleAdsRow.getCampaignCriterion().getAdSchedule().getEndHour());
         adScheduleDetails.setStartMinute(googleAdsRow.getCampaignCriterion().getAdSchedule().getStartMinuteValue());
         adScheduleDetails.setEndMinute(googleAdsRow.getCampaignCriterion().getAdSchedule().getEndMinuteValue());
+
+        // if no bid modifier is set, set to -1.0
+        adScheduleDetails.setBidModifier(
+                googleAdsRow.getCampaignCriterion().hasBidModifier() ?
+                        googleAdsRow.getCampaignCriterion().getBidModifier() : -1.0f);
 
         return adScheduleDetails;
     }
@@ -101,25 +105,36 @@ public class GoogleAdsRowAdapterImpl implements GoogleAdsRowAdapter {
         proximityDetails.setCriterionResourceName(googleAdsRow.getCampaignCriterion().getResourceName());
         proximityDetails.setCampaignResourceName(googleAdsRow.getCampaignCriterion().getCampaign());
         proximityDetails.setStatus(googleAdsRow.getCampaignCriterion().getStatusValue());
-        proximityDetails.setBidModifier(googleAdsRow.getCampaignCriterion().getBidModifier());
-        proximityDetails.setCityName(googleAdsRow.getCampaignCriterion().getProximity().getAddress().getCityName());
-        proximityDetails.setProvinceName(googleAdsRow.getCampaignCriterion().getProximity().getAddress().getProvinceName());
-        proximityDetails.setStreetAddress(googleAdsRow.getCampaignCriterion().getProximity().getAddress().getStreetAddress());
-        proximityDetails.setPostalCode(googleAdsRow.getCampaignCriterion().getProximity().getAddress().getPostalCode());
-        proximityDetails.setProvinceCode(googleAdsRow.getCampaignCriterion().getProximity().getAddress().getProvinceCode());
-        proximityDetails.setCountryCode(googleAdsRow.getCampaignCriterion().getProximity().getAddress().getCountryCode());
-        proximityDetails.setMicroLongitude(
-                Math.round((float) googleAdsRow
-                        .getCampaignCriterion()
-                        .getProximity()
-                        .getGeoPoint()
-                        .getLongitudeInMicroDegrees() / MICRO_FACTOR));
-        proximityDetails.setMicroLatitude(
-                Math.round((float) googleAdsRow
-                        .getCampaignCriterion()
-                        .getProximity()
-                        .getGeoPoint()
-                        .getLatitudeInMicroDegrees() / MICRO_FACTOR));
+
+        if (googleAdsRow.getCampaignCriterion().getProximity().hasAddress()) {
+            proximityDetails.setCityName(googleAdsRow.getCampaignCriterion().getProximity().getAddress().getCityName());
+            proximityDetails.setProvinceName(googleAdsRow.getCampaignCriterion().getProximity().getAddress().getProvinceName());
+            proximityDetails.setStreetAddress(googleAdsRow.getCampaignCriterion().getProximity().getAddress().getStreetAddress());
+            proximityDetails.setPostalCode(googleAdsRow.getCampaignCriterion().getProximity().getAddress().getPostalCode());
+            proximityDetails.setProvinceCode(googleAdsRow.getCampaignCriterion().getProximity().getAddress().getProvinceCode());
+            proximityDetails.setCountryCode(googleAdsRow.getCampaignCriterion().getProximity().getAddress().getCountryCode());
+        }
+
+        // if no bid modifier is set, set to -1.0
+        proximityDetails.setBidModifier(
+                googleAdsRow.getCampaignCriterion().hasBidModifier() ?
+                        googleAdsRow.getCampaignCriterion().getBidModifier() : -1.0f);
+
+        if (googleAdsRow.getCampaignCriterion().getProximity().hasGeoPoint()) {
+            proximityDetails.setLongitude(
+                    Math.round((float) googleAdsRow
+                            .getCampaignCriterion()
+                            .getProximity()
+                            .getGeoPoint()
+                            .getLongitudeInMicroDegrees() / MICRO_FACTOR));
+            proximityDetails.setLatitude(
+                    Math.round((float) googleAdsRow
+                            .getCampaignCriterion()
+                            .getProximity()
+                            .getGeoPoint()
+                            .getLatitudeInMicroDegrees() / MICRO_FACTOR));
+        }
+
         proximityDetails.setRadius(googleAdsRow.getCampaignCriterion().getProximity().getRadius());
         proximityDetails.setRadiusUnits(googleAdsRow.getCampaignCriterion().getProximity().getRadiusUnitsValue());
 
@@ -142,6 +157,11 @@ public class GoogleAdsRowAdapterImpl implements GoogleAdsRowAdapter {
         if (locationDetails.getGeoTargetingConstant().isEmpty())
             return null;
 
+        // if no bid modifier is set, set to -1.0
+        locationDetails.setBidModifier(
+                googleAdsRow.getCampaignCriterion().hasBidModifier() ?
+                        googleAdsRow.getCampaignCriterion().getBidModifier() : -1.0f);
+
         return locationDetails;
     }
 
@@ -154,6 +174,7 @@ public class GoogleAdsRowAdapterImpl implements GoogleAdsRowAdapter {
         languageDetails.setCampaignResourceName(googleAdsRow.getCampaignCriterion().getCampaign());
         languageDetails.setStatus(googleAdsRow.getCampaignCriterion().getStatusValue());
         languageDetails.setLanguageCode(googleAdsRow.getCampaignCriterion().getLanguage().getLanguageConstant());
+        languageDetails.setBidModifier(-1.0f); // language cannot have a bid modifier
 
         // Google Ads adds language targets that the user doesn't specify. These cannot be removed or updated.
         // These will have an empty language code. Do not add to list to refrain from confusion.
@@ -171,8 +192,12 @@ public class GoogleAdsRowAdapterImpl implements GoogleAdsRowAdapter {
         deviceDetails.setCriterionResourceName(googleAdsRow.getCampaignCriterion().getResourceName());
         deviceDetails.setCampaignResourceName(googleAdsRow.getCampaignCriterion().getCampaign());
         deviceDetails.setStatus(googleAdsRow.getCampaignCriterion().getStatusValue());
-        deviceDetails.setBidModifier(googleAdsRow.getCampaignCriterion().getBidModifier());
         deviceDetails.setDeviceType(googleAdsRow.getCampaignCriterion().getDevice().getTypeValue());
+
+        // if no bid modifier is set, set to -1.0
+        deviceDetails.setBidModifier(
+                googleAdsRow.getCampaignCriterion().hasBidModifier() ?
+                        googleAdsRow.getCampaignCriterion().getBidModifier() : -1.0f);
 
         return deviceDetails;
     }

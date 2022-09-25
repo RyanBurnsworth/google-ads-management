@@ -22,10 +22,12 @@ import com.addyai.models.campaign_criterion.CriterionDetails;
 import com.google.ads.googleads.v11.services.CampaignBudgetOperation;
 import com.google.ads.googleads.v11.services.CampaignCriterionOperation;
 import com.google.ads.googleads.v11.services.CampaignOperation;
+import org.springframework.stereotype.Component;
 
 import java.util.List;
 import java.util.Map;
 
+@Component
 public interface OperationBuilder {
     List<CampaignOperation> buildCampaignOperationList(List<CampaignDetails> campaignDetailsList,
                                                        OperationType operationType);

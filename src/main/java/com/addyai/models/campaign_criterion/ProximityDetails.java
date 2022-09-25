@@ -18,24 +18,54 @@ package com.addyai.models.campaign_criterion;
 import static com.addyai.utils.misc.Constants.RADIUS_UNITS_MILES;
 
 public class ProximityDetails extends CriterionDetails {
+    /**
+     * The city to be targeted with this criterion
+     */
     private String cityName = "";
 
+    /**
+     * The country code to be targeted with this criterion
+     */
     private String countryCode = "";
 
+    /**
+     * The postal code to be targeted with this criterion
+     */
     private String postalCode = "";
 
+    /**
+     * The province code to be targeted (For non-US proximity targeting)
+     */
     private String provinceCode = "";
 
+    /**
+     * The province name to be targeted (For non-US promixity targeting)
+     */
     private String provinceName = "";
 
+    /**
+     * The street address for targeting
+     */
     private String streetAddress = "";
 
-    private float microLongitude = 0.0f;
+    /**
+     * The longitude value to be used for targeting
+     */
+    private float longitude = 0.0f;
 
-    private float microLatitude = 0.0f;
+    /**
+     * The latitude value to be used for targeting
+     */
+    private float latitude = 0.0f;
 
+    /**
+     * The radius of the proximity to target
+     */
     private double radius = 0.0;
 
+    /**
+     * The units of the radius value (Miles or Kilometers)
+     */
     private int radiusUnits = RADIUS_UNITS_MILES;
 
     public String getCityName() {
@@ -86,20 +116,20 @@ public class ProximityDetails extends CriterionDetails {
         this.streetAddress = streetAddress;
     }
 
-    public float getMicroLongitude() {
-        return microLongitude;
+    public float getLongitude() {
+        return longitude;
     }
 
-    public void setMicroLongitude(float microLongitude) {
-        this.microLongitude = microLongitude;
+    public void setLongitude(float longitude) {
+        this.longitude = longitude;
     }
 
-    public float getMicroLatitude() {
-        return microLatitude;
+    public float getLatitude() {
+        return latitude;
     }
 
-    public void setMicroLatitude(float microLatitude) {
-        this.microLatitude = microLatitude;
+    public void setLatitude(float latitude) {
+        this.latitude = latitude;
     }
 
     public double getRadius() {

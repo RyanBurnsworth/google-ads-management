@@ -19,12 +19,28 @@ import static com.addyai.utils.misc.Constants.DEFAULT_COUNTRY_CODE;
 import static com.addyai.utils.misc.Constants.DEFAULT_LOCALE;
 
 public class LocationDetails extends CriterionDetails {
+    /**
+     * The geo targeting constant associated to a location
+     *
+     * @see <a href="https://developers.google.com/google-ads/api/fields/v11/geo_target_constant">Geo Targeting Constants</a>
+     */
     private String geoTargetingConstant = "";
 
+    /**
+     * The locale of the targeting criterion
+     * Defaults to 'en'
+     */
     private String locale = DEFAULT_LOCALE;
 
+    /**
+     * The country code of the targeting criterion
+     * Defaults to 'US'
+     */
     private String countryCode = DEFAULT_COUNTRY_CODE;
 
+    /**
+     * The location to be targeted with this criterion
+     */
     private String location = "";
 
     public String getGeoTargetingConstant() {

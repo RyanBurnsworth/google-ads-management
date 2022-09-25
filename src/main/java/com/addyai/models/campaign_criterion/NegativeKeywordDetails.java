@@ -19,8 +19,16 @@ import static com.addyai.utils.misc.Constants.CRITERION_TYPE_KEYWORD;
 import static com.addyai.utils.misc.Constants.KEYWORD_MATCH_TYPE_BROAD;
 
 public class NegativeKeywordDetails extends CriterionDetails {
+    /**
+     * The text to be targeted as a negative keyword
+     */
     private String keywordText = "";
 
+    /**
+     * The match type of the negative keyword
+     *
+     * @see com.google.ads.googleads.v11.enums.KeywordMatchTypeEnum.KeywordMatchType
+     */
     private int keywordMatchType = KEYWORD_MATCH_TYPE_BROAD;
 
     @Override

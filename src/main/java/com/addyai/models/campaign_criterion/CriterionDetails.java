@@ -28,18 +28,48 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
         @JsonSubTypes.Type(value = DeviceDetails.class, name = "device")
 })
 public abstract class CriterionDetails {
+    /**
+     * The ID of the criterion resource
+     */
     public long campaignCriterionId = 0L;
 
+    /**
+     * The resource name for the parent campaign
+     * Format: <b>/customers/{customerId}/campaigns/{campaignId}</b>
+     */
     private String campaignResourceName = "";
 
+    /**
+     * The resource name for the criterion
+     * Format: <b>/customers/{customerId}/campaignCriterion/{campaignId~criterionId}</b>
+     */
     private String criterionResourceName = "";
 
+    /**
+     * A flag declaring whether this criterion is a negative or not
+     * Defaults to false
+     */
     private boolean isNegative = false;
 
+    /**
+     * The bid modifier to be used with this criterion
+     * Modify bids for a criterion from -100% - +900%
+     * Range: 0.0 - 10.0 and -1.0 if not set
+     */
     private float bidModifier = 0.0f;
 
+    /**
+     * The identifier for the type of criterion
+     *
+     * @see com.google.ads.googleads.v11.enums.CriterionTypeEnum.CriterionType
+     */
     private int criterionType = 1;
 
+    /**
+     * The status of the criterion
+     *
+     * @see com.google.ads.googleads.v11.enums.CampaignCriterionStatusEnum.CampaignCriterionStatus
+     */
     private int status = 2;
 
     public long getCampaignCriterionId() {

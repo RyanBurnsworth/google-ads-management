@@ -611,8 +611,8 @@ public class EntityValidatorTest {
         proximityDetails.setStreetAddress("");
         proximityDetails.setPostalCode("");
         proximityDetails.setCityName("");
-        proximityDetails.setMicroLatitude(0);
-        proximityDetails.setMicroLongitude(10);
+        proximityDetails.setLatitude(0);
+        proximityDetails.setLongitude(10);
         singleCriterionDetailsList.add(proximityDetails);
 
         ValidationErrorResponse validationErrorResponse =
@@ -634,8 +634,8 @@ public class EntityValidatorTest {
         proximityDetails.setStreetAddress("");
         proximityDetails.setPostalCode("");
         proximityDetails.setCityName("");
-        proximityDetails.setMicroLatitude(10);
-        proximityDetails.setMicroLongitude(0);
+        proximityDetails.setLatitude(10);
+        proximityDetails.setLongitude(0);
         singleCriterionDetailsList.add(proximityDetails);
 
         ValidationErrorResponse validationErrorResponse =

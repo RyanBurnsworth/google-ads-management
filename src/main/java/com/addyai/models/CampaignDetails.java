@@ -53,8 +53,8 @@ public class CampaignDetails {
     /**
      * The advertising channel type for the campaign.
      *
-     * @see <a href="https://developers.google.com/google-ads/api/reference/rpc/v11/AdvertisingChannelTypeEnum.AdvertisingChannelType">Advertising Channel Types</a>
-     * Defaults to "SEARCH"
+     * @see AdvertisingChannelTypeEnum.AdvertisingChannelType
+     * Defaults to 2
      */
     private int advertisingChannelType = AdvertisingChannelTypeEnum.AdvertisingChannelType.SEARCH_VALUE;
 
@@ -117,6 +117,7 @@ public class CampaignDetails {
 
     /**
      * The name of the budget resource. Auto-generates when the budget is created.
+     * Format: <b>/customers/{customerId}/campaignBudgets/{campaignBudgetId}</b>
      */
     private String budgetResourceName = "";
 

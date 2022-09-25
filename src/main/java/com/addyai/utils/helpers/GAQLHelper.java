@@ -133,7 +133,8 @@ public class GAQLHelper {
                 "  campaign_criterion.proximity.geo_point.latitude_in_micro_degrees, " +
                 "  campaign_criterion.proximity.geo_point.longitude_in_micro_degrees, " +
                 "  campaign_criterion.proximity.radius, " +
-                "  campaign_criterion.proximity.radius_units " +
+                "  campaign_criterion.proximity.radius_units, " +
+                "  campaign_criterion.bid_modifier " +
                 "FROM campaign_criterion WHERE campaign_criterion.status = 'ENABLED' AND " +
                 "campaign_criterion.campaign ='" + campaign + "' AND campaign_criterion.proximity.radius != 0";
     }
@@ -146,7 +147,8 @@ public class GAQLHelper {
                 "  campaign_criterion.type, " +
                 "  campaign_criterion.status, " +
                 "  campaign_criterion.negative, " +
-                "  campaign_criterion.device.type " +
+                "  campaign_criterion.device.type, " +
+                "  campaign_criterion.bid_modifier " +
                 "FROM campaign_criterion WHERE campaign_criterion.status = 'ENABLED' AND " +
                 "campaign_criterion.campaign ='" + campaign + "' AND campaign_criterion.device.type " +
                 "IN ('DESKTOP', 'MOBILE', 'TABLET')";
@@ -160,6 +162,7 @@ public class GAQLHelper {
                 "  campaign_criterion.type, " +
                 "  campaign_criterion.status, " +
                 "  campaign_criterion.negative, " +
+                "  campaign_criterion.bid_modifier, " +
                 "  campaign_criterion.language.language_constant " +
                 "FROM campaign_criterion WHERE campaign_criterion.status = 'ENABLED' AND " +
                 "campaign_criterion.campaign ='" + campaign + "'";
@@ -173,6 +176,7 @@ public class GAQLHelper {
                 "  campaign_criterion.type, " +
                 "  campaign_criterion.status, " +
                 "  campaign_criterion.negative, " +
+                "  campaign_criterion.bid_modifier, " +
                 "  campaign_criterion.location.geo_target_constant " +
                 "FROM campaign_criterion WHERE campaign_criterion.status = 'ENABLED' AND " +
                 "campaign_criterion.campaign ='" + campaign + "'";

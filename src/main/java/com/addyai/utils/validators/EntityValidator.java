@@ -20,14 +20,13 @@ import com.addyai.error_handling.ValidationErrorResponse;
 import com.addyai.models.BudgetDetails;
 import com.addyai.models.CampaignDetails;
 import com.addyai.models.campaign_criterion.*;
+import com.addyai.utils.misc.Constants;
 import com.google.ads.googleads.v11.enums.CampaignStatusEnum;
 
 import java.time.format.DateTimeFormatter;
 import java.time.format.ResolverStyle;
 import java.util.List;
 import java.util.Locale;
-
-import static com.addyai.utils.misc.Constants.*;
 
 public class EntityValidator {
     public static final String INVALID_CAMPAIGN_DETAILS_ERR_CODE = "INVALID_CAMPAIGN_DETAILS";
@@ -103,20 +102,20 @@ public class EntityValidator {
             return new ValidationErrorResponse(
                     INVALID_CAMPAIGN_DETAILS_ERR_CODE,
                     GENERAL_INVALID_STATUS_ERR_MSG);
-        } else if (campaignDetails.getAdvertisingChannelType() != ADVERTISING_CHANNEL_TYPE_SEARCH &&
-                campaignDetails.getAdvertisingChannelType() != ADVERTISING_CHANNEL_TYPE_DISPLAY &&
-                campaignDetails.getAdvertisingChannelType() != ADVERTISING_CHANNEL_TYPE_MULTI_CHANNEL) {
+        } else if (campaignDetails.getAdvertisingChannelType() != Constants.ADVERTISING_CHANNEL_TYPE_SEARCH &&
+                campaignDetails.getAdvertisingChannelType() != Constants.ADVERTISING_CHANNEL_TYPE_DISPLAY &&
+                campaignDetails.getAdvertisingChannelType() != Constants.ADVERTISING_CHANNEL_TYPE_MULTI_CHANNEL) {
             return new ValidationErrorResponse(
                     INVALID_CAMPAIGN_DETAILS_ERR_CODE,
                     INVALID_ADVERTISING_CHANNEL_ERR_MSG);
-        } else if (campaignDetails.getPositiveGeoTargetType() != POSITIVE_GEO_TARGET_TYPE_PRESENCE_OR_INTEREST &&
-                campaignDetails.getPositiveGeoTargetType() != POSITIVE_GEO_TARGET_TYPE_SEARCH_INTEREST &&
-                campaignDetails.getPositiveGeoTargetType() != POSITIVE_GEO_TARGET_TYPE_PRESENCE) {
+        } else if (campaignDetails.getPositiveGeoTargetType() != Constants.POSITIVE_GEO_TARGET_TYPE_PRESENCE_OR_INTEREST &&
+                campaignDetails.getPositiveGeoTargetType() != Constants.POSITIVE_GEO_TARGET_TYPE_SEARCH_INTEREST &&
+                campaignDetails.getPositiveGeoTargetType() != Constants.POSITIVE_GEO_TARGET_TYPE_PRESENCE) {
             return new ValidationErrorResponse(
                     INVALID_CAMPAIGN_DETAILS_ERR_CODE,
                     INVALID_POSITIVE_GEO_TARGET_TYPE_ERR_MSG);
-        } else if (campaignDetails.getNegativeGeoTargetType() != NEGATIVE_GEO_TARGET_TYPE_PRESENCE_OR_INTEREST &&
-                campaignDetails.getNegativeGeoTargetType() != NEGATIVE_GEO_TARGET_TYPE_PRESENCE) {
+        } else if (campaignDetails.getNegativeGeoTargetType() != Constants.NEGATIVE_GEO_TARGET_TYPE_PRESENCE_OR_INTEREST &&
+                campaignDetails.getNegativeGeoTargetType() != Constants.NEGATIVE_GEO_TARGET_TYPE_PRESENCE) {
             return new ValidationErrorResponse(
                     INVALID_CAMPAIGN_DETAILS_ERR_CODE,
                     INVALID_NEGATIVE_GEO_TARGET_TYPE_ERR_MSG);
@@ -161,13 +160,13 @@ public class EntityValidator {
             return new ValidationErrorResponse(
                     INVALID_BUDGET_DETAILS_ERR_CODE,
                     GENERAL_NAME_EMPTY_ERR_MSG);
-        } else if (budgetDetails.getStatus() != BUDGET_STATUS_ENABLED &&
-                budgetDetails.getStatus() != BUDGET_STATUS_REMOVED) {
+        } else if (budgetDetails.getStatus() != Constants.BUDGET_STATUS_ENABLED &&
+                budgetDetails.getStatus() != Constants.BUDGET_STATUS_REMOVED) {
             return new ValidationErrorResponse(
                     INVALID_BUDGET_DETAILS_ERR_CODE,
                     GENERAL_INVALID_STATUS_ERR_MSG);
-        } else if (budgetDetails.getDeliveryMethod() != BUDGET_DELIVERY_METHOD_STANDARD &&
-                budgetDetails.getDeliveryMethod() != BUDGET_DELIVERY_METHOD_ACCELERATED) {
+        } else if (budgetDetails.getDeliveryMethod() != Constants.BUDGET_DELIVERY_METHOD_STANDARD &&
+                budgetDetails.getDeliveryMethod() != Constants.BUDGET_DELIVERY_METHOD_ACCELERATED) {
             return new ValidationErrorResponse(
                     INVALID_BUDGET_DETAILS_ERR_CODE,
                     INVALID_BUDGET_DELIVERY_STATUS_ERR_MSG);
@@ -226,9 +225,9 @@ public class EntityValidator {
     }
 
     private static ValidationErrorResponse isKeywordDetailsValid(NegativeKeywordDetails negativeKeywordDetails) {
-        if (negativeKeywordDetails.getStatus() != CRITERION_STATUS_ENABLED &&
-                negativeKeywordDetails.getStatus() != CRITERION_STATUS_PAUSED &&
-                negativeKeywordDetails.getStatus() != CRITERION_STATUS_REMOVED) {
+        if (negativeKeywordDetails.getStatus() != Constants.CRITERION_STATUS_ENABLED &&
+                negativeKeywordDetails.getStatus() != Constants.CRITERION_STATUS_PAUSED &&
+                negativeKeywordDetails.getStatus() != Constants.CRITERION_STATUS_REMOVED) {
             return new ValidationErrorResponse(
                     INVALID_NEGATIVE_KEYWORD_DETAILS_ERR_CODE,
                     GENERAL_INVALID_STATUS_ERR_MSG);
@@ -236,9 +235,9 @@ public class EntityValidator {
             return new ValidationErrorResponse(
                     INVALID_NEGATIVE_KEYWORD_DETAILS_ERR_CODE,
                     NEGATIVE_KEYWORD_TEXT_EMPTY_ERR_MSG);
-        } else if (negativeKeywordDetails.getKeywordMatchType() != KEYWORD_MATCH_TYPE_BROAD &&
-                negativeKeywordDetails.getKeywordMatchType() != KEYWORD_MATCH_TYPE_PHRASE &&
-                negativeKeywordDetails.getKeywordMatchType() != KEYWORD_MATCH_TYPE_EXACT) {
+        } else if (negativeKeywordDetails.getKeywordMatchType() != Constants.KEYWORD_MATCH_TYPE_BROAD &&
+                negativeKeywordDetails.getKeywordMatchType() != Constants.KEYWORD_MATCH_TYPE_PHRASE &&
+                negativeKeywordDetails.getKeywordMatchType() != Constants.KEYWORD_MATCH_TYPE_EXACT) {
             return new ValidationErrorResponse(
                     INVALID_NEGATIVE_KEYWORD_DETAILS_ERR_CODE,
                     NEGATIVE_KEYWORD_INVALID_MATCH_TYPE_ERR_MSG);
@@ -247,19 +246,19 @@ public class EntityValidator {
     }
 
     private static ValidationErrorResponse isAdScheduledDetailsValid(AdScheduleDetails adScheduleDetails) {
-        if (adScheduleDetails.getStatus() != CRITERION_STATUS_ENABLED &&
-                adScheduleDetails.getStatus() != CRITERION_STATUS_PAUSED &&
-                adScheduleDetails.getStatus() != CRITERION_STATUS_REMOVED) {
+        if (adScheduleDetails.getStatus() != Constants.CRITERION_STATUS_ENABLED &&
+                adScheduleDetails.getStatus() != Constants.CRITERION_STATUS_PAUSED &&
+                adScheduleDetails.getStatus() != Constants.CRITERION_STATUS_REMOVED) {
             return new ValidationErrorResponse(
                     INVALID_AD_SCHEDULE_DETAILS_ERR_CODE,
                     GENERAL_INVALID_STATUS_ERR_MSG);
-        } else if (adScheduleDetails.getDayOfWeek() != DAY_OF_WEEK_SUNDAY &&
-                adScheduleDetails.getDayOfWeek() != DAY_OF_WEEK_MONDAY &&
-                adScheduleDetails.getDayOfWeek() != DAY_OF_WEEK_TUESDAY &&
-                adScheduleDetails.getDayOfWeek() != DAY_OF_WEEK_WEDNESDAY &&
-                adScheduleDetails.getDayOfWeek() != DAY_OF_WEEK_THURSDAY &&
-                adScheduleDetails.getDayOfWeek() != DAY_OF_WEEK_FRIDAY &&
-                adScheduleDetails.getDayOfWeek() != DAY_OF_WEEK_SATURDAY) {
+        } else if (adScheduleDetails.getDayOfWeek() != Constants.DAY_OF_WEEK_SUNDAY &&
+                adScheduleDetails.getDayOfWeek() != Constants.DAY_OF_WEEK_MONDAY &&
+                adScheduleDetails.getDayOfWeek() != Constants.DAY_OF_WEEK_TUESDAY &&
+                adScheduleDetails.getDayOfWeek() != Constants.DAY_OF_WEEK_WEDNESDAY &&
+                adScheduleDetails.getDayOfWeek() != Constants.DAY_OF_WEEK_THURSDAY &&
+                adScheduleDetails.getDayOfWeek() != Constants.DAY_OF_WEEK_FRIDAY &&
+                adScheduleDetails.getDayOfWeek() != Constants.DAY_OF_WEEK_SATURDAY) {
             return new ValidationErrorResponse(
                     INVALID_AD_SCHEDULE_DETAILS_ERR_CODE,
                     INVALID_DAY_OF_WEEK_ERR_MSG);
@@ -272,14 +271,14 @@ public class EntityValidator {
             return new ValidationErrorResponse(
                     INVALID_AD_SCHEDULE_DETAILS_ERR_CODE,
                     INVALID_HOUR_VALUE_ERR_MSG);
-        } else if (adScheduleDetails.getStartMinute() != MINUTE_OF_HOUR_ZERO &&
-                adScheduleDetails.getStartMinute() != MINUTE_OF_HOUR_FIFTEEN &&
-                adScheduleDetails.getStartMinute() != MINUTE_OF_HOUR_THIRTY &&
-                adScheduleDetails.getStartMinute() != MINUTE_OF_HOUR_FORTY_FIVE ||
-                adScheduleDetails.getEndMinute() != MINUTE_OF_HOUR_ZERO &&
-                        adScheduleDetails.getEndMinute() != MINUTE_OF_HOUR_FIFTEEN &&
-                        adScheduleDetails.getEndMinute() != MINUTE_OF_HOUR_THIRTY &&
-                        adScheduleDetails.getEndMinute() != MINUTE_OF_HOUR_FORTY_FIVE) {
+        } else if (adScheduleDetails.getStartMinute() != Constants.MINUTE_OF_HOUR_ZERO &&
+                adScheduleDetails.getStartMinute() != Constants.MINUTE_OF_HOUR_FIFTEEN &&
+                adScheduleDetails.getStartMinute() != Constants.MINUTE_OF_HOUR_THIRTY &&
+                adScheduleDetails.getStartMinute() != Constants.MINUTE_OF_HOUR_FORTY_FIVE ||
+                adScheduleDetails.getEndMinute() != Constants.MINUTE_OF_HOUR_ZERO &&
+                        adScheduleDetails.getEndMinute() != Constants.MINUTE_OF_HOUR_FIFTEEN &&
+                        adScheduleDetails.getEndMinute() != Constants.MINUTE_OF_HOUR_THIRTY &&
+                        adScheduleDetails.getEndMinute() != Constants.MINUTE_OF_HOUR_FORTY_FIVE) {
             return new ValidationErrorResponse(
                     INVALID_AD_SCHEDULE_DETAILS_ERR_CODE,
                     INVALID_MINUTE_VALUE_ERR_MSG);
@@ -288,9 +287,9 @@ public class EntityValidator {
     }
 
     private static ValidationErrorResponse isDeviceDetailsValid(DeviceDetails deviceDetails) {
-        if (deviceDetails.getStatus() != CRITERION_STATUS_ENABLED &&
-                deviceDetails.getStatus() != CRITERION_STATUS_PAUSED &&
-                deviceDetails.getStatus() != CRITERION_STATUS_REMOVED) {
+        if (deviceDetails.getStatus() != Constants.CRITERION_STATUS_ENABLED &&
+                deviceDetails.getStatus() != Constants.CRITERION_STATUS_PAUSED &&
+                deviceDetails.getStatus() != Constants.CRITERION_STATUS_REMOVED) {
             return new ValidationErrorResponse(
                     INVALID_DEVICE_DETAILS_ERR_CODE,
                     GENERAL_INVALID_STATUS_ERR_MSG);
@@ -298,9 +297,9 @@ public class EntityValidator {
             return new ValidationErrorResponse(
                     INVALID_DEVICE_DETAILS_ERR_CODE,
                     GENERAL_BID_MODIFIER_OUT_OF_RANGE);
-        } else if (deviceDetails.getDeviceType() != DEVICE_TYPE_DESKTOP &&
-                deviceDetails.getDeviceType() != DEVICE_TYPE_MOBILE &&
-                deviceDetails.getDeviceType() != DEVICE_TYPE_TABLET) {
+        } else if (deviceDetails.getDeviceType() != Constants.DEVICE_TYPE_DESKTOP &&
+                deviceDetails.getDeviceType() != Constants.DEVICE_TYPE_MOBILE &&
+                deviceDetails.getDeviceType() != Constants.DEVICE_TYPE_TABLET) {
             return new ValidationErrorResponse(
                     INVALID_DEVICE_DETAILS_ERR_CODE,
                     INVALID_DEVICE_TYPE_DETAILS_ERR_MSG);
@@ -309,16 +308,16 @@ public class EntityValidator {
     }
 
     private static ValidationErrorResponse isLanguageDetailsValid(LanguageDetails languageDetails) {
-        String languageCodeValue = languageDetails.getLanguageCode().replace(LANGUAGE_CODE_PREFIX, "");
+        String languageCodeValue = languageDetails.getLanguageCode().replace(Constants.LANGUAGE_CODE_PREFIX, "");
 
-        if (languageDetails.getStatus() != CRITERION_STATUS_ENABLED &&
-                languageDetails.getStatus() != CRITERION_STATUS_PAUSED &&
-                languageDetails.getStatus() != CRITERION_STATUS_REMOVED) {
+        if (languageDetails.getStatus() != Constants.CRITERION_STATUS_ENABLED &&
+                languageDetails.getStatus() != Constants.CRITERION_STATUS_PAUSED &&
+                languageDetails.getStatus() != Constants.CRITERION_STATUS_REMOVED) {
             return new ValidationErrorResponse(
                     INVALID_LANGUAGE_DETAILS_ERR_CODE,
                     GENERAL_INVALID_STATUS_ERR_MSG);
         } else if (languageDetails.getLanguageCode().isEmpty() ||
-                languageDetails.getLanguageCode().contains(LANGUAGE_CODE_PREFIX) &&
+                languageDetails.getLanguageCode().contains(Constants.LANGUAGE_CODE_PREFIX) &&
                         !NumberValidator.isNumeric(languageCodeValue)) {
             return new ValidationErrorResponse(
                     INVALID_LANGUAGE_DETAILS_ERR_CODE,
@@ -329,9 +328,9 @@ public class EntityValidator {
     }
 
     private static ValidationErrorResponse isLocationDetailsValid(LocationDetails locationDetails) {
-        if (locationDetails.getStatus() != CRITERION_STATUS_ENABLED &&
-                locationDetails.getStatus() != CRITERION_STATUS_PAUSED &&
-                locationDetails.getStatus() != CRITERION_STATUS_REMOVED) {
+        if (locationDetails.getStatus() != Constants.CRITERION_STATUS_ENABLED &&
+                locationDetails.getStatus() != Constants.CRITERION_STATUS_PAUSED &&
+                locationDetails.getStatus() != Constants.CRITERION_STATUS_REMOVED) {
             return new ValidationErrorResponse(
                     INVALID_LOCATION_DETAILS_ERR_CODE,
                     GENERAL_INVALID_STATUS_ERR_MSG);
@@ -356,9 +355,9 @@ public class EntityValidator {
     }
 
     private static ValidationErrorResponse isProximityDetailsValid(ProximityDetails proximityDetails) {
-        if (proximityDetails.getStatus() != CRITERION_STATUS_ENABLED &&
-                proximityDetails.getStatus() != CRITERION_STATUS_PAUSED &&
-                proximityDetails.getStatus() != CRITERION_STATUS_REMOVED) {
+        if (proximityDetails.getStatus() != Constants.CRITERION_STATUS_ENABLED &&
+                proximityDetails.getStatus() != Constants.CRITERION_STATUS_PAUSED &&
+                proximityDetails.getStatus() != Constants.CRITERION_STATUS_REMOVED) {
             return new ValidationErrorResponse(
                     INVALID_PROXIMITY_DETAILS_ERR_CODE,
                     GENERAL_INVALID_STATUS_ERR_MSG);
@@ -370,8 +369,8 @@ public class EntityValidator {
             return new ValidationErrorResponse(
                     INVALID_PROXIMITY_DETAILS_ERR_CODE,
                     GENERAL_BID_MODIFIER_PLUS_NEGATIVE);
-        } else if ((proximityDetails.getMicroLatitude() > 0 && proximityDetails.getMicroLongitude() == 0) ||
-                (proximityDetails.getMicroLatitude() == 0 && proximityDetails.getMicroLongitude() > 0)) {
+        } else if ((proximityDetails.getLatitude() > 0 && proximityDetails.getLongitude() == 0) ||
+                (proximityDetails.getLatitude() == 0 && proximityDetails.getLongitude() > 0)) {
             return new ValidationErrorResponse(
                     INVALID_PROXIMITY_DETAILS_ERR_CODE,
                     INVALID_PROXIMITY_LONGITUDE_LATITUDE_ERR_MSG);
@@ -385,8 +384,8 @@ public class EntityValidator {
             return new ValidationErrorResponse(
                     INVALID_PROXIMITY_DETAILS_ERR_CODE,
                     INVALID_PROXIMITY_POSTAL_CODE_VALUE_ERR_MSG);
-        } else if (proximityDetails.getMicroLatitude() < -90 || proximityDetails.getMicroLatitude() > 90 ||
-                proximityDetails.getMicroLongitude() < -180 || proximityDetails.getMicroLongitude() > 180) {
+        } else if (proximityDetails.getLatitude() < -90 || proximityDetails.getLatitude() > 90 ||
+                proximityDetails.getLongitude() < -180 || proximityDetails.getLongitude() > 180) {
             return new ValidationErrorResponse(
                     INVALID_PROXIMITY_DETAILS_ERR_CODE,
                     INVALID_PROXIMITY_GEO_COORDS_ERR_MSG);
@@ -409,8 +408,8 @@ public class EntityValidator {
             return new ValidationErrorResponse(
                     INVALID_PROXIMITY_DETAILS_ERR_CODE,
                     INVALID_PROXIMITY_RADIUS_VALUE_ERR_MSG);
-        } else if (proximityDetails.getRadiusUnits() != RADIUS_UNITS_MILES &&
-                proximityDetails.getRadiusUnits() != RADIUS_UNITS_KILOMETERS) {
+        } else if (proximityDetails.getRadiusUnits() != Constants.RADIUS_UNITS_MILES &&
+                proximityDetails.getRadiusUnits() != Constants.RADIUS_UNITS_KILOMETERS) {
             return new ValidationErrorResponse(
                     INVALID_PROXIMITY_DETAILS_ERR_CODE,
                     INVALID_PROXIMITY_RADIUS_UNIT_VALUE_ERR_MSG);
@@ -422,8 +421,8 @@ public class EntityValidator {
         for (CampaignDetails campaignDetails : campaignDetailsList) {
             if (campaignDetails.getCampaignResourceName().isEmpty()) {
                 return new ValidationErrorResponse(
-                        INVALID_REQUEST_ERROR,
-                        MISSING_PARAMS);
+                        Constants.INVALID_REQUEST_ERROR,
+                        Constants.MISSING_PARAMS);
             }
         }
         return null;
