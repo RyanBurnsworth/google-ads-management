@@ -13,14 +13,14 @@
  *
  */
 
-package com.addyai.repos.campaigns.budget.impl;
+package com.addyai.repos.adgroup.impl;
 
 import com.addyai.builder.GoogleAdsClientBuilder;
 import com.addyai.error_handling.ApiExceptionResolver;
-import com.addyai.models.BudgetDetails;
-import com.addyai.repos.campaigns.budget.BudgetRepository;
-import com.addyai.repos.requests.StreamRequest;
-import com.addyai.repos.requests.impl.StreamRequestImpl;
+import com.addyai.models.AdGroupDetails;
+import com.addyai.repos.adgroup.AdGroupRepository;
+import com.addyai.repos.request.StreamRequest;
+import com.addyai.repos.request.impl.StreamRequestImpl;
 import com.addyai.utils.helpers.GAQLHelper;
 import com.google.ads.googleads.v11.services.*;
 import com.google.api.gax.rpc.ServerStream;
@@ -30,12 +30,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Repository
-public class BudgetRepositoryImpl implements BudgetRepository {
+public class AdGroupRepositoryImpl implements AdGroupRepository {
+    private final AdGroupServiceClient adGroupServiceClient;
+
     private final StreamRequest requestBuilder;
 
-    private final CampaignBudgetServiceClient campaignBudgetServiceClient;
-
-    public BudgetRepositoryImpl() {
+    public AdGroupRepositoryImpl() {
         GoogleAdsClientBuilder googleAdsClientBuilder = GoogleAdsClientBuilder.INSTANCE;
 
         GoogleAdsServiceClient googleAdsServiceClient = googleAdsClientBuilder
@@ -45,41 +45,44 @@ public class BudgetRepositoryImpl implements BudgetRepository {
 
         this.requestBuilder = new StreamRequestImpl(googleAdsServiceClient);
 
-        campaignBudgetServiceClient = googleAdsClientBuilder.getGoogleAdsClient()
-                .getLatestVersion().createCampaignBudgetServiceClient();
+        adGroupServiceClient = googleAdsClientBuilder
+                .getGoogleAdsClient()
+                .getLatestVersion()
+                .createAdGroupServiceClient();
     }
 
     @Override
-    public List<BudgetDetails> fetchAllBudgetDetails(long customerId) throws Exception {
-        try {
-            String query = GAQLHelper.getCampaignBudgetQuery();
+    public List<AdGroupDetails> fetchAllAdGroupDetails(long customerId, String campaignResName) throws Exception {
+        List<AdGroupDetails> adGroupDetailsList;
 
-            // build and perform the search request on client account
+        try {
+            String query = GAQLHelper.getAdGroupDetailsByCampaignQuery(campaignResName);
+
             SearchGoogleAdsStreamRequest request = requestBuilder.buildStreamRequest(customerId, query);
             ServerStream<SearchGoogleAdsStreamResponse> response = requestBuilder.callStreamRequest(request);
 
-            return GAQLHelper.convertStreamResponseToBudgetDetails(response);
+            adGroupDetailsList = GAQLHelper.convertStreamResponseToAdGroupDetails(response);
+
+            return adGroupDetailsList;
         } catch (Exception e) {
             throw ApiExceptionResolver.doResolveException(e);
         }
     }
 
     @Override
-    public List<String> performCampaignBudgetOperations(long customerId, List<CampaignBudgetOperation> campaignBudgetOperationList) throws Exception {
-        List<String> budgetResourceNameList = new ArrayList<>();
-        try {
-            // At this time we are going to assume the response is OK if no exception is thrown
-            MutateCampaignBudgetsResponse budgetsResponse = campaignBudgetServiceClient
-                    .mutateCampaignBudgets(Long.toString(customerId), campaignBudgetOperationList);
+    public List<String> performAdGroupOperations(long customerId, List<AdGroupOperation> adGroupOperationList) throws Exception {
+        List<String> adGroupResourceNameList = new ArrayList<>();
 
-            // create budget details objects from the results and add to list
-            for (MutateCampaignBudgetResult response : budgetsResponse.getResultsList()) {
-                budgetResourceNameList.add(response.getResourceName());
+        try {
+            MutateAdGroupsResponse response = adGroupServiceClient
+                    .mutateAdGroups(Long.toString(customerId), adGroupOperationList);
+
+            for (MutateAdGroupResult result : response.getResultsList()) {
+                adGroupResourceNameList.add(result.getResourceName());
             }
         } catch (Exception e) {
             throw ApiExceptionResolver.doResolveException(e);
         }
-
-        return budgetResourceNameList;
+        return adGroupResourceNameList;
     }
 }

@@ -15,6 +15,7 @@
 
 package com.addyai.utils;
 
+import com.addyai.models.AdGroupDetails;
 import com.addyai.models.BudgetDetails;
 import com.addyai.models.CampaignDetails;
 import com.addyai.models.campaign_criterion.*;
@@ -35,6 +36,7 @@ public class TestUtils {
     public static final long MOCK_CAMPAIGN_ID = 0L;
     public static final String MOCK_CAMPAIGN_NAME = "Test Campaign 1";
     public static final String MOCK_CAMPAIGN_RESOURCE_NAME = "customers/9059845250/campaigns/18357890301";
+    public static final String MOCK_AD_GROUP_RESOURCE_NAME = "customers/9059845250/adgroups/39203940293";
     public static final CampaignStatusEnum.CampaignStatus MOCK_CAMPAIGN_STATUS = CampaignStatusEnum.CampaignStatus.ENABLED;
     public static final AdvertisingChannelTypeEnum.AdvertisingChannelType MOCK_CAMPAIGN_ADVERTISING_CHANNEL = AdvertisingChannelTypeEnum.AdvertisingChannelType.SEARCH;
     public static final String MOCK_CAMPAIGN_BUDGET_RESOURCE_NAME = "customers/9059845250/campaignBudgets/11599749725";
@@ -304,6 +306,19 @@ public class TestUtils {
 
         mapping.put(MOCK_CAMPAIGN_RESOURCE_NAME, criterionDetailsList);
         return mapping;
+    }
+
+    public AdGroupDetails getMockAdGroupDetails() {
+        AdGroupDetails adGroupDetails = new AdGroupDetails();
+        adGroupDetails.setAdGroupName("Test Ad Group");
+        adGroupDetails.setAdGroupId(2L);
+        adGroupDetails.setType(AdGroupTypeEnum.AdGroupType.SEARCH_STANDARD_VALUE);
+        adGroupDetails.setCpcBid(10 * MICRO_FACTOR);
+        adGroupDetails.setCampaignResourceName(MOCK_CAMPAIGN_RESOURCE_NAME);
+        adGroupDetails.setAdGroupResourceName(MOCK_AD_GROUP_RESOURCE_NAME);
+        adGroupDetails.setStatus(AdGroupStatusEnum.AdGroupStatus.ENABLED_VALUE);
+
+        return adGroupDetails;
     }
 
     private Campaign.NetworkSettings getMockNetworkSettings() {

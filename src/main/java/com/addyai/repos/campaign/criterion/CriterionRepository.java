@@ -13,7 +13,7 @@
  *
  */
 
-package com.addyai.repos.campaigns.criterion;
+package com.addyai.repos.campaign.criterion;
 
 import com.addyai.models.campaign_criterion.CriterionDetails;
 import com.google.ads.googleads.v11.services.CampaignCriterionOperation;

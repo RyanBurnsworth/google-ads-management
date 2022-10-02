@@ -13,9 +13,9 @@
  *
  */
 
-package com.addyai.repos.requests.impl;
+package com.addyai.repos.request.impl;
 
-import com.addyai.repos.requests.StreamRequest;
+import com.addyai.repos.request.StreamRequest;
 import com.google.ads.googleads.v11.services.GoogleAdsServiceClient;
 import com.google.ads.googleads.v11.services.SearchGoogleAdsStreamRequest;
 import com.google.ads.googleads.v11.services.SearchGoogleAdsStreamResponse;

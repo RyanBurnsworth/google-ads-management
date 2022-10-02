@@ -15,6 +15,7 @@
 
 package com.addyai.adapter;
 
+import com.addyai.models.AdGroupDetails;
 import com.addyai.models.BudgetDetails;
 import com.addyai.models.CampaignDetails;
 import com.addyai.models.campaign_criterion.*;
@@ -36,4 +37,6 @@ public interface GoogleAdsRowAdapter {
     LanguageDetails getLanguageDetails(GoogleAdsRow googleAdsRow);
 
     DeviceDetails getDeviceDetails(GoogleAdsRow googleAdsRow);
+
+    AdGroupDetails getAdGroupDetails(GoogleAdsRow googleAdsRow);
 }

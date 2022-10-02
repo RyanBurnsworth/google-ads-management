@@ -13,14 +13,14 @@
  *
  */
 
-package com.addyai.repos.campaigns.impl;
+package com.addyai.repos.campaign.impl;
 
 import com.addyai.builder.GoogleAdsClientBuilder;
 import com.addyai.error_handling.ApiExceptionResolver;
 import com.addyai.models.CampaignDetails;
-import com.addyai.repos.campaigns.CampaignRepository;
-import com.addyai.repos.requests.StreamRequest;
-import com.addyai.repos.requests.impl.StreamRequestImpl;
+import com.addyai.repos.campaign.CampaignRepository;
+import com.addyai.repos.request.StreamRequest;
+import com.addyai.repos.request.impl.StreamRequestImpl;
 import com.addyai.utils.helpers.GAQLHelper;
 import com.google.ads.googleads.v11.services.*;
 import com.google.api.gax.rpc.ServerStream;

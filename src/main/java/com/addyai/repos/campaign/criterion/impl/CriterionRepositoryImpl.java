@@ -13,14 +13,14 @@
  *
  */
 
-package com.addyai.repos.campaigns.criterion.impl;
+package com.addyai.repos.campaign.criterion.impl;
 
 import com.addyai.builder.GoogleAdsClientBuilder;
 import com.addyai.error_handling.ApiExceptionResolver;
 import com.addyai.models.campaign_criterion.CriterionDetails;
-import com.addyai.repos.campaigns.criterion.CriterionRepository;
-import com.addyai.repos.requests.StreamRequest;
-import com.addyai.repos.requests.impl.StreamRequestImpl;
+import com.addyai.repos.campaign.criterion.CriterionRepository;
+import com.addyai.repos.request.StreamRequest;
+import com.addyai.repos.request.impl.StreamRequestImpl;
 import com.addyai.utils.helpers.GAQLHelper;
 import com.google.ads.googleads.v11.enums.CriterionTypeEnum;
 import com.google.ads.googleads.v11.services.*;

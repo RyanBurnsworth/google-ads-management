@@ -17,6 +17,7 @@ package com.addyai.utils.helpers;
 
 import com.addyai.adapter.GoogleAdsRowAdapter;
 import com.addyai.adapter.impl.GoogleAdsRowAdapterImpl;
+import com.addyai.models.AdGroupDetails;
 import com.addyai.models.BudgetDetails;
 import com.addyai.models.CampaignDetails;
 import com.addyai.models.campaign_criterion.*;
@@ -182,6 +183,31 @@ public class GAQLHelper {
                 "campaign_criterion.campaign ='" + campaign + "'";
     }
 
+    public static String getAdGroupDetailsQuery() {
+        return "SELECT " +
+                "ad_group.id, " +
+                "ad_group.name, " +
+                "ad_group.resource_name, " +
+                "ad_group.campaign, " +
+                "ad_group.type, " +
+                "ad_group.status, " +
+                "ad_group.cpc_bid_micros " +
+                "FROM ad_group WHERE ad_group.status IN ('ENABLED', 'PAUSED') ORDER BY ad_group.id";
+    }
+
+
+    public static String getAdGroupDetailsByCampaignQuery(String campaignResName) {
+        return "SELECT " +
+                "ad_group.id, " +
+                "ad_group.name, " +
+                "ad_group.resource_name, " +
+                "ad_group.campaign, " +
+                "ad_group.type, " +
+                "ad_group.status, " +
+                "ad_group.cpc_bid_micros " +
+                "FROM ad_group WHERE ad_group.campaign ='" + campaignResName + "'";
+    }
+
     public static List<CampaignDetails> convertStreamResponseToCampaignDetailsList(ServerStream<SearchGoogleAdsStreamResponse> streamResponse) {
         GoogleAdsRowAdapter googleAdsRowAdapter = new GoogleAdsRowAdapterImpl();
         List<CampaignDetails> campaignDetailsList = new ArrayList<>();
@@ -207,6 +233,19 @@ public class GAQLHelper {
             }
         }
         return budgetDetailsList;
+    }
+
+    public static List<AdGroupDetails> convertStreamResponseToAdGroupDetails(ServerStream<SearchGoogleAdsStreamResponse> streamResponse) {
+        GoogleAdsRowAdapterImpl googleAdsRowAdapter = new GoogleAdsRowAdapterImpl();
+        List<AdGroupDetails> adGroupDetailsList = new ArrayList<>();
+
+        for (SearchGoogleAdsStreamResponse response : streamResponse) {
+            for (GoogleAdsRow googleAdsRow : response.getResultsList()) {
+                AdGroupDetails adGroupDetails = googleAdsRowAdapter.getAdGroupDetails(googleAdsRow);
+                adGroupDetailsList.add(adGroupDetails);
+            }
+        }
+        return adGroupDetailsList;
     }
 
     public static List<CriterionDetails> convertStreamResponseToCriterionDetails(

@@ -13,17 +13,15 @@
  *
  */
 
-package com.addyai.repos.campaigns;
+package com.addyai.repos.adgroup;
 
-import com.addyai.models.CampaignDetails;
-import com.google.ads.googleads.v11.services.CampaignOperation;
+import com.addyai.models.AdGroupDetails;
+import com.google.ads.googleads.v11.services.AdGroupOperation;
 
 import java.util.List;
 
-public interface CampaignRepository {
-    List<CampaignDetails> fetchAllCampaignDetails(long customerId) throws Exception;
+public interface AdGroupRepository {
+    List<AdGroupDetails> fetchAllAdGroupDetails(long customerId, String campaignResName) throws Exception;
 
-    CampaignDetails fetchCampaignDetailsByName(long customerId, String campaignName) throws Exception;
-
-    List<String> performCampaignOperations(long customerId, List<CampaignOperation> campaignOperations) throws Exception;
+    List<String> performAdGroupOperations(long customerId, List<AdGroupOperation> adGroupOperationList) throws Exception;
 }
