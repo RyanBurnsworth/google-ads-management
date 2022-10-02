@@ -257,4 +257,9 @@ public class OperationBuilderImplTest {
         assertEquals(9, campaignCriterionOperationList.size());
         assertTrue(campaignCriterionOperationList.get(0).hasRemove());
     }
+
+    @Test
+    void testBuildAdGroupOperationListForCreateOperation() {
+
+    }
 }

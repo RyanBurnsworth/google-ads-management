@@ -17,6 +17,7 @@ package com.addyai.validators;
 
 import com.addyai.enums.OperationType;
 import com.addyai.error_handling.ValidationErrorResponse;
+import com.addyai.models.AdGroupDetails;
 import com.addyai.models.BudgetDetails;
 import com.addyai.models.CampaignDetails;
 import com.addyai.models.campaign_criterion.*;
@@ -26,13 +27,13 @@ import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import static com.addyai.utils.TestUtils.MOCK_CAMPAIGN_RESOURCE_NAME;
 import static com.addyai.utils.misc.Constants.*;
 import static com.addyai.utils.validators.EntityValidator.*;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
 public class EntityValidatorTest {
@@ -759,6 +760,7 @@ public class EntityValidatorTest {
         assertEquals(INVALID_DEVICE_DETAILS_ERR_CODE, validationErrorResponse.getErrorCode());
         assertEquals(GENERAL_BID_MODIFIER_OUT_OF_RANGE, validationErrorResponse.getErrorMessage());
     }
+
     @Test
     void testDeviceDetailsBidModifierTooHighValidationError() {
         List<CriterionDetails> criterionDetailsList =
@@ -930,6 +932,7 @@ public class EntityValidatorTest {
         assertEquals(INVALID_LOCATION_DETAILS_ERR_CODE, validationErrorResponse.getErrorCode());
         assertEquals(INVALID_EMPTY_LOCATION_ERR_MSG, validationErrorResponse.getErrorMessage());
     }
+
     @Test
     void testLocationDetailsLocationContainsDigitsValidationError() {
         List<CriterionDetails> criterionDetailsList =
@@ -1011,5 +1014,93 @@ public class EntityValidatorTest {
 
         assertEquals(INVALID_REQUEST_ERROR, validationErrorResponse.getErrorCode());
         assertEquals(MISSING_PARAMS, validationErrorResponse.getErrorMessage());
+    }
+
+    @Test
+    void testValidateAdGroupDetailsReturnsNull() {
+        ValidationErrorResponse validationErrorResponse =
+                EntityValidator.isAdGroupDetailsValid(
+                        Collections.singletonList(testUtils.getMockAdGroupDetails()),
+                        OperationType.CREATE);
+
+        assertNull(validationErrorResponse);
+    }
+
+    @Test
+    void testValidateAdGroupDetailsFailsWhenAdGroupNameIsEmpty() {
+        AdGroupDetails adGroupDetails = testUtils.getMockAdGroupDetails();
+        adGroupDetails.setAdGroupName("");
+
+        ValidationErrorResponse validationErrorResponse =
+                EntityValidator.isAdGroupDetailsValid(Collections.singletonList(adGroupDetails), OperationType.CREATE);
+
+        assertNotNull(validationErrorResponse);
+        assertEquals(INVALID_AD_GROUP_DETAILS_ERR_CODE, validationErrorResponse.getErrorCode());
+        assertEquals(INVALID_AD_GROUP_NAME_EMPTY_ERR_MSG, validationErrorResponse.getErrorMessage());
+    }
+
+    @Test
+    void testValidateAdGroupFailsWhenCampaignResNameIsEmpty() {
+        AdGroupDetails adGroupDetails = testUtils.getMockAdGroupDetails();
+        adGroupDetails.setCampaignResourceName("");
+
+        ValidationErrorResponse validationErrorResponse =
+                EntityValidator.isAdGroupDetailsValid(Collections.singletonList(adGroupDetails), OperationType.CREATE);
+
+        assertNotNull(validationErrorResponse);
+        assertEquals(INVALID_AD_GROUP_DETAILS_ERR_CODE, validationErrorResponse.getErrorCode());
+        assertEquals(INVALID_AD_GROUP_CAMPAIGN_RES_NAME_MISSING_ERR_MSG, validationErrorResponse.getErrorMessage());
+    }
+
+    @Test
+    void testValidateAdGroupFailsWhenTypeIsInvalid() {
+        AdGroupDetails adGroupDetails = testUtils.getMockAdGroupDetails();
+        adGroupDetails.setType(-1);
+
+        ValidationErrorResponse validationErrorResponse =
+                EntityValidator.isAdGroupDetailsValid(Collections.singletonList(adGroupDetails), OperationType.CREATE);
+
+        assertNotNull(validationErrorResponse);
+        assertEquals(INVALID_AD_GROUP_DETAILS_ERR_CODE, validationErrorResponse.getErrorCode());
+        assertEquals(INVALID_AD_GROUP_TYPE_ERR_MSG, validationErrorResponse.getErrorMessage());
+    }
+
+    @Test
+    void testValidateAdGroupFailsWhenStatusIsInvalid() {
+        AdGroupDetails adGroupDetails = testUtils.getMockAdGroupDetails();
+        adGroupDetails.setStatus(-1);
+
+        ValidationErrorResponse validationErrorResponse =
+                EntityValidator.isAdGroupDetailsValid(Collections.singletonList(adGroupDetails), OperationType.CREATE);
+
+        assertNotNull(validationErrorResponse);
+        assertEquals(INVALID_AD_GROUP_DETAILS_ERR_CODE, validationErrorResponse.getErrorCode());
+        assertEquals(INVALID_AD_GROUP_STATUS_ERR_MSG, validationErrorResponse.getErrorMessage());
+    }
+
+    @Test
+    void testValidateAdGroupFailsWhenOpUpdateAndAdGroupResNameIsEmpty() {
+        AdGroupDetails adGroupDetails = testUtils.getMockAdGroupDetails();
+        adGroupDetails.setAdGroupResourceName("");
+
+        ValidationErrorResponse validationErrorResponse =
+                EntityValidator.isAdGroupDetailsValid(Collections.singletonList(adGroupDetails), OperationType.UPDATE);
+
+        assertNotNull(validationErrorResponse);
+        assertEquals(INVALID_AD_GROUP_DETAILS_ERR_CODE, validationErrorResponse.getErrorCode());
+        assertEquals(INVALID_AD_GROUP_MISSING_RES_NAME_ERR_MSG, validationErrorResponse.getErrorMessage());
+    }
+
+    @Test
+    void testValidateAdGroupFailsWhenCPCBidValueIsTooLow() {
+        AdGroupDetails adGroupDetails = testUtils.getMockAdGroupDetails();
+        adGroupDetails.setCpcBid(0.00);
+
+        ValidationErrorResponse validationErrorResponse =
+                EntityValidator.isAdGroupDetailsValid(Collections.singletonList(adGroupDetails), OperationType.CREATE);
+
+        assertNotNull(validationErrorResponse);
+        assertEquals(INVALID_AD_GROUP_DETAILS_ERR_CODE, validationErrorResponse.getErrorCode());
+        assertEquals(INVALID_AD_GROUP_CPC_BID_ERR_MSG, validationErrorResponse.getErrorMessage());
     }
 }

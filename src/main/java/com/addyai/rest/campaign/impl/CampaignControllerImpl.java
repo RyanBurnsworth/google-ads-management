@@ -13,10 +13,10 @@
  *
  */
 
-package com.addyai.rest.impl;
+package com.addyai.rest.campaign.impl;
 
 import com.addyai.models.CampaignDetails;
-import com.addyai.rest.CampaignController;
+import com.addyai.rest.campaign.CampaignController;
 import com.addyai.services.campaign.CampaignService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

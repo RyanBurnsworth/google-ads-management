@@ -13,15 +13,15 @@
  *
  */
 
-package com.addyai.repos.campaigns.budget;
+package com.addyai.repos.adgroup;
 
-import com.addyai.models.BudgetDetails;
-import com.google.ads.googleads.v11.services.CampaignBudgetOperation;
+import com.addyai.models.AdGroupDetails;
+import com.google.ads.googleads.v11.services.AdGroupOperation;
 
 import java.util.List;
 
-public interface BudgetRepository {
-    List<BudgetDetails> fetchAllBudgetDetails(long customerId) throws Exception;
+public interface AdGroupRepository {
+    List<AdGroupDetails> fetchAllAdGroupDetails(long customerId, String campaignResName) throws Exception;
 
-    List<String> performCampaignBudgetOperations(long customerId, List<CampaignBudgetOperation> campaignBudgetOperationList) throws Exception;
+    List<String> performAdGroupOperations(long customerId, List<AdGroupOperation> adGroupOperationList) throws Exception;
 }

@@ -13,15 +13,15 @@
  *
  */
 
-package com.addyai.repos.requests;
+package com.addyai.repos.campaign.budget;
 
-import com.google.ads.googleads.v11.services.SearchGoogleAdsStreamRequest;
-import com.google.ads.googleads.v11.services.SearchGoogleAdsStreamResponse;
-import com.google.api.gax.rpc.ServerStream;
+import com.addyai.models.BudgetDetails;
+import com.google.ads.googleads.v11.services.CampaignBudgetOperation;
 
-public interface StreamRequest {
+import java.util.List;
 
-    SearchGoogleAdsStreamRequest buildStreamRequest(long customerId, String query);
+public interface BudgetRepository {
+    List<BudgetDetails> fetchAllBudgetDetails(long customerId) throws Exception;
 
-    ServerStream<SearchGoogleAdsStreamResponse> callStreamRequest(SearchGoogleAdsStreamRequest streamRequest);
+    List<String> performCampaignBudgetOperations(long customerId, List<CampaignBudgetOperation> campaignBudgetOperationList) throws Exception;
 }

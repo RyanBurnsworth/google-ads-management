@@ -17,15 +17,18 @@ package com.addyai.builder.impl;
 
 import com.addyai.builder.OperationBuilder;
 import com.addyai.enums.OperationType;
+import com.addyai.models.AdGroupDetails;
 import com.addyai.models.BudgetDetails;
 import com.addyai.models.CampaignDetails;
 import com.addyai.models.campaign_criterion.*;
 import com.google.ads.googleads.lib.utils.FieldMasks;
 import com.google.ads.googleads.v11.common.*;
 import com.google.ads.googleads.v11.enums.*;
+import com.google.ads.googleads.v11.resources.AdGroup;
 import com.google.ads.googleads.v11.resources.Campaign;
 import com.google.ads.googleads.v11.resources.CampaignBudget;
 import com.google.ads.googleads.v11.resources.CampaignCriterion;
+import com.google.ads.googleads.v11.services.AdGroupOperation;
 import com.google.ads.googleads.v11.services.CampaignBudgetOperation;
 import com.google.ads.googleads.v11.services.CampaignCriterionOperation;
 import com.google.ads.googleads.v11.services.CampaignOperation;
@@ -245,6 +248,35 @@ public class OperationBuilderImpl implements OperationBuilder {
     }
 
     /**
+     * Build [AdGroupOperation] to be used to create, update or remove AdGroups
+     *
+     * @param adGroupDetailsList [AdGroupDetails] used to populate the fields for each AdGroupOperation
+     * @param operationType      the type of operation to be performed: CREATE, UPDATE or REMOVE
+     * @return [AdGroupOperation] the AdGroupOperations to be performed on the client's account
+     */
+    @Override
+    public List<AdGroupOperation> buildAdGroupOperationList(List<AdGroupDetails> adGroupDetailsList, OperationType operationType) {
+        List<AdGroupOperation> adGroupOperationList = new ArrayList<>();
+
+        for (AdGroupDetails adGroupDetails : adGroupDetailsList) {
+            AdGroupOperation.Builder adGroupOperationBuilder = AdGroupOperation.newBuilder();
+
+            AdGroup adGroup = buildAdGroupFromDetails(adGroupDetails, operationType);
+            if (operationType.equals(OperationType.CREATE)) {
+                adGroupOperationBuilder.setCreate(adGroup);
+            } else if (operationType.equals(OperationType.UPDATE)) {
+                adGroupOperationBuilder.setUpdate(adGroup);
+                adGroupOperationBuilder.setUpdateMask(FieldMasks.allSetFieldsOf(adGroup));
+            } else if (operationType.equals(OperationType.REMOVE)) {
+                adGroupOperationBuilder.setRemove(adGroupDetails.getAdGroupResourceName());
+            }
+
+            adGroupOperationList.add(adGroupOperationBuilder.build());
+        }
+        return adGroupOperationList;
+    }
+
+    /**
      * Build a campaign object using a CampaignDetails object
      *
      * @param campaignDetails details to be parsed into a [Campaign]
@@ -436,5 +468,27 @@ public class OperationBuilderImpl implements OperationBuilder {
                     .setRadiusUnitsValue(proximityDetails.getRadiusUnits());
         }
         return proximityInfoBuilder;
+    }
+
+    private AdGroup buildAdGroupFromDetails(AdGroupDetails adGroupDetails, OperationType operationType) {
+        AdGroup.Builder adGroupBuilder = AdGroup.newBuilder();
+
+        if (operationType.equals(OperationType.REMOVE)) {
+            adGroupBuilder.setResourceName(adGroupDetails.getAdGroupResourceName());
+            return adGroupBuilder.build();
+        } else if (operationType.equals(OperationType.CREATE)) {
+            adGroupBuilder.setCampaign(adGroupDetails.getCampaignResourceName());
+            adGroupBuilder.setTypeValue(adGroupDetails.getType());
+        } else if (operationType.equals(OperationType.UPDATE))
+            adGroupBuilder.setResourceName(adGroupDetails.getAdGroupResourceName());
+
+        if (adGroupDetails.getCpcBid() != 0.0)
+            adGroupBuilder.setCpcBidMicros((long) (adGroupDetails.getCpcBid() * MICRO_FACTOR));
+        if (!adGroupDetails.getAdGroupName().isEmpty())
+            adGroupBuilder.setName(adGroupDetails.getAdGroupName());
+        if (adGroupDetails.getStatus() != -1)
+            adGroupBuilder.setStatusValue(adGroupDetails.getStatus());
+
+        return adGroupBuilder.build();
     }
 }

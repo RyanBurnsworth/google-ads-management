@@ -16,6 +16,7 @@
 package com.addyai.adapter.impl;
 
 import com.addyai.adapter.GoogleAdsRowAdapter;
+import com.addyai.models.AdGroupDetails;
 import com.addyai.models.BudgetDetails;
 import com.addyai.models.CampaignDetails;
 import com.addyai.models.campaign_criterion.*;
@@ -200,5 +201,18 @@ public class GoogleAdsRowAdapterImpl implements GoogleAdsRowAdapter {
                         googleAdsRow.getCampaignCriterion().getBidModifier() : -1.0f);
 
         return deviceDetails;
+    }
+
+    @Override
+    public AdGroupDetails getAdGroupDetails(GoogleAdsRow googleAdsRow) {
+        AdGroupDetails adGroupDetails = new AdGroupDetails();
+        adGroupDetails.setCpcBid((int) (googleAdsRow.getAdGroup().getCpcBidMicros() / MICRO_FACTOR));
+        adGroupDetails.setAdGroupResourceName(googleAdsRow.getAdGroup().getResourceName());
+        adGroupDetails.setCampaignResourceName(googleAdsRow.getAdGroup().getCampaign());
+        adGroupDetails.setStatus(googleAdsRow.getAdGroup().getStatusValue());
+        adGroupDetails.setType(googleAdsRow.getAdGroup().getTypeValue());
+        adGroupDetails.setAdGroupName(googleAdsRow.getAdGroup().getName());
+
+        return adGroupDetails;
     }
 }

@@ -13,7 +13,7 @@
  *
  */
 
-package com.addyai.rest;
+package com.addyai.rest.token;
 
 import com.addyai.services.account.ManagerAccountService;
 import org.springframework.web.bind.annotation.GetMapping;

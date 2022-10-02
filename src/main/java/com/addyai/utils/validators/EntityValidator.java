@@ -17,10 +17,13 @@ package com.addyai.utils.validators;
 
 import com.addyai.enums.OperationType;
 import com.addyai.error_handling.ValidationErrorResponse;
+import com.addyai.models.AdGroupDetails;
 import com.addyai.models.BudgetDetails;
 import com.addyai.models.CampaignDetails;
 import com.addyai.models.campaign_criterion.*;
 import com.addyai.utils.misc.Constants;
+import com.google.ads.googleads.v11.enums.AdGroupStatusEnum;
+import com.google.ads.googleads.v11.enums.AdGroupTypeEnum;
 import com.google.ads.googleads.v11.enums.CampaignStatusEnum;
 
 import java.time.format.DateTimeFormatter;
@@ -31,6 +34,7 @@ import java.util.Locale;
 public class EntityValidator {
     public static final String INVALID_CAMPAIGN_DETAILS_ERR_CODE = "INVALID_CAMPAIGN_DETAILS";
     public static final String INVALID_BUDGET_DETAILS_ERR_CODE = "INVALID_BUDGET_DETAILS";
+    public static final String INVALID_AD_GROUP_DETAILS_ERR_CODE = "INVALID_AD_GROUP_DETAILS";
     public static final String INVALID_NEGATIVE_KEYWORD_DETAILS_ERR_CODE = "INVALID_NEGATIVE_KEYWORD_DETAILS";
     public static final String INVALID_AD_SCHEDULE_DETAILS_ERR_CODE = "INVALID_AD_SCHEDULE_DETAILS";
     public static final String INVALID_DEVICE_DETAILS_ERR_CODE = "INVALID_DEVICE_DETAILS";
@@ -75,6 +79,13 @@ public class EntityValidator {
     public static final String INVALID_PROXIMITY_RADIUS_VALUE_ERR_MSG = "Invalid radius value";
     public static final String INVALID_PROXIMITY_RADIUS_UNIT_VALUE_ERR_MSG = "Invalid radius units value";
     public static final String INVALID_PROXIMITY_MISSING_ADDRESS_FIELDS_ERR_MSG = "Missing address fields";
+
+    public static final String INVALID_AD_GROUP_NAME_EMPTY_ERR_MSG = "Ad Group name cannot be empty";
+    public static final String INVALID_AD_GROUP_MISSING_RES_NAME_ERR_MSG = "Ad Group resource name cannot be empty";
+    public static final String INVALID_AD_GROUP_CAMPAIGN_RES_NAME_MISSING_ERR_MSG = "Campaign resource name cannot be empty";
+    public static final String INVALID_AD_GROUP_TYPE_ERR_MSG = "Invalid Ad Group type value";
+    public static final String INVALID_AD_GROUP_CPC_BID_ERR_MSG = "CPC bid must be greater than 0";
+    public static final String INVALID_AD_GROUP_STATUS_ERR_MSG = "Invalid Ad Group status value";
 
     /**
      * Validate the fields of the CampaignDetails object
@@ -219,6 +230,62 @@ public class EntityValidator {
 
                 if (proximityValidationError != null)
                     return proximityValidationError;
+            }
+        }
+        return null;
+    }
+
+
+    /**
+     * Validate the fields of a [AdGroupDetails]
+     *
+     * @param adGroupDetailsList [AdGroupDetails] to be validated
+     * @return if invalid return a ValidationResponseError, else return null
+     */
+    public static ValidationErrorResponse isAdGroupDetailsValid(List<AdGroupDetails> adGroupDetailsList,
+                                                                OperationType operationType) {
+        for (AdGroupDetails adGroupDetails : adGroupDetailsList) {
+            if (operationType.equals(OperationType.REMOVE)) {
+                if (adGroupDetails.getAdGroupResourceName().isEmpty())
+                    return new ValidationErrorResponse(
+                            INVALID_AD_GROUP_DETAILS_ERR_CODE,
+                            INVALID_AD_GROUP_MISSING_RES_NAME_ERR_MSG);
+            }
+
+            if (operationType.equals(OperationType.CREATE)) {
+                if (adGroupDetails.getAdGroupName() == null || adGroupDetails.getAdGroupName().isEmpty()) {
+                    return new ValidationErrorResponse(
+                            INVALID_AD_GROUP_DETAILS_ERR_CODE,
+                            INVALID_AD_GROUP_NAME_EMPTY_ERR_MSG);
+                } else if ((adGroupDetails.getType() != AdGroupTypeEnum.AdGroupType.SEARCH_STANDARD_VALUE)) {
+                    return new ValidationErrorResponse(
+                            INVALID_AD_GROUP_DETAILS_ERR_CODE,
+                            INVALID_AD_GROUP_TYPE_ERR_MSG);
+                } else if ((adGroupDetails.getStatus() != AdGroupStatusEnum.AdGroupStatus.ENABLED_VALUE) &&
+                        adGroupDetails.getStatus() != AdGroupStatusEnum.AdGroupStatus.PAUSED_VALUE) {
+                    return new ValidationErrorResponse(
+                            INVALID_AD_GROUP_DETAILS_ERR_CODE,
+                            INVALID_AD_GROUP_STATUS_ERR_MSG);
+                } else if ((adGroupDetails.getCampaignResourceName() == null ||
+                        adGroupDetails.getCampaignResourceName().isEmpty())) {
+                    return new ValidationErrorResponse(
+                            INVALID_AD_GROUP_DETAILS_ERR_CODE,
+                            INVALID_AD_GROUP_CAMPAIGN_RES_NAME_MISSING_ERR_MSG);
+                } else if (adGroupDetails.getCpcBid() <= 0) {
+                    return new ValidationErrorResponse(
+                            INVALID_AD_GROUP_DETAILS_ERR_CODE,
+                            INVALID_AD_GROUP_CPC_BID_ERR_MSG);
+                }
+            }
+
+            // if the operation is to update, validate the ad group resource name before proceeding
+            if (operationType.equals(OperationType.UPDATE)) {
+                if (adGroupDetails.getAdGroupResourceName() == null ||
+                        adGroupDetails.getAdGroupResourceName().isEmpty()) {
+                    return new ValidationErrorResponse(
+                            INVALID_AD_GROUP_DETAILS_ERR_CODE,
+                            INVALID_AD_GROUP_MISSING_RES_NAME_ERR_MSG);
+                }
             }
         }
         return null;
