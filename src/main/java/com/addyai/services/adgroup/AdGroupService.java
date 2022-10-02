@@ -23,7 +23,7 @@ public interface AdGroupService {
 
     void upsertAdGroups(long customerId, List<AdGroupDetails> adGroupDetailsList, boolean shouldCreate) throws Exception;
 
-    void deleteAdGroups(long customerId, List<AdGroupDetails> adGroupDetailsList);
+    void deleteAdGroups(long customerId, List<AdGroupDetails> adGroupDetailsList) throws Exception;
 
     List<AdGroupDetails> findAllAdGroupsByCampaign(long customerId, String campaignResName) throws Exception;
 }

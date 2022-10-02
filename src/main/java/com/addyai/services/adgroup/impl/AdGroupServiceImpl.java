@@ -20,7 +20,6 @@ import com.addyai.builder.impl.OperationBuilderImpl;
 import com.addyai.enums.OperationType;
 import com.addyai.error_handling.ValidationErrorResponse;
 import com.addyai.error_handling.exceptions.InvalidRequestException;
-import com.addyai.error_handling.exceptions.NotFoundException;
 import com.addyai.models.AdGroupDetails;
 import com.addyai.repos.adgroup.AdGroupRepository;
 import com.addyai.services.adgroup.AdGroupService;
@@ -30,7 +29,8 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 
-import static com.addyai.utils.misc.Constants.*;
+import static com.addyai.utils.misc.Constants.INVALID_REQUEST_ERROR;
+import static com.addyai.utils.misc.Constants.MISSING_PARAMS;
 
 @Service
 public class AdGroupServiceImpl implements AdGroupService {
@@ -48,7 +48,7 @@ public class AdGroupServiceImpl implements AdGroupService {
         OperationType operationType = shouldCreate ? OperationType.CREATE : OperationType.UPDATE;
 
         ValidationErrorResponse validationErrorResponse =
-                EntityValidator.validateAdGroupDetails(adGroupDetailsList, operationType);
+                EntityValidator.isAdGroupDetailsValid(adGroupDetailsList, operationType);
 
         if (validationErrorResponse != null) {
             throw new InvalidRequestException(
@@ -63,8 +63,22 @@ public class AdGroupServiceImpl implements AdGroupService {
     }
 
     @Override
-    public void deleteAdGroups(long customerId, List<AdGroupDetails> adGroupDetailsList) {
+    public void deleteAdGroups(long customerId, List<AdGroupDetails> adGroupDetailsList) throws Exception {
+        OperationType operationType = OperationType.REMOVE;
 
+        ValidationErrorResponse validationErrorResponse =
+                EntityValidator.isAdGroupDetailsValid(adGroupDetailsList, operationType);
+
+        if (validationErrorResponse != null) {
+            throw new InvalidRequestException(
+                    validationErrorResponse.getErrorCode(),
+                    validationErrorResponse.getErrorMessage());
+        }
+
+        List<AdGroupOperation> adGroupOperationList = operationBuilder
+                .buildAdGroupOperationList(adGroupDetailsList, operationType);
+
+        adGroupRepository.performAdGroupOperations(customerId, adGroupOperationList);
     }
 
     @Override

@@ -1019,7 +1019,7 @@ public class EntityValidatorTest {
     @Test
     void testValidateAdGroupDetailsReturnsNull() {
         ValidationErrorResponse validationErrorResponse =
-                EntityValidator.validateAdGroupDetails(
+                EntityValidator.isAdGroupDetailsValid(
                         Collections.singletonList(testUtils.getMockAdGroupDetails()),
                         OperationType.CREATE);
 
@@ -1032,7 +1032,7 @@ public class EntityValidatorTest {
         adGroupDetails.setAdGroupName("");
 
         ValidationErrorResponse validationErrorResponse =
-                EntityValidator.validateAdGroupDetails(Collections.singletonList(adGroupDetails), OperationType.CREATE);
+                EntityValidator.isAdGroupDetailsValid(Collections.singletonList(adGroupDetails), OperationType.CREATE);
 
         assertNotNull(validationErrorResponse);
         assertEquals(INVALID_AD_GROUP_DETAILS_ERR_CODE, validationErrorResponse.getErrorCode());
@@ -1045,7 +1045,7 @@ public class EntityValidatorTest {
         adGroupDetails.setCampaignResourceName("");
 
         ValidationErrorResponse validationErrorResponse =
-                EntityValidator.validateAdGroupDetails(Collections.singletonList(adGroupDetails), OperationType.CREATE);
+                EntityValidator.isAdGroupDetailsValid(Collections.singletonList(adGroupDetails), OperationType.CREATE);
 
         assertNotNull(validationErrorResponse);
         assertEquals(INVALID_AD_GROUP_DETAILS_ERR_CODE, validationErrorResponse.getErrorCode());
@@ -1058,7 +1058,7 @@ public class EntityValidatorTest {
         adGroupDetails.setType(-1);
 
         ValidationErrorResponse validationErrorResponse =
-                EntityValidator.validateAdGroupDetails(Collections.singletonList(adGroupDetails), OperationType.CREATE);
+                EntityValidator.isAdGroupDetailsValid(Collections.singletonList(adGroupDetails), OperationType.CREATE);
 
         assertNotNull(validationErrorResponse);
         assertEquals(INVALID_AD_GROUP_DETAILS_ERR_CODE, validationErrorResponse.getErrorCode());
@@ -1071,7 +1071,7 @@ public class EntityValidatorTest {
         adGroupDetails.setStatus(-1);
 
         ValidationErrorResponse validationErrorResponse =
-                EntityValidator.validateAdGroupDetails(Collections.singletonList(adGroupDetails), OperationType.CREATE);
+                EntityValidator.isAdGroupDetailsValid(Collections.singletonList(adGroupDetails), OperationType.CREATE);
 
         assertNotNull(validationErrorResponse);
         assertEquals(INVALID_AD_GROUP_DETAILS_ERR_CODE, validationErrorResponse.getErrorCode());
@@ -1084,7 +1084,7 @@ public class EntityValidatorTest {
         adGroupDetails.setAdGroupResourceName("");
 
         ValidationErrorResponse validationErrorResponse =
-                EntityValidator.validateAdGroupDetails(Collections.singletonList(adGroupDetails), OperationType.UPDATE);
+                EntityValidator.isAdGroupDetailsValid(Collections.singletonList(adGroupDetails), OperationType.UPDATE);
 
         assertNotNull(validationErrorResponse);
         assertEquals(INVALID_AD_GROUP_DETAILS_ERR_CODE, validationErrorResponse.getErrorCode());
@@ -1097,7 +1097,7 @@ public class EntityValidatorTest {
         adGroupDetails.setCpcBid(0.00);
 
         ValidationErrorResponse validationErrorResponse =
-                EntityValidator.validateAdGroupDetails(Collections.singletonList(adGroupDetails), OperationType.CREATE);
+                EntityValidator.isAdGroupDetailsValid(Collections.singletonList(adGroupDetails), OperationType.CREATE);
 
         assertNotNull(validationErrorResponse);
         assertEquals(INVALID_AD_GROUP_DETAILS_ERR_CODE, validationErrorResponse.getErrorCode());

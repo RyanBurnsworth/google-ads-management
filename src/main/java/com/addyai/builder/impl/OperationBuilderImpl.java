@@ -261,7 +261,7 @@ public class OperationBuilderImpl implements OperationBuilder {
         for (AdGroupDetails adGroupDetails : adGroupDetailsList) {
             AdGroupOperation.Builder adGroupOperationBuilder = AdGroupOperation.newBuilder();
 
-            AdGroup adGroup = buildAdGroupFromDetails(adGroupDetails);
+            AdGroup adGroup = buildAdGroupFromDetails(adGroupDetails, operationType);
             if (operationType.equals(OperationType.CREATE)) {
                 adGroupOperationBuilder.setCreate(adGroup);
             } else if (operationType.equals(OperationType.UPDATE)) {
@@ -470,15 +470,25 @@ public class OperationBuilderImpl implements OperationBuilder {
         return proximityInfoBuilder;
     }
 
-    private AdGroup buildAdGroupFromDetails(AdGroupDetails adGroupDetails) {
+    private AdGroup buildAdGroupFromDetails(AdGroupDetails adGroupDetails, OperationType operationType) {
         AdGroup.Builder adGroupBuilder = AdGroup.newBuilder();
 
-        if (adGroupDetails.getCampaignResourceName() != null && !adGroupDetails.getCampaignResourceName().isEmpty())
+        if (operationType.equals(OperationType.REMOVE)) {
+            adGroupBuilder.setResourceName(adGroupDetails.getAdGroupResourceName());
+            return adGroupBuilder.build();
+        } else if (operationType.equals(OperationType.CREATE)) {
             adGroupBuilder.setCampaign(adGroupDetails.getCampaignResourceName());
+            adGroupBuilder.setTypeValue(adGroupDetails.getType());
+        } else if (operationType.equals(OperationType.UPDATE))
+            adGroupBuilder.setResourceName(adGroupDetails.getAdGroupResourceName());
 
-        adGroupBuilder.setCpcBidMicros((long) (adGroupDetails.getCpcBid() * MICRO_FACTOR));
-        adGroupBuilder.setName(adGroupDetails.getAdGroupName());
-        adGroupBuilder.setStatusValue(adGroupDetails.getStatus());
+        if (adGroupDetails.getCpcBid() != 0.0)
+            adGroupBuilder.setCpcBidMicros((long) (adGroupDetails.getCpcBid() * MICRO_FACTOR));
+        if (!adGroupDetails.getAdGroupName().isEmpty())
+            adGroupBuilder.setName(adGroupDetails.getAdGroupName());
+        if (adGroupDetails.getStatus() != -1)
+            adGroupBuilder.setStatusValue(adGroupDetails.getStatus());
+
         return adGroupBuilder.build();
     }
 }

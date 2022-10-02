@@ -27,5 +27,5 @@ public interface AdGroupController {
 
     ResponseEntity<Void> updateAdGroups(String customerId, List<AdGroupDetails> adGroupDetailsList) throws Exception;
 
-    ResponseEntity<Void> deleteAdGroups(long customerId, List<AdGroupDetails> adGroupDetailsList) throws Exception;
+    ResponseEntity<Void> deleteAdGroups(String customerId, List<AdGroupDetails> adGroupDetailsList) throws Exception;
 }

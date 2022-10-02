@@ -205,7 +205,8 @@ public class GAQLHelper {
                 "ad_group.type, " +
                 "ad_group.status, " +
                 "ad_group.cpc_bid_micros " +
-                "FROM ad_group WHERE ad_group.campaign ='" + campaignResName + "'";
+                "FROM ad_group WHERE ad_group.campaign ='" + campaignResName +
+                "' AND ad_group.status IN ('ENABLED', 'PAUSED')";
     }
 
     public static List<CampaignDetails> convertStreamResponseToCampaignDetailsList(ServerStream<SearchGoogleAdsStreamResponse> streamResponse) {

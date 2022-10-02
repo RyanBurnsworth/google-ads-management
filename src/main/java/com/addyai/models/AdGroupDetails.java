@@ -24,36 +24,36 @@ public class AdGroupDetails {
     /**
      * The name of the AdGroup
      */
-    private String adGroupName;
+    private String adGroupName = "";
 
     /**
      * The resource name of the AdGroup
      */
-    private String adGroupResourceName;
+    private String adGroupResourceName = "";
 
     /**
      * The Campaign resource name the AdGroup is associated to
      */
-    private String campaignResourceName;
+    private String campaignResourceName = "";
 
     /**
      * The type of AdGroup
      *
      * @see com.google.ads.googleads.v11.enums.AdGroupTypeEnum.AdGroupType
      */
-    private int type;
+    private int type = -1;
 
     /**
      * The status of the adgroup
      *
      * @see com.google.ads.googleads.v11.enums.AdGroupStatusEnum.AdGroupStatus
      */
-    private int status;
+    private int status = -1;
 
     /**
      * The maximum bid for each cost-per-click
      */
-    private double cpcBid;
+    private double cpcBid = 0.0;
 
     public long getAdGroupId() {
         return adGroupId;

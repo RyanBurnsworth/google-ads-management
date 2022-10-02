@@ -235,6 +235,62 @@ public class EntityValidator {
         return null;
     }
 
+
+    /**
+     * Validate the fields of a [AdGroupDetails]
+     *
+     * @param adGroupDetailsList [AdGroupDetails] to be validated
+     * @return if invalid return a ValidationResponseError, else return null
+     */
+    public static ValidationErrorResponse isAdGroupDetailsValid(List<AdGroupDetails> adGroupDetailsList,
+                                                                OperationType operationType) {
+        for (AdGroupDetails adGroupDetails : adGroupDetailsList) {
+            if (operationType.equals(OperationType.REMOVE)) {
+                if (adGroupDetails.getAdGroupResourceName().isEmpty())
+                    return new ValidationErrorResponse(
+                            INVALID_AD_GROUP_DETAILS_ERR_CODE,
+                            INVALID_AD_GROUP_MISSING_RES_NAME_ERR_MSG);
+            }
+
+            if (operationType.equals(OperationType.CREATE)) {
+                if (adGroupDetails.getAdGroupName() == null || adGroupDetails.getAdGroupName().isEmpty()) {
+                    return new ValidationErrorResponse(
+                            INVALID_AD_GROUP_DETAILS_ERR_CODE,
+                            INVALID_AD_GROUP_NAME_EMPTY_ERR_MSG);
+                } else if ((adGroupDetails.getType() != AdGroupTypeEnum.AdGroupType.SEARCH_STANDARD_VALUE)) {
+                    return new ValidationErrorResponse(
+                            INVALID_AD_GROUP_DETAILS_ERR_CODE,
+                            INVALID_AD_GROUP_TYPE_ERR_MSG);
+                } else if ((adGroupDetails.getStatus() != AdGroupStatusEnum.AdGroupStatus.ENABLED_VALUE) &&
+                        adGroupDetails.getStatus() != AdGroupStatusEnum.AdGroupStatus.PAUSED_VALUE) {
+                    return new ValidationErrorResponse(
+                            INVALID_AD_GROUP_DETAILS_ERR_CODE,
+                            INVALID_AD_GROUP_STATUS_ERR_MSG);
+                } else if ((adGroupDetails.getCampaignResourceName() == null ||
+                        adGroupDetails.getCampaignResourceName().isEmpty())) {
+                    return new ValidationErrorResponse(
+                            INVALID_AD_GROUP_DETAILS_ERR_CODE,
+                            INVALID_AD_GROUP_CAMPAIGN_RES_NAME_MISSING_ERR_MSG);
+                } else if (adGroupDetails.getCpcBid() <= 0) {
+                    return new ValidationErrorResponse(
+                            INVALID_AD_GROUP_DETAILS_ERR_CODE,
+                            INVALID_AD_GROUP_CPC_BID_ERR_MSG);
+                }
+            }
+
+            // if the operation is to update, validate the ad group resource name before proceeding
+            if (operationType.equals(OperationType.UPDATE)) {
+                if (adGroupDetails.getAdGroupResourceName() == null ||
+                        adGroupDetails.getAdGroupResourceName().isEmpty()) {
+                    return new ValidationErrorResponse(
+                            INVALID_AD_GROUP_DETAILS_ERR_CODE,
+                            INVALID_AD_GROUP_MISSING_RES_NAME_ERR_MSG);
+                }
+            }
+        }
+        return null;
+    }
+
     private static ValidationErrorResponse isKeywordDetailsValid(NegativeKeywordDetails negativeKeywordDetails) {
         if (negativeKeywordDetails.getStatus() != Constants.CRITERION_STATUS_ENABLED &&
                 negativeKeywordDetails.getStatus() != Constants.CRITERION_STATUS_PAUSED &&
@@ -434,43 +490,6 @@ public class EntityValidator {
                 return new ValidationErrorResponse(
                         Constants.INVALID_REQUEST_ERROR,
                         Constants.MISSING_PARAMS);
-            }
-        }
-        return null;
-    }
-
-    public static ValidationErrorResponse validateAdGroupDetails(List<AdGroupDetails> adGroupDetailsList,
-                                                                 OperationType operationType) {
-        for (AdGroupDetails adGroupDetails : adGroupDetailsList) {
-            if (adGroupDetails.getAdGroupName().isEmpty()) {
-                return new ValidationErrorResponse(
-                        INVALID_AD_GROUP_DETAILS_ERR_CODE,
-                        INVALID_AD_GROUP_NAME_EMPTY_ERR_MSG);
-            } else if ((adGroupDetails.getType() != AdGroupTypeEnum.AdGroupType.SEARCH_STANDARD_VALUE)) {
-                return new ValidationErrorResponse(
-                        INVALID_AD_GROUP_DETAILS_ERR_CODE,
-                        INVALID_AD_GROUP_TYPE_ERR_MSG);
-            } else if ((adGroupDetails.getStatus() != AdGroupStatusEnum.AdGroupStatus.ENABLED_VALUE) &&
-                    adGroupDetails.getStatus() != AdGroupStatusEnum.AdGroupStatus.PAUSED_VALUE) {
-                return new ValidationErrorResponse(
-                        INVALID_AD_GROUP_DETAILS_ERR_CODE,
-                        INVALID_AD_GROUP_STATUS_ERR_MSG);
-            }
-
-            // if the operation is to update, validate the ad group resource name before proceeding
-            if (operationType.equals(OperationType.UPDATE)) {
-                if (adGroupDetails.getAdGroupResourceName() == null ||
-                        adGroupDetails.getAdGroupResourceName().isEmpty()) {
-                    return new ValidationErrorResponse(
-                            INVALID_AD_GROUP_DETAILS_ERR_CODE,
-                            INVALID_AD_GROUP_MISSING_RES_NAME_ERR_MSG);
-                }
-            }
-
-            if (adGroupDetails.getCpcBid() <= 0) {
-                return new ValidationErrorResponse(
-                        INVALID_AD_GROUP_DETAILS_ERR_CODE,
-                        INVALID_AD_GROUP_CPC_BID_ERR_MSG);
             }
         }
         return null;

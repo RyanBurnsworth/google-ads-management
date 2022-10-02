@@ -54,12 +54,14 @@ public class AdGroupControllerImpl implements AdGroupController {
     public ResponseEntity<Void> updateAdGroups(@PathVariable String customerId,
                                                @RequestBody List<AdGroupDetails> adGroupDetailsList) throws Exception {
         adGroupService.upsertAdGroups(Long.parseLong(customerId), adGroupDetailsList, false);
-        return new ResponseEntity<>(HttpStatus.CREATED);
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 
     @Override
     @PostMapping("remove")
-    public ResponseEntity<Void> deleteAdGroups(long customerId, List<AdGroupDetails> adGroupDetailsList) throws Exception {
-        return null;
+    public ResponseEntity<Void> deleteAdGroups(@PathVariable String customerId,
+                                               @RequestBody List<AdGroupDetails> adGroupDetailsList) throws Exception {
+        adGroupService.deleteAdGroups(Long.parseLong(customerId), adGroupDetailsList);
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 }
