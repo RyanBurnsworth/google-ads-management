@@ -19,6 +19,7 @@ import com.addyai.adapter.GoogleAdsRowAdapter;
 import com.addyai.models.AdGroupDetails;
 import com.addyai.models.BudgetDetails;
 import com.addyai.models.CampaignDetails;
+import com.addyai.models.KeywordDetails;
 import com.addyai.models.campaign_criterion.*;
 import com.google.ads.googleads.v11.services.GoogleAdsRow;
 
@@ -84,7 +85,7 @@ public class GoogleAdsRowAdapterImpl implements GoogleAdsRowAdapter {
     }
 
     @Override
-    public NegativeKeywordDetails getKeywordDetails(GoogleAdsRow googleAdsRow) {
+    public NegativeKeywordDetails getNegativeKeywordDetails(GoogleAdsRow googleAdsRow) {
         NegativeKeywordDetails negativeKeywordDetails = new NegativeKeywordDetails();
         negativeKeywordDetails.setCriterionType(CRITERION_TYPE_KEYWORD);
         negativeKeywordDetails.setCampaignCriterionId(googleAdsRow.getCampaignCriterion().getCriterionId());
@@ -214,5 +215,17 @@ public class GoogleAdsRowAdapterImpl implements GoogleAdsRowAdapter {
         adGroupDetails.setAdGroupName(googleAdsRow.getAdGroup().getName());
 
         return adGroupDetails;
+    }
+
+    @Override
+    public KeywordDetails getKeywordDetails(GoogleAdsRow googleAdsRow) {
+        KeywordDetails keywordDetails = new KeywordDetails();
+        keywordDetails.setKeywordResourceName(googleAdsRow.getAdGroupCriterion().getResourceName());
+        keywordDetails.setKeywordId(googleAdsRow.getAdGroupCriterion().getCriterionId());
+        keywordDetails.setKeywordMatchType(googleAdsRow.getAdGroupCriterion().getKeyword().getMatchTypeValue());
+        keywordDetails.setKeywordText(googleAdsRow.getAdGroupCriterion().getKeyword().getText());
+        keywordDetails.setStatus(googleAdsRow.getAdGroupCriterion().getStatusValue());
+        keywordDetails.setCpcBid((double) (googleAdsRow.getAdGroupCriterion().getCpcBidMicros() / MICRO_FACTOR));
+        return keywordDetails;
     }
 }

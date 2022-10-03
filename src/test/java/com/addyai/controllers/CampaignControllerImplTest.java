@@ -13,7 +13,7 @@
  *
  */
 
-package com.addyai.rest;
+package com.addyai.controllers;
 
 import com.addyai.error_handling.exceptions.InvalidRequestException;
 import com.addyai.models.CampaignDetails;

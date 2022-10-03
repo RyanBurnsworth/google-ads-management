@@ -13,15 +13,16 @@
  *
  */
 
-package com.addyai;
+package com.addyai.repos.keyword;
 
-import org.springframework.boot.SpringApplication;
-import org.springframework.boot.autoconfigure.SpringBootApplication;
+import com.addyai.models.KeywordDetails;
+import com.google.ads.googleads.v11.services.AdGroupCriterionOperation;
 
-@SpringBootApplication
-public class GoogleAdsManagementApplication {
+import java.util.List;
 
-    public static void main(String[] args) {
-        SpringApplication.run(GoogleAdsManagementApplication.class, args);
-    }
+public interface KeywordRepository {
+
+    List<KeywordDetails> fetchKeywordDetailsByAdGroup(long customerId, String adGroupResName) throws Exception;
+
+    List<String> performKeywordOperations(long customerId, List<AdGroupCriterionOperation> adGroupCriterionOperationList) throws Exception;
 }

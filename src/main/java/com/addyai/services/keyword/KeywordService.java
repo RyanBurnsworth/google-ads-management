@@ -13,15 +13,16 @@
  *
  */
 
-package com.addyai;
+package com.addyai.services.keyword;
 
-import org.springframework.boot.SpringApplication;
-import org.springframework.boot.autoconfigure.SpringBootApplication;
+import com.addyai.models.KeywordDetails;
 
-@SpringBootApplication
-public class GoogleAdsManagementApplication {
+import java.util.List;
 
-    public static void main(String[] args) {
-        SpringApplication.run(GoogleAdsManagementApplication.class, args);
-    }
+public interface KeywordService {
+    void upsertKeywords(long customerId, List<KeywordDetails> keywordDetailsList, boolean shouldCreate) throws Exception;
+
+    void deleteKeywords(long customerId, List<KeywordDetails> keywordDetailsList) throws Exception;
+
+    List<KeywordDetails> findAllKeywordsByAdGroup(long customerId, String adGroupResName) throws Exception;
 }

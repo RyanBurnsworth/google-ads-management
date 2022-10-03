@@ -18,6 +18,7 @@ package com.addyai.adapter;
 import com.addyai.models.AdGroupDetails;
 import com.addyai.models.BudgetDetails;
 import com.addyai.models.CampaignDetails;
+import com.addyai.models.KeywordDetails;
 import com.addyai.models.campaign_criterion.*;
 import com.google.ads.googleads.v11.services.GoogleAdsRow;
 
@@ -28,7 +29,7 @@ public interface GoogleAdsRowAdapter {
 
     AdScheduleDetails getAdScheduleDetails(GoogleAdsRow googleAdsRow);
 
-    NegativeKeywordDetails getKeywordDetails(GoogleAdsRow googleAdsRow);
+    NegativeKeywordDetails getNegativeKeywordDetails(GoogleAdsRow googleAdsRow);
 
     ProximityDetails getProximityDetails(GoogleAdsRow googleAdsRow);
 
@@ -39,4 +40,6 @@ public interface GoogleAdsRowAdapter {
     DeviceDetails getDeviceDetails(GoogleAdsRow googleAdsRow);
 
     AdGroupDetails getAdGroupDetails(GoogleAdsRow googleAdsRow);
+
+    KeywordDetails getKeywordDetails(GoogleAdsRow googleAdsRow);
 }

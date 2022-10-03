@@ -108,7 +108,7 @@ public class GoogleAdsRowAdapterImplTest {
                 .setCampaignCriterion(testUtils.getMockCampaignCriterion(CriterionTypeEnum.CriterionType.KEYWORD))
                 .build();
 
-        NegativeKeywordDetails negativeKeywordDetails = googleAdsRowAdapter.getKeywordDetails(googleAdsRow);
+        NegativeKeywordDetails negativeKeywordDetails = googleAdsRowAdapter.getNegativeKeywordDetails(googleAdsRow);
         assertEquals(negativeKeywordDetails.getCriterionType(), CRITERION_TYPE_KEYWORD);
         assertEquals(negativeKeywordDetails.getCampaignCriterionId(), MOCK_CRITERION_ID);
         assertEquals(negativeKeywordDetails.getCampaignResourceName(), MOCK_CAMPAIGN_RESOURCE_NAME);
