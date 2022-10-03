@@ -13,19 +13,19 @@
  *
  */
 
-package com.addyai.rest.adgroup;
+package com.addyai.controllers.keyword;
 
-import com.addyai.models.AdGroupDetails;
+import com.addyai.models.KeywordDetails;
 import org.springframework.http.ResponseEntity;
 
 import java.util.List;
 
-public interface AdGroupController {
-    ResponseEntity<List<AdGroupDetails>> fetchAllAdGroupDetails(long customerId, String campaignResName) throws Exception;
+public interface KeywordController {
+    ResponseEntity<List<KeywordDetails>> findKeywordDetailsByAdGroup(String customerId, String adGroupResourceName) throws Exception;
 
-    ResponseEntity<Void> createAdGroups(String customerId, List<AdGroupDetails> adGroupDetailsList) throws Exception;
+    ResponseEntity<Void> addKeywordsToAdGroup(String customerId, List<KeywordDetails> keywordDetailsList) throws Exception;
 
-    ResponseEntity<Void> updateAdGroups(String customerId, List<AdGroupDetails> adGroupDetailsList) throws Exception;
+    ResponseEntity<Void> updateKeywords(String customerId, List<KeywordDetails> keywordDetailsList) throws Exception;
 
-    ResponseEntity<Void> deleteAdGroups(String customerId, List<AdGroupDetails> adGroupDetailsList) throws Exception;
+    ResponseEntity<Void> deleteKeywords(String customerId, List<KeywordDetails> keywordDetailsList) throws Exception;
 }

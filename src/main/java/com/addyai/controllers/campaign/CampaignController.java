@@ -13,7 +13,7 @@
  *
  */
 
-package com.addyai.rest.campaign;
+package com.addyai.controllers.campaign;
 
 import com.addyai.models.CampaignDetails;
 import org.springframework.http.ResponseEntity;

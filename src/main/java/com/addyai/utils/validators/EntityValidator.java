@@ -20,6 +20,7 @@ import com.addyai.error_handling.ValidationErrorResponse;
 import com.addyai.models.AdGroupDetails;
 import com.addyai.models.BudgetDetails;
 import com.addyai.models.CampaignDetails;
+import com.addyai.models.KeywordDetails;
 import com.addyai.models.campaign_criterion.*;
 import com.addyai.utils.misc.Constants;
 import com.google.ads.googleads.v11.enums.AdGroupStatusEnum;
@@ -35,6 +36,7 @@ public class EntityValidator {
     public static final String INVALID_CAMPAIGN_DETAILS_ERR_CODE = "INVALID_CAMPAIGN_DETAILS";
     public static final String INVALID_BUDGET_DETAILS_ERR_CODE = "INVALID_BUDGET_DETAILS";
     public static final String INVALID_AD_GROUP_DETAILS_ERR_CODE = "INVALID_AD_GROUP_DETAILS";
+    public static final String INVALID_KEYWORD_DETAILS_ERR_CODE = "INVALID_KEYWORD_DETAILS";
     public static final String INVALID_NEGATIVE_KEYWORD_DETAILS_ERR_CODE = "INVALID_NEGATIVE_KEYWORD_DETAILS";
     public static final String INVALID_AD_SCHEDULE_DETAILS_ERR_CODE = "INVALID_AD_SCHEDULE_DETAILS";
     public static final String INVALID_DEVICE_DETAILS_ERR_CODE = "INVALID_DEVICE_DETAILS";
@@ -59,6 +61,8 @@ public class EntityValidator {
     public static final String BUDGET_TOO_LOW_ERR_MSG = "Campaign budget must be greater than 0";
     public static final String INVALID_BUDGET_DELIVERY_STATUS_ERR_MSG = "Delivery status must be set to standard or accelerated";
 
+    public static final String KEYWORD_TEXT_EMPTY_ERR_MSG = "Keyword text cannot be empty";
+    public static final String KEYWORD_INVALID_MATCH_TYPE_ERR_MSG = "Invalid match type. Must be BROAD, PHRASE OR EXACT";
     public static final String NEGATIVE_KEYWORD_TEXT_EMPTY_ERR_MSG = "Negative keyword text cannot be empty";
     public static final String NEGATIVE_KEYWORD_INVALID_MATCH_TYPE_ERR_MSG = "Invalid match type. Must be BROAD, PHRASE OR EXACT";
 
@@ -82,6 +86,7 @@ public class EntityValidator {
 
     public static final String INVALID_AD_GROUP_NAME_EMPTY_ERR_MSG = "Ad Group name cannot be empty";
     public static final String INVALID_AD_GROUP_MISSING_RES_NAME_ERR_MSG = "Ad Group resource name cannot be empty";
+    public static final String INVALID_KEYWORD_MISSING_RES_NAME_ERR_MSG = "Keyword resource name cannot be empty";
     public static final String INVALID_AD_GROUP_CAMPAIGN_RES_NAME_MISSING_ERR_MSG = "Campaign resource name cannot be empty";
     public static final String INVALID_AD_GROUP_TYPE_ERR_MSG = "Invalid Ad Group type value";
     public static final String INVALID_AD_GROUP_CPC_BID_ERR_MSG = "CPC bid must be greater than 0";
@@ -195,7 +200,7 @@ public class EntityValidator {
         for (CriterionDetails criterionDetails : criterionDetailsList) {
             if (criterionDetails instanceof NegativeKeywordDetails) {
                 ValidationErrorResponse keywordValidationError =
-                        isKeywordDetailsValid(((NegativeKeywordDetails) criterionDetails));
+                        isNegativeKeywordDetailsValid(((NegativeKeywordDetails) criterionDetails));
 
                 if (keywordValidationError != null)
                     return keywordValidationError;
@@ -291,7 +296,42 @@ public class EntityValidator {
         return null;
     }
 
-    private static ValidationErrorResponse isKeywordDetailsValid(NegativeKeywordDetails negativeKeywordDetails) {
+    public static ValidationErrorResponse isKeywordDetailsValid(List<KeywordDetails> keywordDetailsList, OperationType operationType) {
+        for (KeywordDetails keywordDetails : keywordDetailsList) {
+            if (operationType.equals(OperationType.CREATE)) {
+                if (keywordDetails.getAdGroupResourceName().isEmpty()) {
+                    return new ValidationErrorResponse(
+                            INVALID_KEYWORD_DETAILS_ERR_CODE,
+                            INVALID_AD_GROUP_MISSING_RES_NAME_ERR_MSG);
+                } else if (keywordDetails.getStatus() != Constants.CRITERION_STATUS_ENABLED &&
+                        keywordDetails.getStatus() != Constants.CRITERION_STATUS_PAUSED &&
+                        keywordDetails.getStatus() != Constants.CRITERION_STATUS_REMOVED) {
+                    return new ValidationErrorResponse(
+                            INVALID_KEYWORD_DETAILS_ERR_CODE,
+                            GENERAL_INVALID_STATUS_ERR_MSG);
+                } else if (keywordDetails.getKeywordText().isEmpty()) {
+                    return new ValidationErrorResponse(
+                            INVALID_KEYWORD_DETAILS_ERR_CODE,
+                            KEYWORD_TEXT_EMPTY_ERR_MSG);
+                } else if (keywordDetails.getKeywordMatchType() != Constants.KEYWORD_MATCH_TYPE_BROAD &&
+                        keywordDetails.getKeywordMatchType() != Constants.KEYWORD_MATCH_TYPE_PHRASE &&
+                        keywordDetails.getKeywordMatchType() != Constants.KEYWORD_MATCH_TYPE_EXACT) {
+                    return new ValidationErrorResponse(
+                            INVALID_KEYWORD_DETAILS_ERR_CODE,
+                            KEYWORD_INVALID_MATCH_TYPE_ERR_MSG);
+                }
+            } else if (operationType.equals(OperationType.UPDATE)) {
+                if (keywordDetails.getKeywordResourceName().isEmpty()) {
+                    return new ValidationErrorResponse(
+                            INVALID_KEYWORD_DETAILS_ERR_CODE,
+                            INVALID_KEYWORD_MISSING_RES_NAME_ERR_MSG);
+                }
+            }
+        }
+        return null;
+    }
+
+    private static ValidationErrorResponse isNegativeKeywordDetailsValid(NegativeKeywordDetails negativeKeywordDetails) {
         if (negativeKeywordDetails.getStatus() != Constants.CRITERION_STATUS_ENABLED &&
                 negativeKeywordDetails.getStatus() != Constants.CRITERION_STATUS_PAUSED &&
                 negativeKeywordDetails.getStatus() != Constants.CRITERION_STATUS_REMOVED) {

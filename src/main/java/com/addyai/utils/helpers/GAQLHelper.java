@@ -20,6 +20,7 @@ import com.addyai.adapter.impl.GoogleAdsRowAdapterImpl;
 import com.addyai.models.AdGroupDetails;
 import com.addyai.models.BudgetDetails;
 import com.addyai.models.CampaignDetails;
+import com.addyai.models.KeywordDetails;
 import com.addyai.models.campaign_criterion.*;
 import com.google.ads.googleads.v11.enums.CriterionTypeEnum;
 import com.google.ads.googleads.v11.services.GoogleAdsRow;
@@ -195,7 +196,6 @@ public class GAQLHelper {
                 "FROM ad_group WHERE ad_group.status IN ('ENABLED', 'PAUSED') ORDER BY ad_group.id";
     }
 
-
     public static String getAdGroupDetailsByCampaignQuery(String campaignResName) {
         return "SELECT " +
                 "ad_group.id, " +
@@ -207,6 +207,21 @@ public class GAQLHelper {
                 "ad_group.cpc_bid_micros " +
                 "FROM ad_group WHERE ad_group.campaign ='" + campaignResName +
                 "' AND ad_group.status IN ('ENABLED', 'PAUSED')";
+    }
+
+    public static String getKeywordDetailsByAdGroup(String adGroupResName) {
+        return "SELECT " +
+                "ad_group_criterion.criterion_id, " +
+                "ad_group_criterion.resource_name, " +
+                "ad_group_criterion.ad_group, " +
+                "ad_group_criterion.type, " +
+                "ad_group_criterion.status, " +
+                "ad_group_criterion.keyword.match_type, " +
+                "ad_group_criterion.keyword.text, " +
+                "ad_group_criterion.cpc_bid_micros, " +
+                "ad_group_criterion.bid_modifier " +
+                "FROM ad_group_criterion WHERE ad_group_criterion.ad_group ='" + adGroupResName +
+                "' AND ad_group_criterion.status IN ('ENABLED', 'PAUSED')";
     }
 
     public static List<CampaignDetails> convertStreamResponseToCampaignDetailsList(ServerStream<SearchGoogleAdsStreamResponse> streamResponse) {
@@ -249,6 +264,19 @@ public class GAQLHelper {
         return adGroupDetailsList;
     }
 
+    public static List<KeywordDetails> convertStreamResponseToKeywordDetails(ServerStream<SearchGoogleAdsStreamResponse> streamResponses) {
+        GoogleAdsRowAdapterImpl googleAdsRowAdapter = new GoogleAdsRowAdapterImpl();
+        List<KeywordDetails> keywordDetailsList = new ArrayList<>();
+
+        for (SearchGoogleAdsStreamResponse response : streamResponses) {
+            for (GoogleAdsRow googleAdsRow : response.getResultsList()) {
+                KeywordDetails keywordDetails = googleAdsRowAdapter.getKeywordDetails(googleAdsRow);
+                keywordDetailsList.add(keywordDetails);
+            }
+        }
+        return keywordDetailsList;
+    }
+
     public static List<CriterionDetails> convertStreamResponseToCriterionDetails(
             ServerStream<SearchGoogleAdsStreamResponse> streamResponse, CriterionTypeEnum.CriterionType criterionType) {
         GoogleAdsRowAdapter googleAdsRowAdapter = new GoogleAdsRowAdapterImpl();
@@ -262,7 +290,7 @@ public class GAQLHelper {
                         criterionDetailsList.add(adScheduleDetails);
                         break;
                     case KEYWORD:
-                        NegativeKeywordDetails negativeKeywordDetails = googleAdsRowAdapter.getKeywordDetails(googleAdsRow);
+                        NegativeKeywordDetails negativeKeywordDetails = googleAdsRowAdapter.getNegativeKeywordDetails(googleAdsRow);
                         criterionDetailsList.add(negativeKeywordDetails);
                         break;
                     case DEVICE:

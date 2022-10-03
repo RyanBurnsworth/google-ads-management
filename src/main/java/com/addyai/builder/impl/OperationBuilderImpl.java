@@ -20,18 +20,13 @@ import com.addyai.enums.OperationType;
 import com.addyai.models.AdGroupDetails;
 import com.addyai.models.BudgetDetails;
 import com.addyai.models.CampaignDetails;
+import com.addyai.models.KeywordDetails;
 import com.addyai.models.campaign_criterion.*;
 import com.google.ads.googleads.lib.utils.FieldMasks;
 import com.google.ads.googleads.v11.common.*;
 import com.google.ads.googleads.v11.enums.*;
-import com.google.ads.googleads.v11.resources.AdGroup;
-import com.google.ads.googleads.v11.resources.Campaign;
-import com.google.ads.googleads.v11.resources.CampaignBudget;
-import com.google.ads.googleads.v11.resources.CampaignCriterion;
-import com.google.ads.googleads.v11.services.AdGroupOperation;
-import com.google.ads.googleads.v11.services.CampaignBudgetOperation;
-import com.google.ads.googleads.v11.services.CampaignCriterionOperation;
-import com.google.ads.googleads.v11.services.CampaignOperation;
+import com.google.ads.googleads.v11.resources.*;
+import com.google.ads.googleads.v11.services.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -276,6 +271,29 @@ public class OperationBuilderImpl implements OperationBuilder {
         return adGroupOperationList;
     }
 
+    @Override
+    public List<AdGroupCriterionOperation> buildAdGroupCriterionOperationList(List<KeywordDetails> keywordDetailsList,
+                                                                              OperationType operationType) {
+        List<AdGroupCriterionOperation> keywordOperationList = new ArrayList<>();
+
+        for (KeywordDetails keywordDetails : keywordDetailsList) {
+            AdGroupCriterionOperation.Builder keywordOperationBuilder = AdGroupCriterionOperation.newBuilder();
+
+            AdGroupCriterion adGroupCriterion = buildAdGroupCriterionFromDetails(keywordDetails, operationType);
+            if (operationType.equals(OperationType.CREATE)) {
+                keywordOperationBuilder.setCreate(adGroupCriterion);
+            } else if (operationType.equals(OperationType.UPDATE)) {
+                keywordOperationBuilder.setUpdate(adGroupCriterion);
+                keywordOperationBuilder.setUpdateMask(FieldMasks.allSetFieldsOf(adGroupCriterion));
+            } else if (operationType.equals(OperationType.REMOVE)) {
+                keywordOperationBuilder.setRemove(keywordDetails.getKeywordResourceName());
+            }
+
+            keywordOperationList.add(keywordOperationBuilder.build());
+        }
+        return keywordOperationList;
+    }
+
     /**
      * Build a campaign object using a CampaignDetails object
      *
@@ -490,5 +508,33 @@ public class OperationBuilderImpl implements OperationBuilder {
             adGroupBuilder.setStatusValue(adGroupDetails.getStatus());
 
         return adGroupBuilder.build();
+    }
+
+    private AdGroupCriterion buildAdGroupCriterionFromDetails(KeywordDetails keywordDetails, OperationType operationType) {
+        AdGroupCriterion.Builder keywordBuilder = AdGroupCriterion.newBuilder();
+
+        if (operationType.equals(OperationType.REMOVE)) {
+            keywordBuilder.setResourceName(keywordDetails.getKeywordResourceName());
+            return keywordBuilder.build();
+        } else if (operationType.equals(OperationType.CREATE)) {
+            keywordBuilder.setAdGroup(keywordDetails.getAdGroupResourceName());
+            keywordBuilder.setKeyword(KeywordInfo.newBuilder()
+                    .setText(keywordDetails.getKeywordText())
+                    .setMatchTypeValue(keywordDetails.getKeywordMatchType()));
+            keywordBuilder.setStatusValue(keywordDetails.getStatus());
+            keywordBuilder.setCpcBidMicros((long) (keywordDetails.getCpcBid() * MICRO_FACTOR));
+        } else if (operationType.equals(OperationType.UPDATE)) {
+            // keyword can only update the cpc bid and/or status
+            keywordBuilder.setResourceName(keywordDetails.getKeywordResourceName());
+
+            if (keywordDetails.getCpcBid() > 0.0) {
+                keywordBuilder.setCpcBidMicros((long) (keywordDetails.getCpcBid() * MICRO_FACTOR));
+            }
+
+            if (keywordDetails.getStatus() != -1) {
+                keywordBuilder.setStatusValue(keywordDetails.getStatus());
+            }
+        }
+        return keywordBuilder.build();
     }
 }

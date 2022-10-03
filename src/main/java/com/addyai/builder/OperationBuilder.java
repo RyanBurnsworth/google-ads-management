@@ -19,11 +19,9 @@ import com.addyai.enums.OperationType;
 import com.addyai.models.AdGroupDetails;
 import com.addyai.models.BudgetDetails;
 import com.addyai.models.CampaignDetails;
+import com.addyai.models.KeywordDetails;
 import com.addyai.models.campaign_criterion.CriterionDetails;
-import com.google.ads.googleads.v11.services.AdGroupOperation;
-import com.google.ads.googleads.v11.services.CampaignBudgetOperation;
-import com.google.ads.googleads.v11.services.CampaignCriterionOperation;
-import com.google.ads.googleads.v11.services.CampaignOperation;
+import com.google.ads.googleads.v11.services.*;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -41,4 +39,7 @@ public interface OperationBuilder {
                                                                          OperationType operationType);
 
     List<AdGroupOperation> buildAdGroupOperationList(List<AdGroupDetails> adGroupDetailsList, OperationType operationType);
+
+    List<AdGroupCriterionOperation> buildAdGroupCriterionOperationList(List<KeywordDetails> keywordDetailsList,
+                                                                       OperationType operationType);
 }

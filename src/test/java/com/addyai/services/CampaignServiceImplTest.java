@@ -35,7 +35,6 @@ import java.util.List;
 
 import static com.addyai.utils.TestUtils.MOCK_CAMPAIGN_BUDGET_RESOURCE_NAME;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 @SpringBootTest(classes = CampaignServiceImpl.class)

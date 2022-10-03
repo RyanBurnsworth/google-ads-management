@@ -13,10 +13,10 @@
  *
  */
 
-package com.addyai.rest.adgroup.impl;
+package com.addyai.controllers.adgroup.impl;
 
+import com.addyai.controllers.adgroup.AdGroupController;
 import com.addyai.models.AdGroupDetails;
-import com.addyai.rest.adgroup.AdGroupController;
 import com.addyai.services.adgroup.AdGroupService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
