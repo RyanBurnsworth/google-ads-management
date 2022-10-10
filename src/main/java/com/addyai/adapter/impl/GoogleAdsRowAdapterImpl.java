@@ -20,6 +20,7 @@ import com.addyai.models.AdGroupDetails;
 import com.addyai.models.BudgetDetails;
 import com.addyai.models.CampaignDetails;
 import com.addyai.models.KeywordDetails;
+import com.addyai.models.assets.SitelinkAssetDetails;
 import com.addyai.models.campaign_criterion.*;
 import com.google.ads.googleads.v11.services.GoogleAdsRow;
 
@@ -227,5 +228,20 @@ public class GoogleAdsRowAdapterImpl implements GoogleAdsRowAdapter {
         keywordDetails.setStatus(googleAdsRow.getAdGroupCriterion().getStatusValue());
         keywordDetails.setCpcBid((double) (googleAdsRow.getAdGroupCriterion().getCpcBidMicros() / MICRO_FACTOR));
         return keywordDetails;
+    }
+
+    @Override
+    public SitelinkAssetDetails getSitelinkDetails(GoogleAdsRow googleAdsRow) {
+        SitelinkAssetDetails sitelinkAssetDetails = new SitelinkAssetDetails();
+        sitelinkAssetDetails.setAssetId(googleAdsRow.getAsset().getId());
+        sitelinkAssetDetails.setAssetName(googleAdsRow.getAsset().getName());
+        sitelinkAssetDetails.setAssetSource(googleAdsRow.getAsset().getSourceValue());
+        sitelinkAssetDetails.setAssetType(googleAdsRow.getAsset().getTypeValue());
+        sitelinkAssetDetails.setStartDate(googleAdsRow.getAsset().getSitelinkAsset().getStartDate());
+        sitelinkAssetDetails.setEndDate(googleAdsRow.getAsset().getSitelinkAsset().getEndDate());
+        sitelinkAssetDetails.setDescription1(googleAdsRow.getAsset().getSitelinkAsset().getDescription1());
+        sitelinkAssetDetails.setDescription2(googleAdsRow.getAsset().getSitelinkAsset().getDescription2());
+        sitelinkAssetDetails.setLinkText(googleAdsRow.getAsset().getSitelinkAsset().getLinkText());
+        return sitelinkAssetDetails;
     }
 }
