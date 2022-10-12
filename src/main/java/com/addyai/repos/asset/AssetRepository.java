@@ -8,5 +8,5 @@ import java.util.List;
 public interface AssetRepository {
     List<AssetDetails> fetchAssets(long customerId) throws Exception;
 
-    List<String> performAssetOperations(long customerId, List<AssetOperation> assetOperationList);
+    List<String> performAssetOperations(long customerId, List<AssetOperation> assetOperationList) throws Exception;
 }

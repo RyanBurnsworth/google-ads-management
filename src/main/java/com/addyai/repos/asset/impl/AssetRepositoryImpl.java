@@ -70,7 +70,13 @@ public class AssetRepositoryImpl implements AssetRepository {
     }
 
     @Override
-    public List<String> performAssetOperations(long customerId, List<AssetOperation> assetOperationList) {
-        return null;
+    public List<String> performAssetOperations(long customerId, List<AssetOperation> assetOperationList) throws Exception {
+        try {
+            MutateAssetsResponse assetsResponse = assetServiceClient.mutateAssets(
+                    Long.toString(customerId), assetOperationList);
+        } catch (Exception e) {
+            throw ApiExceptionResolver.doResolveException(e);
+        }
+        return null; // TODO: update when knowing more
     }
 }

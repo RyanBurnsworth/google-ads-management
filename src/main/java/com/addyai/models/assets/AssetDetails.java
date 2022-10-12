@@ -1,12 +1,18 @@
 package com.addyai.models.assets;
 
+import com.fasterxml.jackson.annotation.JsonSubTypes;
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.google.ads.googleads.v11.enums.AssetSourceEnum;
 import com.google.ads.googleads.v11.enums.AssetTypeEnum;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class AssetDetails {
+@JsonTypeInfo(use = JsonTypeInfo.Id.NAME, property = "type")
+@JsonSubTypes({
+        @JsonSubTypes.Type(value = SitelinkDetails.class, name = "sitelinks")
+})
+public abstract class AssetDetails {
     private long assetId = 0L;
     private String assetName = "";
     private int assetType = AssetTypeEnum.AssetType.UNKNOWN_VALUE;

@@ -22,7 +22,7 @@ import com.addyai.models.BudgetDetails;
 import com.addyai.models.CampaignDetails;
 import com.addyai.models.KeywordDetails;
 import com.addyai.models.assets.AssetDetails;
-import com.addyai.models.assets.SitelinkAssetDetails;
+import com.addyai.models.assets.SitelinkDetails;
 import com.addyai.models.campaign_criterion.*;
 import com.google.ads.googleads.v11.enums.AssetTypeEnum;
 import com.google.ads.googleads.v11.enums.CriterionTypeEnum;
@@ -346,9 +346,9 @@ public class GAQLHelper {
             for (GoogleAdsRow googleAdsRow : searchGoogleAdsStreamResponse.getResultsList()) {
                 switch (assetType) {
                     case SITELINK:
-                        SitelinkAssetDetails sitelinkAssetDetails =
+                        SitelinkDetails sitelinkDetails =
                                 googleAdsRowAdapter.getSitelinkDetails(googleAdsRow);
-                        assetDetailsList.add(sitelinkAssetDetails);
+                        assetDetailsList.add(sitelinkDetails);
                         break;
                     default:
                         break;
