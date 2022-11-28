@@ -21,7 +21,10 @@ import com.addyai.models.AdGroupDetails;
 import com.addyai.models.BudgetDetails;
 import com.addyai.models.CampaignDetails;
 import com.addyai.models.KeywordDetails;
+import com.addyai.models.assets.AssetDetails;
+import com.addyai.models.assets.SitelinkDetails;
 import com.addyai.models.campaign_criterion.*;
+import com.google.ads.googleads.v11.enums.AssetTypeEnum;
 import com.google.ads.googleads.v11.enums.CriterionTypeEnum;
 import com.google.ads.googleads.v11.services.GoogleAdsRow;
 import com.google.ads.googleads.v11.services.SearchGoogleAdsStreamResponse;
@@ -224,6 +227,20 @@ public class GAQLHelper {
                 "' AND ad_group_criterion.status IN ('ENABLED', 'PAUSED')";
     }
 
+    public static String getSitelinksAssetQuery() {
+        return "SELECT " +
+                "asset.id, " +
+                "asset.name, " +
+                "asset.type, " +
+                "asset.source, " +
+                "asset.sitelink_asset.description1, " +
+                "asset.sitelink_asset.description2, " +
+                "asset.sitelink_asset.link_text, " +
+                "asset.sitelink_asset.start_date, " +
+                "asset.sitelink_asset.end_date " +
+                "FROM asset WHERE asset.sitelink_asset.link_text != ''" ;
+    }
+
     public static List<CampaignDetails> convertStreamResponseToCampaignDetailsList(ServerStream<SearchGoogleAdsStreamResponse> streamResponse) {
         GoogleAdsRowAdapter googleAdsRowAdapter = new GoogleAdsRowAdapterImpl();
         List<CampaignDetails> campaignDetailsList = new ArrayList<>();
@@ -318,5 +335,26 @@ public class GAQLHelper {
             }
         }
         return criterionDetailsList;
+    }
+
+    public static List<AssetDetails> convertStreamResponseToAssetDetails(
+            ServerStream<SearchGoogleAdsStreamResponse> streamResponse, AssetTypeEnum.AssetType assetType) {
+        GoogleAdsRowAdapter googleAdsRowAdapter = new GoogleAdsRowAdapterImpl();
+        List<AssetDetails> assetDetailsList = new ArrayList<>();
+
+        for (SearchGoogleAdsStreamResponse searchGoogleAdsStreamResponse : streamResponse) {
+            for (GoogleAdsRow googleAdsRow : searchGoogleAdsStreamResponse.getResultsList()) {
+                switch (assetType) {
+                    case SITELINK:
+                        SitelinkDetails sitelinkDetails =
+                                googleAdsRowAdapter.getSitelinkDetails(googleAdsRow);
+                        assetDetailsList.add(sitelinkDetails);
+                        break;
+                    default:
+                        break;
+                }
+            }
+        }
+        return assetDetailsList;
     }
 }

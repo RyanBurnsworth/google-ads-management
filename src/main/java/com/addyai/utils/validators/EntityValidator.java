@@ -21,6 +21,8 @@ import com.addyai.models.AdGroupDetails;
 import com.addyai.models.BudgetDetails;
 import com.addyai.models.CampaignDetails;
 import com.addyai.models.KeywordDetails;
+import com.addyai.models.assets.AssetDetails;
+import com.addyai.models.assets.SitelinkDetails;
 import com.addyai.models.campaign_criterion.*;
 import com.addyai.utils.misc.Constants;
 import com.google.ads.googleads.v11.enums.AdGroupStatusEnum;
@@ -37,6 +39,7 @@ public class EntityValidator {
     public static final String INVALID_BUDGET_DETAILS_ERR_CODE = "INVALID_BUDGET_DETAILS";
     public static final String INVALID_AD_GROUP_DETAILS_ERR_CODE = "INVALID_AD_GROUP_DETAILS";
     public static final String INVALID_KEYWORD_DETAILS_ERR_CODE = "INVALID_KEYWORD_DETAILS";
+    public static final String INVALID_SITELINK_DETAILS_ERR_CODE = "INVALID_SITELINK_DETAILS";
     public static final String INVALID_NEGATIVE_KEYWORD_DETAILS_ERR_CODE = "INVALID_NEGATIVE_KEYWORD_DETAILS";
     public static final String INVALID_AD_SCHEDULE_DETAILS_ERR_CODE = "INVALID_AD_SCHEDULE_DETAILS";
     public static final String INVALID_DEVICE_DETAILS_ERR_CODE = "INVALID_DEVICE_DETAILS";
@@ -91,6 +94,7 @@ public class EntityValidator {
     public static final String INVALID_AD_GROUP_TYPE_ERR_MSG = "Invalid Ad Group type value";
     public static final String INVALID_AD_GROUP_CPC_BID_ERR_MSG = "CPC bid must be greater than 0";
     public static final String INVALID_AD_GROUP_STATUS_ERR_MSG = "Invalid Ad Group status value";
+    public static final String MISSING_LINK_TEXT_ERR_MSG = "Missing Link Text";
 
     /**
      * Validate the fields of the CampaignDetails object
@@ -531,6 +535,28 @@ public class EntityValidator {
                         Constants.INVALID_REQUEST_ERROR,
                         Constants.MISSING_PARAMS);
             }
+        }
+        return null;
+    }
+
+    public static ValidationErrorResponse isAssetDetailsValid(List<AssetDetails> assetDetailsList) {
+        for (AssetDetails assetDetails : assetDetailsList) {
+            if (assetDetails instanceof SitelinkDetails) {
+                ValidationErrorResponse validationErrorResponse =
+                        isSitelinkAssetDetailsValid((SitelinkDetails) assetDetails);
+
+                if (validationErrorResponse != null)
+                    return validationErrorResponse;
+            }
+        }
+        return null;
+    }
+
+    private static ValidationErrorResponse isSitelinkAssetDetailsValid(SitelinkDetails sitelinkDetails) {
+        if (sitelinkDetails.getLinkText().isEmpty()) {
+            return new ValidationErrorResponse(
+                    INVALID_SITELINK_DETAILS_ERR_CODE,
+                    MISSING_LINK_TEXT_ERR_MSG);
         }
         return null;
     }

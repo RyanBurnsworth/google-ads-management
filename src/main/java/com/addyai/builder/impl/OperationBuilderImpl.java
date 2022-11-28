@@ -21,6 +21,8 @@ import com.addyai.models.AdGroupDetails;
 import com.addyai.models.BudgetDetails;
 import com.addyai.models.CampaignDetails;
 import com.addyai.models.KeywordDetails;
+import com.addyai.models.assets.AssetDetails;
+import com.addyai.models.assets.SitelinkDetails;
 import com.addyai.models.campaign_criterion.*;
 import com.google.ads.googleads.lib.utils.FieldMasks;
 import com.google.ads.googleads.v11.common.*;
@@ -346,6 +348,51 @@ public class OperationBuilderImpl implements OperationBuilder {
             campaignBuilder.setResourceName(campaignDetails.getCampaignResourceName());
 
         return campaignBuilder.build();
+    }
+
+    @Override
+    public List<AssetOperation> buildAssetOperationList(List<AssetDetails> assetDetailsList, OperationType operationType) {
+        List<AssetOperation> assetOperationList = new ArrayList<>();
+        AssetOperation.Builder assetOperationBuilder = AssetOperation.newBuilder();
+
+        for (AssetDetails assetDetails : assetDetailsList) {
+            Asset.Builder assetBuilder = Asset.newBuilder();
+
+            if (assetDetails.getAssetType() == AssetTypeEnum.AssetType.SITELINK_VALUE) {
+                SitelinkDetails sitelinkDetails = (SitelinkDetails) assetDetails;
+                SitelinkAsset.Builder sitelinkAssetBuilder = SitelinkAsset.newBuilder();
+                sitelinkAssetBuilder.setDescription1(sitelinkDetails.getDescription1());
+                sitelinkAssetBuilder.setDescription2(sitelinkDetails.getDescription2());
+                sitelinkAssetBuilder.setLinkText(sitelinkDetails.getLinkText());
+                sitelinkAssetBuilder.setStartDate(sitelinkDetails.getStartDate());
+                sitelinkAssetBuilder.setEndDate(sitelinkDetails.getEndDate());
+
+                assetBuilder.setSitelinkAsset(sitelinkAssetBuilder.build());
+            }
+
+            // add the final urls to the asset object
+            assetBuilder.addAllFinalUrls(assetDetails.getFinalUrlList());
+
+            // add the final mobile urls to the asset object
+            assetBuilder.addAllFinalMobileUrls(assetDetails.getFinalMobileUrlList());
+
+            // add a final suffix
+            assetBuilder.setFinalUrlSuffix(assetDetails.getFinalUrlSuffix());
+
+            Asset asset;
+            if (operationType.equals(OperationType.CREATE)) {
+                asset = assetBuilder.build();
+                assetOperationBuilder.setCreate(asset);
+            } else if (operationType.equals(OperationType.UPDATE)) {
+                assetBuilder.setResourceName(assetDetails.getAssetName());
+                asset = assetBuilder.build();
+
+                assetOperationBuilder.setUpdate(asset);
+                assetOperationBuilder.setUpdateMask(FieldMasks.allSetFieldsOf(asset));
+            }
+            assetOperationList.add(assetOperationBuilder.build());
+        }
+        return assetOperationList;
     }
 
     /**
