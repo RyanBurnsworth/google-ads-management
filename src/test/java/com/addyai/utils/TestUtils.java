@@ -19,11 +19,11 @@ import com.addyai.models.AdGroupDetails;
 import com.addyai.models.BudgetDetails;
 import com.addyai.models.CampaignDetails;
 import com.addyai.models.campaign_criterion.*;
-import com.google.ads.googleads.v11.common.*;
-import com.google.ads.googleads.v11.enums.*;
-import com.google.ads.googleads.v11.resources.Campaign;
-import com.google.ads.googleads.v11.resources.CampaignBudget;
-import com.google.ads.googleads.v11.resources.CampaignCriterion;
+import com.google.ads.googleads.v12.common.*;
+import com.google.ads.googleads.v12.enums.*;
+import com.google.ads.googleads.v12.resources.Campaign;
+import com.google.ads.googleads.v12.resources.CampaignBudget;
+import com.google.ads.googleads.v12.resources.CampaignCriterion;
 
 import java.util.ArrayList;
 import java.util.HashMap;

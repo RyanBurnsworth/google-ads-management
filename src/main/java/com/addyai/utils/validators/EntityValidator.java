@@ -25,9 +25,9 @@ import com.addyai.models.assets.AssetDetails;
 import com.addyai.models.assets.SitelinkDetails;
 import com.addyai.models.campaign_criterion.*;
 import com.addyai.utils.misc.Constants;
-import com.google.ads.googleads.v11.enums.AdGroupStatusEnum;
-import com.google.ads.googleads.v11.enums.AdGroupTypeEnum;
-import com.google.ads.googleads.v11.enums.CampaignStatusEnum;
+import com.google.ads.googleads.v12.enums.AdGroupStatusEnum;
+import com.google.ads.googleads.v12.enums.AdGroupTypeEnum;
+import com.google.ads.googleads.v12.enums.CampaignStatusEnum;
 
 import java.time.format.DateTimeFormatter;
 import java.time.format.ResolverStyle;

@@ -24,10 +24,10 @@ import com.addyai.models.KeywordDetails;
 import com.addyai.models.assets.AssetDetails;
 import com.addyai.models.assets.SitelinkDetails;
 import com.addyai.models.campaign_criterion.*;
-import com.google.ads.googleads.v11.enums.AssetTypeEnum;
-import com.google.ads.googleads.v11.enums.CriterionTypeEnum;
-import com.google.ads.googleads.v11.services.GoogleAdsRow;
-import com.google.ads.googleads.v11.services.SearchGoogleAdsStreamResponse;
+import com.google.ads.googleads.v12.enums.AssetTypeEnum;
+import com.google.ads.googleads.v12.enums.CriterionTypeEnum;
+import com.google.ads.googleads.v12.services.GoogleAdsRow;
+import com.google.ads.googleads.v12.services.SearchGoogleAdsStreamResponse;
 import com.google.api.gax.rpc.ServerStream;
 
 import java.util.ArrayList;

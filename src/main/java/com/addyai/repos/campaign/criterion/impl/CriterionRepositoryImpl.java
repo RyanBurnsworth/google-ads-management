@@ -22,8 +22,8 @@ import com.addyai.repos.campaign.criterion.CriterionRepository;
 import com.addyai.repos.request.StreamRequest;
 import com.addyai.repos.request.impl.StreamRequestImpl;
 import com.addyai.utils.helpers.GAQLHelper;
-import com.google.ads.googleads.v11.enums.CriterionTypeEnum;
-import com.google.ads.googleads.v11.services.*;
+import com.google.ads.googleads.v12.enums.CriterionTypeEnum;
+import com.google.ads.googleads.v12.services.*;
 import com.google.api.gax.rpc.ServerStream;
 import org.springframework.stereotype.Repository;
 

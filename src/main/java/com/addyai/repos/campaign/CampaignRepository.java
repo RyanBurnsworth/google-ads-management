@@ -16,7 +16,7 @@
 package com.addyai.repos.campaign;
 
 import com.addyai.models.CampaignDetails;
-import com.google.ads.googleads.v11.services.CampaignOperation;
+import com.google.ads.googleads.v12.services.CampaignOperation;
 
 import java.util.List;
 

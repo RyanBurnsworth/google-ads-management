@@ -19,14 +19,14 @@ import com.addyai.enums.OperationType;
 import com.addyai.utils.TestUtils;
 import com.addyai.builder.OperationBuilder;
 import com.addyai.builder.impl.OperationBuilderImpl;
-import com.google.ads.googleads.v11.enums.CampaignCriterionStatusEnum;
-import com.google.ads.googleads.v11.enums.MinuteOfHourEnum;
-import com.google.ads.googleads.v11.enums.NegativeGeoTargetTypeEnum;
-import com.google.ads.googleads.v11.resources.Campaign;
-import com.google.ads.googleads.v11.resources.CampaignBudget;
-import com.google.ads.googleads.v11.services.CampaignBudgetOperation;
-import com.google.ads.googleads.v11.services.CampaignCriterionOperation;
-import com.google.ads.googleads.v11.services.CampaignOperation;
+import com.google.ads.googleads.v12.enums.CampaignCriterionStatusEnum;
+import com.google.ads.googleads.v12.enums.MinuteOfHourEnum;
+import com.google.ads.googleads.v12.enums.NegativeGeoTargetTypeEnum;
+import com.google.ads.googleads.v12.resources.Campaign;
+import com.google.ads.googleads.v12.resources.CampaignBudget;
+import com.google.ads.googleads.v12.services.CampaignBudgetOperation;
+import com.google.ads.googleads.v12.services.CampaignCriterionOperation;
+import com.google.ads.googleads.v12.services.CampaignOperation;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,7 +36,7 @@ import java.util.List;
 
 import static com.addyai.utils.TestUtils.*;
 import static com.addyai.utils.misc.Constants.*;
-import static com.google.ads.googleads.v11.enums.PositiveGeoTargetTypeEnum.PositiveGeoTargetType.PRESENCE;
+import static com.google.ads.googleads.v12.enums.PositiveGeoTargetTypeEnum.PositiveGeoTargetType.PRESENCE;
 import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest(classes = OperationBuilderImpl.class)

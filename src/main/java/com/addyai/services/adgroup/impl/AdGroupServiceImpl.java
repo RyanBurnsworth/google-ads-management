@@ -24,7 +24,7 @@ import com.addyai.models.AdGroupDetails;
 import com.addyai.repos.adgroup.AdGroupRepository;
 import com.addyai.services.adgroup.AdGroupService;
 import com.addyai.utils.validators.EntityValidator;
-import com.google.ads.googleads.v11.services.AdGroupOperation;
+import com.google.ads.googleads.v12.services.AdGroupOperation;
 import org.springframework.stereotype.Service;
 
 import java.util.List;

@@ -25,10 +25,10 @@ import com.addyai.models.assets.AssetDetails;
 import com.addyai.models.assets.SitelinkDetails;
 import com.addyai.models.campaign_criterion.*;
 import com.google.ads.googleads.lib.utils.FieldMasks;
-import com.google.ads.googleads.v11.common.*;
-import com.google.ads.googleads.v11.enums.*;
-import com.google.ads.googleads.v11.resources.*;
-import com.google.ads.googleads.v11.services.*;
+import com.google.ads.googleads.v12.common.*;
+import com.google.ads.googleads.v12.enums.*;
+import com.google.ads.googleads.v12.resources.*;
+import com.google.ads.googleads.v12.services.*;
 
 import java.util.ArrayList;
 import java.util.List;
