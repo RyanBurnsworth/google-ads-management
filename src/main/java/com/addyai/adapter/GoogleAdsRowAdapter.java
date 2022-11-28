@@ -21,7 +21,7 @@ import com.addyai.models.CampaignDetails;
 import com.addyai.models.KeywordDetails;
 import com.addyai.models.assets.SitelinkDetails;
 import com.addyai.models.campaign_criterion.*;
-import com.google.ads.googleads.v11.services.GoogleAdsRow;
+import com.google.ads.googleads.v12.services.GoogleAdsRow;
 
 public interface GoogleAdsRowAdapter {
     CampaignDetails getCampaignDetails(GoogleAdsRow googleAdsRow);

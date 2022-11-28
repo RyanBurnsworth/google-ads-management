@@ -22,7 +22,7 @@ import com.addyai.models.CampaignDetails;
 import com.addyai.models.KeywordDetails;
 import com.addyai.models.assets.AssetDetails;
 import com.addyai.models.campaign_criterion.CriterionDetails;
-import com.google.ads.googleads.v11.services.*;
+import com.google.ads.googleads.v12.services.*;
 import org.springframework.stereotype.Component;
 
 import java.util.List;

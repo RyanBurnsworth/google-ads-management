@@ -15,7 +15,7 @@
 
 package com.addyai.utils.misc;
 
-import com.google.ads.googleads.v11.enums.*;
+import com.google.ads.googleads.v12.enums.*;
 
 public class Constants {
     public static final long MICRO_FACTOR = 1000000L;

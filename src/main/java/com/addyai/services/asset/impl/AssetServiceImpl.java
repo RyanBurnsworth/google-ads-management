@@ -9,7 +9,7 @@ import com.addyai.models.assets.AssetDetails;
 import com.addyai.repos.asset.AssetRepository;
 import com.addyai.services.asset.AssetService;
 import com.addyai.utils.validators.EntityValidator;
-import com.google.ads.googleads.v11.services.AssetOperation;
+import com.google.ads.googleads.v12.services.AssetOperation;
 import org.springframework.stereotype.Service;
 
 import java.util.List;

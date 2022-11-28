@@ -18,7 +18,7 @@ package com.addyai.error_handling;
 import com.addyai.error_handling.exceptions.InvalidRequestException;
 import com.addyai.error_handling.exceptions.ServiceFailureException;
 import com.addyai.utils.helpers.StringHelper;
-import com.google.ads.googleads.v11.errors.GoogleAdsException;
+import com.google.ads.googleads.v12.errors.GoogleAdsException;
 
 import static com.addyai.utils.misc.Constants.UNKNOWN_SERVICE_ERROR;
 

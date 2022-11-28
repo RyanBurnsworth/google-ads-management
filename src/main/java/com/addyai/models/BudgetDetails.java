@@ -44,7 +44,7 @@ public class BudgetDetails {
      * will show ads at every chance until the budget is exhausted for the day.
      * Defaults to BudgetDeliveryMethodEnum.BudgetDeliveryMethod.STANDARD_VALUE
      *
-     * @see com.google.ads.googleads.v11.enums.BudgetDeliveryMethodEnum.BudgetDeliveryMethod
+     * @see com.google.ads.googleads.v12.enums.BudgetDeliveryMethodEnum.BudgetDeliveryMethod
      */
     private int deliveryMethod = BUDGET_DELIVERY_METHOD_STANDARD;
 
@@ -64,7 +64,7 @@ public class BudgetDetails {
      * The status of the budget
      * Default is BudgetStatusEnum.BudgetStatus.ENABLED_VALUE
      *
-     * @see com.google.ads.googleads.v11.enums.BudgetStatusEnum.BudgetStatus
+     * @see com.google.ads.googleads.v12.enums.BudgetStatusEnum.BudgetStatus
      */
     private int status = BUDGET_STATUS_ENABLED;
 

@@ -32,9 +32,9 @@ import com.addyai.repos.campaign.budget.BudgetRepository;
 import com.addyai.repos.campaign.criterion.CriterionRepository;
 import com.addyai.services.campaign.CampaignService;
 import com.addyai.utils.validators.EntityValidator;
-import com.google.ads.googleads.v11.services.CampaignBudgetOperation;
-import com.google.ads.googleads.v11.services.CampaignCriterionOperation;
-import com.google.ads.googleads.v11.services.CampaignOperation;
+import com.google.ads.googleads.v12.services.CampaignBudgetOperation;
+import com.google.ads.googleads.v12.services.CampaignCriterionOperation;
+import com.google.ads.googleads.v12.services.CampaignOperation;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
