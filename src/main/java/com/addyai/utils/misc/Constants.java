@@ -24,7 +24,7 @@ public class Constants {
 
     public static final int NUM_CRITERION_CLASSES_SUPPORTED = 6;
 
-    public static final int NUM_ASSET_CLASSES_SUPPORTED = 1;
+    public static final int NUM_ASSET_CLASSES_SUPPORTED = 2;
 
     public static final String DEFAULT_LOCALE = "en";
     public static final String DEFAULT_COUNTRY_CODE = "US";

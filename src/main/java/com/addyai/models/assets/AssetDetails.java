@@ -5,21 +5,16 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.google.ads.googleads.v12.enums.AssetSourceEnum;
 import com.google.ads.googleads.v12.enums.AssetTypeEnum;
 
-import java.util.ArrayList;
-import java.util.List;
-
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, property = "type")
 @JsonSubTypes({
-        @JsonSubTypes.Type(value = SitelinkDetails.class, name = "sitelinks")
+        @JsonSubTypes.Type(value = SitelinkDetails.class, name = "sitelinks"),
+        @JsonSubTypes.Type(value = CallExtensionDetails.class, name = "call")
 })
 public abstract class AssetDetails {
     private long assetId = 0L;
     private String assetName = "";
     private int assetType = AssetTypeEnum.AssetType.UNKNOWN_VALUE;
     private int assetSource = AssetSourceEnum.AssetSource.UNKNOWN_VALUE;
-    private List<String> finalUrlList = new ArrayList<>();
-    private List<String> finalMobileUrlList = new ArrayList<>();
-    private String finalUrlSuffix = "";
 
     public long getAssetId() {
         return assetId;
@@ -51,29 +46,5 @@ public abstract class AssetDetails {
 
     public void setAssetSource(int assetSource) {
         this.assetSource = assetSource;
-    }
-
-    public List<String> getFinalUrlList() {
-        return finalUrlList;
-    }
-
-    public void setFinalUrlList(List<String> finalUrlList) {
-        this.finalUrlList = finalUrlList;
-    }
-
-    public List<String> getFinalMobileUrlList() {
-        return finalMobileUrlList;
-    }
-
-    public void setFinalMobileUrlList(List<String> finalMobileUrlList) {
-        this.finalMobileUrlList = finalMobileUrlList;
-    }
-
-    public String getFinalUrlSuffix() {
-        return finalUrlSuffix;
-    }
-
-    public void setFinalUrlSuffix(String finalUrlSuffix) {
-        this.finalUrlSuffix = finalUrlSuffix;
     }
 }

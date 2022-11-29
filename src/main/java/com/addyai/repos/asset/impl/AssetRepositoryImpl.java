@@ -59,6 +59,16 @@ public class AssetRepositoryImpl implements AssetRepository {
                                         AssetTypeEnum.AssetType.SITELINK);
                         assetDetailsList.addAll(sitelinkDetails);
                         break;
+                    case 1:
+                        query = GAQLHelper.getCallExtensionAssetQuery();
+
+                        request = requestBuilder.buildStreamRequest(customerId, query);
+                        response = requestBuilder.callStreamRequest(request);
+
+                        List<AssetDetails> callExtensionDetails =
+                                GAQLHelper.convertStreamResponseToAssetDetails(response,
+                                        AssetTypeEnum.AssetType.CALL);
+                        assetDetailsList.addAll(callExtensionDetails);
                     default:
                         break;
                 }

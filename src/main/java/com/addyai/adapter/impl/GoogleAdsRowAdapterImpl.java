@@ -20,6 +20,7 @@ import com.addyai.models.AdGroupDetails;
 import com.addyai.models.BudgetDetails;
 import com.addyai.models.CampaignDetails;
 import com.addyai.models.KeywordDetails;
+import com.addyai.models.assets.CallExtensionDetails;
 import com.addyai.models.assets.SitelinkDetails;
 import com.addyai.models.campaign_criterion.*;
 import com.google.ads.googleads.v12.services.GoogleAdsRow;
@@ -243,5 +244,25 @@ public class GoogleAdsRowAdapterImpl implements GoogleAdsRowAdapter {
         sitelinkDetails.setDescription2(googleAdsRow.getAsset().getSitelinkAsset().getDescription2());
         sitelinkDetails.setLinkText(googleAdsRow.getAsset().getSitelinkAsset().getLinkText());
         return sitelinkDetails;
+    }
+
+    @Override
+    public CallExtensionDetails getCallExtensionDetails(GoogleAdsRow googleAdsRow) {
+        CallExtensionDetails callExtensionDetails = new CallExtensionDetails();
+        callExtensionDetails.setAssetId(googleAdsRow.getAsset().getId());
+        callExtensionDetails.setAssetName(googleAdsRow.getAsset().getResourceName());
+        callExtensionDetails.setAssetSource(googleAdsRow.getAsset().getSourceValue());
+        callExtensionDetails.setAssetType(googleAdsRow.getAsset().getTypeValue());
+        callExtensionDetails.setPhoneNumber(googleAdsRow.getAsset().getCallAsset().getPhoneNumber());
+        callExtensionDetails.setCountryCode(googleAdsRow.getAsset().getCallAsset().getCountryCode());
+        if (googleAdsRow.getAsset().getCallAsset().getAdScheduleTargetsCount() > 0) {
+            callExtensionDetails.setStartHour(googleAdsRow.getAsset().getCallAsset().getAdScheduleTargets(0).getStartHour());
+            callExtensionDetails.setStartHour(googleAdsRow.getAsset().getCallAsset().getAdScheduleTargets(0).getEndHour());
+            callExtensionDetails.setStartHour(googleAdsRow.getAsset().getCallAsset().getAdScheduleTargets(0).getStartMinuteValue());
+            callExtensionDetails.setStartHour(googleAdsRow.getAsset().getCallAsset().getAdScheduleTargets(0).getEndMinuteValue());
+            callExtensionDetails.setDayOfWeek(googleAdsRow.getAsset().getCallAsset().getAdScheduleTargets(0).getDayOfWeekValue());
+        }
+
+        return callExtensionDetails;
     }
 }
