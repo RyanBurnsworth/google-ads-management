@@ -49,7 +49,6 @@ public class KeywordRepositoryImpl implements KeywordRepository {
                 .getGoogleAdsClient()
                 .getLatestVersion()
                 .createAdGroupCriterionServiceClient();
-
     }
 
     @Override

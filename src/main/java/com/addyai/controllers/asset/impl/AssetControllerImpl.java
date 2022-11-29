@@ -1,8 +1,10 @@
 package com.addyai.controllers.asset.impl;
 
 import com.addyai.controllers.asset.AssetController;
+import com.addyai.enums.AssetLevel;
 import com.addyai.models.assets.AssetDetails;
 import com.addyai.services.asset.AssetService;
+import com.google.ads.googleads.v12.enums.AssetFieldTypeEnum;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -27,17 +29,46 @@ public class AssetControllerImpl implements AssetController {
 
     @Override
     @PostMapping("create")
-    public ResponseEntity<Void> addSitelinks(@PathVariable long customerId,
+    public ResponseEntity<Void> addAssets(@PathVariable long customerId,
+                                          @RequestParam String assetLevel,
+                                          @RequestParam String campaignResName,
                                           @RequestBody List<AssetDetails> assetDetails) throws Exception {
-        assetService.upsertAssets(customerId, assetDetails, true);
+        assetService.upsertAssets(customerId, assetDetails, assetLevel, campaignResName, true);
         return new ResponseEntity<>(HttpStatus.ACCEPTED);
     }
 
     @Override
     @PostMapping("update")
     public ResponseEntity<Void> updateAssets(@PathVariable long customerId,
+                                             @RequestParam String assetLevel,
+                                             @RequestParam String campaignResName,
                                              @RequestBody List<AssetDetails> assetDetailsList) throws Exception {
-        assetService.upsertAssets(customerId, assetDetailsList, false);
+        assetService.upsertAssets(customerId, assetDetailsList, assetLevel, campaignResName, false);
+        return new ResponseEntity<>(HttpStatus.ACCEPTED);
+    }
+
+    @Override
+    @PostMapping("unlink")
+    public ResponseEntity<Void> unlinkAssets(@PathVariable long customerId,
+                                             @RequestParam String assetLevel,
+                                             @RequestParam String campaignResName,
+                                             @RequestParam String assetFieldType,
+                                             @RequestBody List<String> assetResourceNames) throws Exception {
+        AssetFieldTypeEnum.AssetFieldType fieldType =
+                AssetFieldTypeEnum.AssetFieldType.valueOf(assetFieldType);
+
+        if (AssetLevel.valueOf(assetLevel).equals(AssetLevel.ACCOUNT_LEVEL)) {
+            assetService.performCustomerAssetOperation(customerId,
+                    assetResourceNames,
+                    fieldType,
+                    false);
+        } else if (AssetLevel.valueOf(assetLevel).equals(AssetLevel.CAMPAIGN_LEVEL)) {
+            assetService.performCampaignAssetOperation(customerId,
+                    assetResourceNames,
+                    fieldType,
+                    campaignResName,
+                    false);
+        }
         return new ResponseEntity<>(HttpStatus.ACCEPTED);
     }
 }

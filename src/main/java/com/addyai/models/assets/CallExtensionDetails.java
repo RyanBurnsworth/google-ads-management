@@ -1,5 +1,10 @@
 package com.addyai.models.assets;
 
+import com.addyai.models.AdSchedulingDetails;
+
+import java.util.ArrayList;
+import java.util.List;
+
 public class CallExtensionDetails extends AssetDetails {
     @Override
     public long getAssetId() {
@@ -43,11 +48,7 @@ public class CallExtensionDetails extends AssetDetails {
 
     private String countryCode;
     private String phoneNumber;
-    private int dayOfWeek;
-    private int startHour;
-    private int endHour;
-    private int startMinute;
-    private int endMinute;
+    private List<AdSchedulingDetails> adSchedulingDetails = new ArrayList<>();
 
     private int conversionId;
 
@@ -67,44 +68,12 @@ public class CallExtensionDetails extends AssetDetails {
         this.phoneNumber = phoneNumber;
     }
 
-    public int getDayOfWeek() {
-        return dayOfWeek;
+    public List<AdSchedulingDetails> getAdSchedulingDetails() {
+        return adSchedulingDetails;
     }
 
-    public void setDayOfWeek(int dayOfWeek) {
-        this.dayOfWeek = dayOfWeek;
-    }
-
-    public int getStartHour() {
-        return startHour;
-    }
-
-    public void setStartHour(int startHour) {
-        this.startHour = startHour;
-    }
-
-    public int getEndHour() {
-        return endHour;
-    }
-
-    public void setEndHour(int endHour) {
-        this.endHour = endHour;
-    }
-
-    public int getStartMinute() {
-        return startMinute;
-    }
-
-    public void setStartMinute(int startMinute) {
-        this.startMinute = startMinute;
-    }
-
-    public int getEndMinute() {
-        return endMinute;
-    }
-
-    public void setEndMinute(int endMinute) {
-        this.endMinute = endMinute;
+    public void setAdSchedulingDetails(List<AdSchedulingDetails> adSchedulingDetails) {
+        this.adSchedulingDetails = adSchedulingDetails;
     }
 
     public int getConversionId() {

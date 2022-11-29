@@ -15,10 +15,10 @@
 
 package com.addyai.builders;
 
-import com.addyai.enums.OperationType;
-import com.addyai.utils.TestUtils;
 import com.addyai.builder.OperationBuilder;
 import com.addyai.builder.impl.OperationBuilderImpl;
+import com.addyai.enums.OperationType;
+import com.addyai.utils.TestUtils;
 import com.google.ads.googleads.v12.enums.CampaignCriterionStatusEnum;
 import com.google.ads.googleads.v12.enums.MinuteOfHourEnum;
 import com.google.ads.googleads.v12.enums.NegativeGeoTargetTypeEnum;
@@ -256,10 +256,5 @@ public class OperationBuilderImplTest {
 
         assertEquals(9, campaignCriterionOperationList.size());
         assertTrue(campaignCriterionOperationList.get(0).hasRemove());
-    }
-
-    @Test
-    void testBuildAdGroupOperationListForCreateOperation() {
-
     }
 }

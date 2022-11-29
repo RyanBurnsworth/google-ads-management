@@ -21,9 +21,7 @@ import com.addyai.models.CampaignDetails;
 import com.addyai.models.campaign_criterion.*;
 import com.google.ads.googleads.v12.common.*;
 import com.google.ads.googleads.v12.enums.*;
-import com.google.ads.googleads.v12.resources.Campaign;
-import com.google.ads.googleads.v12.resources.CampaignBudget;
-import com.google.ads.googleads.v12.resources.CampaignCriterion;
+import com.google.ads.googleads.v12.resources.*;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -37,6 +35,7 @@ public class TestUtils {
     public static final String MOCK_CAMPAIGN_NAME = "Test Campaign 1";
     public static final String MOCK_CAMPAIGN_RESOURCE_NAME = "customers/9059845250/campaigns/18357890301";
     public static final String MOCK_AD_GROUP_RESOURCE_NAME = "customers/9059845250/adgroups/39203940293";
+    public static final String MOCK_AD_GROUP_CRITERION_RESOURCE_NAME = "customers/9059845250/adgroup_criterion/23402340234";
     public static final CampaignStatusEnum.CampaignStatus MOCK_CAMPAIGN_STATUS = CampaignStatusEnum.CampaignStatus.ENABLED;
     public static final AdvertisingChannelTypeEnum.AdvertisingChannelType MOCK_CAMPAIGN_ADVERTISING_CHANNEL = AdvertisingChannelTypeEnum.AdvertisingChannelType.SEARCH;
     public static final String MOCK_CAMPAIGN_BUDGET_RESOURCE_NAME = "customers/9059845250/campaignBudgets/11599749725";
@@ -66,6 +65,19 @@ public class TestUtils {
     public static final String MOCK_LANGUAGE_CONSTANT = "languages/1000";
 
     public static final String MOCK_KEYWORD_TEXT = "KEYWORD_TEXT";
+
+    public static final String MOCK_AD_GROUP_NAME = "Test AdGroup 1";
+
+    public static final Long MOCK_AD_GROUP_CPC_BID = 30000L;
+
+    public static final String MOCK_SITELINK_DESC_1 = "Sitelink Description 1";
+    public static final String MOCK_SITELINK_DESC_2 = "Sitelink Description 2";
+    public static final String MOCK_SITELINK_LINK = "http://windows.com";
+    public static final String MOCK_SITELINK_START_DATE = "10/10/2022";
+    public static final String MOCK_SITELINK_END_DATE = "10/10/2025";
+
+    public static final String MOCK_CALL_ASSET_PHONE_NUMBER = "555-555-5555";
+    public static final String MOCK_CALL_ASSET_COUNTRY_CODE = "US";
 
     public Campaign getMockCampaign() {
         Campaign.Builder campaignBuilder = Campaign.newBuilder();
@@ -354,5 +366,49 @@ public class TestUtils {
                 .setLatitudeInMicroDegrees(Math.round(MOCK_LATITUDE * MICRO_FACTOR))
                 .setLongitudeInMicroDegrees(Math.round(MOCK_LONGITUDE * MICRO_FACTOR))
                 .build();
+    }
+
+    public AdGroup getMockAdGroup() {
+        return AdGroup.newBuilder()
+                .setCampaign(MOCK_CAMPAIGN_RESOURCE_NAME)
+                .setStatus(AdGroupStatusEnum.AdGroupStatus.PAUSED)
+                .setResourceName(MOCK_AD_GROUP_RESOURCE_NAME)
+                .setCpcBidMicros(MOCK_AD_GROUP_CPC_BID)
+                .setType(AdGroupTypeEnum.AdGroupType.SEARCH_STANDARD)
+                .setName(MOCK_AD_GROUP_NAME)
+                .build();
+    }
+
+    public AdGroupCriterion getMockAdGroupCriterion() {
+        return AdGroupCriterion.newBuilder()
+                .setKeyword(getMockKeywordInfo())
+                .setCpcBidMicros(MOCK_AD_GROUP_CPC_BID)
+                .setAdGroup(MOCK_AD_GROUP_RESOURCE_NAME)
+                .setStatus(AdGroupCriterionStatusEnum.AdGroupCriterionStatus.ENABLED)
+                .setResourceName(MOCK_AD_GROUP_CRITERION_RESOURCE_NAME)
+                .build();
+    }
+
+    public Asset getMockSitelinkAsset() {
+        SitelinkAsset sitelinkAsset = SitelinkAsset.newBuilder()
+                .setDescription1(MOCK_SITELINK_DESC_1)
+                .setDescription2(MOCK_SITELINK_DESC_2)
+                .setStartDate(MOCK_SITELINK_START_DATE)
+                .setEndDate(MOCK_SITELINK_END_DATE)
+                .setLinkText(MOCK_SITELINK_LINK)
+                .build();
+
+        return Asset.newBuilder()
+                .setSitelinkAsset(sitelinkAsset)
+                .build();
+    }
+
+    public Asset getMockCallAsset() {
+        CallAsset callAsset = CallAsset.newBuilder()
+                .setPhoneNumber(MOCK_CALL_ASSET_PHONE_NUMBER)
+                .setCountryCode(MOCK_CALL_ASSET_COUNTRY_CODE)
+                .build();
+
+        return Asset.newBuilder().setCallAsset(callAsset).build();
     }
 }

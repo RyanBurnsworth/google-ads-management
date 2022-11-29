@@ -82,11 +82,18 @@ public class AssetRepositoryImpl implements AssetRepository {
     @Override
     public List<String> performAssetOperations(long customerId, List<AssetOperation> assetOperationList) throws Exception {
         try {
+            List<String> assetResourceNameList = new ArrayList<>();
+
             MutateAssetsResponse assetsResponse = assetServiceClient.mutateAssets(
                     Long.toString(customerId), assetOperationList);
+
+            for (MutateAssetResult result : assetsResponse.getResultsList()) {
+                assetResourceNameList.add(result.getResourceName());
+            }
+
+            return assetResourceNameList;
         } catch (Exception e) {
             throw ApiExceptionResolver.doResolveException(e);
         }
-        return null; // TODO: update when knowing more
     }
 }

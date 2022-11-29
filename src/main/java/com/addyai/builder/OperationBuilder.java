@@ -16,10 +16,7 @@
 package com.addyai.builder;
 
 import com.addyai.enums.OperationType;
-import com.addyai.models.AdGroupDetails;
-import com.addyai.models.BudgetDetails;
-import com.addyai.models.CampaignDetails;
-import com.addyai.models.KeywordDetails;
+import com.addyai.models.*;
 import com.addyai.models.assets.AssetDetails;
 import com.addyai.models.campaign_criterion.CriterionDetails;
 import com.google.ads.googleads.v12.services.*;
@@ -45,4 +42,10 @@ public interface OperationBuilder {
                                                                        OperationType operationType);
 
     List<AssetOperation> buildAssetOperationList(List<AssetDetails> assetDetailsList, OperationType operationType);
+
+    List<CampaignAssetOperation> buildCampaignAssetOperationList(List<AssetLinkerDetails> assetLinkerDetailsList,
+                                                                 OperationType operationType);
+
+    List<CustomerAssetOperation> buildCustomerAssetOperationList(List<AssetLinkerDetails> assetLinkerDetailsList,
+                                                                 OperationType operationType);
 }

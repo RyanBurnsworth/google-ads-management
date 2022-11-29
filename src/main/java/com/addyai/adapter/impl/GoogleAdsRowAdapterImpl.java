@@ -16,14 +16,15 @@
 package com.addyai.adapter.impl;
 
 import com.addyai.adapter.GoogleAdsRowAdapter;
-import com.addyai.models.AdGroupDetails;
-import com.addyai.models.BudgetDetails;
-import com.addyai.models.CampaignDetails;
-import com.addyai.models.KeywordDetails;
+import com.addyai.models.*;
 import com.addyai.models.assets.CallExtensionDetails;
 import com.addyai.models.assets.SitelinkDetails;
 import com.addyai.models.campaign_criterion.*;
+import com.google.ads.googleads.v12.common.AdScheduleInfo;
 import com.google.ads.googleads.v12.services.GoogleAdsRow;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import static com.addyai.utils.misc.Constants.*;
 
@@ -222,6 +223,7 @@ public class GoogleAdsRowAdapterImpl implements GoogleAdsRowAdapter {
     @Override
     public KeywordDetails getKeywordDetails(GoogleAdsRow googleAdsRow) {
         KeywordDetails keywordDetails = new KeywordDetails();
+        keywordDetails.setAdGroupResourceName(googleAdsRow.getAdGroupCriterion().getAdGroup());
         keywordDetails.setKeywordResourceName(googleAdsRow.getAdGroupCriterion().getResourceName());
         keywordDetails.setKeywordId(googleAdsRow.getAdGroupCriterion().getCriterionId());
         keywordDetails.setKeywordMatchType(googleAdsRow.getAdGroupCriterion().getKeyword().getMatchTypeValue());
@@ -256,11 +258,18 @@ public class GoogleAdsRowAdapterImpl implements GoogleAdsRowAdapter {
         callExtensionDetails.setPhoneNumber(googleAdsRow.getAsset().getCallAsset().getPhoneNumber());
         callExtensionDetails.setCountryCode(googleAdsRow.getAsset().getCallAsset().getCountryCode());
         if (googleAdsRow.getAsset().getCallAsset().getAdScheduleTargetsCount() > 0) {
-            callExtensionDetails.setStartHour(googleAdsRow.getAsset().getCallAsset().getAdScheduleTargets(0).getStartHour());
-            callExtensionDetails.setStartHour(googleAdsRow.getAsset().getCallAsset().getAdScheduleTargets(0).getEndHour());
-            callExtensionDetails.setStartHour(googleAdsRow.getAsset().getCallAsset().getAdScheduleTargets(0).getStartMinuteValue());
-            callExtensionDetails.setStartHour(googleAdsRow.getAsset().getCallAsset().getAdScheduleTargets(0).getEndMinuteValue());
-            callExtensionDetails.setDayOfWeek(googleAdsRow.getAsset().getCallAsset().getAdScheduleTargets(0).getDayOfWeekValue());
+            List<AdSchedulingDetails> adSchedulingDetailsList = new ArrayList<>();
+            for (AdScheduleInfo adscheduleInfo : googleAdsRow.getAsset().getCallAsset().getAdScheduleTargetsList()) {
+                AdSchedulingDetails adSchedulingDetails = new AdSchedulingDetails();
+                adSchedulingDetails.setDayOfWeek(adscheduleInfo.getDayOfWeekValue());
+                adSchedulingDetails.setEndHour(adscheduleInfo.getEndHour());
+                adSchedulingDetails.setEndMinute(adscheduleInfo.getEndMinuteValue());
+                adSchedulingDetails.setStartMinute(adscheduleInfo.getStartMinuteValue());
+                adSchedulingDetails.setStartHour(adscheduleInfo.getStartHour());
+
+                adSchedulingDetailsList.add(adSchedulingDetails);
+            }
+            callExtensionDetails.setAdSchedulingDetails(adSchedulingDetailsList);
         }
 
         return callExtensionDetails;

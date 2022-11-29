@@ -17,10 +17,7 @@ package com.addyai.builder.impl;
 
 import com.addyai.builder.OperationBuilder;
 import com.addyai.enums.OperationType;
-import com.addyai.models.AdGroupDetails;
-import com.addyai.models.BudgetDetails;
-import com.addyai.models.CampaignDetails;
-import com.addyai.models.KeywordDetails;
+import com.addyai.models.*;
 import com.addyai.models.assets.AssetDetails;
 import com.addyai.models.assets.CallExtensionDetails;
 import com.addyai.models.assets.SitelinkDetails;
@@ -298,6 +295,67 @@ public class OperationBuilderImpl implements OperationBuilder {
     }
 
     /**
+     * Build a list of {@link CampaignAssetOperation} for use with un/linking assets to campaigns
+     *
+     * @param assetLinkerDetailsList a list of objects containing the details of the assets
+     * @param operationType          CREATE or REMOVE operations
+     * @return list of {@link CampaignAssetOperation}
+     */
+    @Override
+    public List<CampaignAssetOperation> buildCampaignAssetOperationList(List<AssetLinkerDetails> assetLinkerDetailsList, OperationType operationType) {
+        List<CampaignAssetOperation> campaignAssetOperationList = new ArrayList<>();
+        CampaignAssetOperation.Builder campaignAssetOperationBuilder = CampaignAssetOperation.newBuilder();
+
+        for (AssetLinkerDetails assetLinkerDetails : assetLinkerDetailsList) {
+            CampaignAsset campaignAsset = CampaignAsset.newBuilder()
+                    .setAsset(assetLinkerDetails.getAssetResourceName())
+                    .setCampaign(assetLinkerDetails.getCampaignResourceName())
+                    .setFieldType(assetLinkerDetails.getAssetType())
+                    .build();
+
+            if (operationType.equals(OperationType.CREATE)) {
+                campaignAssetOperationBuilder.setCreate(campaignAsset);
+            } else {
+                campaignAssetOperationBuilder.setRemove(assetLinkerDetails.getAssetResourceName());
+            }
+
+            campaignAssetOperationList.add(campaignAssetOperationBuilder.build());
+        }
+
+        return campaignAssetOperationList;
+    }
+
+    /**
+     * Build a list of {@link CustomerAssetOperation} for use with un/linking assets to accounts
+     *
+     * @param assetLinkerDetailsList a list of objects containing the details of the assets
+     * @param operationType          CREATE or REMOVE operations
+     * @return list of {@link CustomerAssetOperation}
+     */
+    @Override
+    public List<CustomerAssetOperation> buildCustomerAssetOperationList(List<AssetLinkerDetails> assetLinkerDetailsList, OperationType operationType) {
+        List<CustomerAssetOperation> customerAssetOperationList = new ArrayList<>();
+        CustomerAssetOperation.Builder customerAssetOperationBuilder = CustomerAssetOperation.newBuilder();
+
+        for (AssetLinkerDetails assetLinkerDetails : assetLinkerDetailsList) {
+            CustomerAsset customerAsset = CustomerAsset.newBuilder()
+                    .setAsset(assetLinkerDetails.getAssetResourceName())
+                    .setFieldType(assetLinkerDetails.getAssetType())
+                    .build();
+
+            if (operationType.equals(OperationType.CREATE)) {
+                customerAssetOperationBuilder.setCreate(customerAsset);
+            } else {
+                customerAssetOperationBuilder.setRemove(assetLinkerDetails.getAssetResourceName());
+            }
+
+            customerAssetOperationList.add(customerAssetOperationBuilder.build());
+        }
+
+        return customerAssetOperationList;
+    }
+
+    /**
      * Build a campaign object using a CampaignDetails object
      *
      * @param campaignDetails details to be parsed into a [Campaign]
@@ -378,15 +436,13 @@ public class OperationBuilderImpl implements OperationBuilder {
                 callAssetBuilder.setPhoneNumber(callExtensionDetails.getPhoneNumber());
                 callAssetBuilder.setCountryCode(callExtensionDetails.getCountryCode());
 
-                if (callExtensionDetails.getStartHour() != 0 && callExtensionDetails.getStartMinute() != 0 &&
-                        callExtensionDetails.getEndHour() != 0 && callExtensionDetails.getEndMinute() != 0 &&
-                        callExtensionDetails.getDayOfWeek() != 0) {
+                for (AdSchedulingDetails adSchedulingDetails : callExtensionDetails.getAdSchedulingDetails()) {
                     AdScheduleInfo.Builder adScheduleInfo = AdScheduleInfo.newBuilder();
-                    adScheduleInfo.setDayOfWeekValue(callExtensionDetails.getDayOfWeek());
-                    adScheduleInfo.setStartHour(callExtensionDetails.getStartHour());
-                    adScheduleInfo.setStartMinuteValue(callExtensionDetails.getStartMinute());
-                    adScheduleInfo.setEndHour(callExtensionDetails.getEndHour());
-                    adScheduleInfo.setEndMinuteValue(callExtensionDetails.getEndMinute());
+                    adScheduleInfo.setDayOfWeekValue(adSchedulingDetails.getDayOfWeek());
+                    adScheduleInfo.setStartHour(adSchedulingDetails.getStartHour());
+                    adScheduleInfo.setStartMinuteValue(adSchedulingDetails.getStartMinute());
+                    adScheduleInfo.setEndHour(adSchedulingDetails.getEndHour());
+                    adScheduleInfo.setEndMinuteValue(adSchedulingDetails.getEndMinute());
                     AdScheduleInfo scheduleInfo = adScheduleInfo.build();
 
                     callAssetBuilder.addAdScheduleTargets(scheduleInfo);
