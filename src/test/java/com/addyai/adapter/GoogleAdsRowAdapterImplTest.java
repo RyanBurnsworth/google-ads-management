@@ -16,8 +16,12 @@
 package com.addyai.adapter;
 
 import com.addyai.adapter.impl.GoogleAdsRowAdapterImpl;
+import com.addyai.models.AdGroupDetails;
 import com.addyai.models.BudgetDetails;
 import com.addyai.models.CampaignDetails;
+import com.addyai.models.KeywordDetails;
+import com.addyai.models.assets.CallExtensionDetails;
+import com.addyai.models.assets.SitelinkDetails;
 import com.addyai.models.campaign_criterion.*;
 import com.addyai.utils.TestUtils;
 import com.google.ads.googleads.v12.enums.*;
@@ -183,5 +187,57 @@ public class GoogleAdsRowAdapterImplTest {
         assertEquals(deviceDetails.getStatus(), CRITERION_STATUS_ENABLED);
         assertEquals(deviceDetails.getBidModifier(), MOCK_BID_MODIFIER);
         assertEquals(deviceDetails.getDeviceType(), DeviceEnum.Device.MOBILE.getNumber());
+    }
+
+    @Test
+    void testGetAdGroupDetails() {
+        GoogleAdsRow googleAdsRow = GoogleAdsRow.newBuilder()
+                .setAdGroup(testUtils.getMockAdGroup())
+                .build();
+
+        AdGroupDetails adGroupDetails = googleAdsRowAdapter.getAdGroupDetails(googleAdsRow);
+        assertEquals(MOCK_AD_GROUP_NAME, adGroupDetails.getAdGroupName());
+        assertEquals(MOCK_AD_GROUP_RESOURCE_NAME, adGroupDetails.getAdGroupResourceName());
+        assertEquals(AdGroupTypeEnum.AdGroupType.SEARCH_STANDARD_VALUE, adGroupDetails.getType());
+        assertEquals(AdGroupStatusEnum.AdGroupStatus.PAUSED_VALUE, adGroupDetails.getStatus());
+    }
+
+    @Test
+    void testGetKeywordDetails() {
+        GoogleAdsRow googleAdsRow = GoogleAdsRow.newBuilder()
+                .setAdGroupCriterion(testUtils.getMockAdGroupCriterion())
+                .build();
+
+        KeywordDetails keywordDetails = googleAdsRowAdapter.getKeywordDetails(googleAdsRow);
+        assertEquals(MOCK_AD_GROUP_RESOURCE_NAME, keywordDetails.getAdGroupResourceName());
+        assertEquals(MOCK_AD_GROUP_CRITERION_RESOURCE_NAME, keywordDetails.getKeywordResourceName());
+        assertEquals(MOCK_NEGATIVE_KEYWORD, keywordDetails.getKeywordText());
+        assertEquals(AdGroupCriterionStatusEnum.AdGroupCriterionStatus.ENABLED_VALUE, keywordDetails.getStatus());
+        assertEquals(KeywordMatchTypeEnum.KeywordMatchType.BROAD_VALUE, keywordDetails.getKeywordMatchType());
+    }
+
+    @Test
+    void testGetSitelinkDetails() {
+        GoogleAdsRow googleAdsRow = GoogleAdsRow.newBuilder()
+                .setAsset(testUtils.getMockSitelinkAsset())
+                .build();
+
+        SitelinkDetails sitelinkDetails = googleAdsRowAdapter.getSitelinkDetails(googleAdsRow);
+        assertEquals(MOCK_SITELINK_DESC_1, sitelinkDetails.getDescription1());
+        assertEquals(MOCK_SITELINK_DESC_2, sitelinkDetails.getDescription2());
+        assertEquals(MOCK_SITELINK_LINK, sitelinkDetails.getLinkText());
+        assertEquals(MOCK_SITELINK_START_DATE, sitelinkDetails.getStartDate());
+        assertEquals(MOCK_SITELINK_END_DATE, sitelinkDetails.getEndDate());
+    }
+
+    @Test
+    void testGetCallExtensionDetails() {
+        GoogleAdsRow googleAdsRow = GoogleAdsRow.newBuilder()
+                .setAsset(testUtils.getMockCallAsset())
+                .build();
+
+        CallExtensionDetails callExtensionDetails = googleAdsRowAdapter.getCallExtensionDetails(googleAdsRow);
+        assertEquals(MOCK_CALL_ASSET_PHONE_NUMBER, callExtensionDetails.getPhoneNumber());
+        assertEquals(MOCK_CALL_ASSET_COUNTRY_CODE, callExtensionDetails.getCountryCode());
     }
 }

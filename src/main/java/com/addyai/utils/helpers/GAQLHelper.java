@@ -248,6 +248,7 @@ public class GAQLHelper {
                 "asset.name, " +
                 "asset.type, " +
                 "asset.source, " +
+                "asset.call_asset.ad_schedule_targets, " +
                 "asset.call_asset.country_code, " +
                 "asset.call_asset.phone_number " +
                 "FROM asset WHERE asset.call_asset.phone_number != ''" ;
