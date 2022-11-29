@@ -22,6 +22,7 @@ import com.addyai.models.BudgetDetails;
 import com.addyai.models.CampaignDetails;
 import com.addyai.models.KeywordDetails;
 import com.addyai.models.assets.AssetDetails;
+import com.addyai.models.assets.CallExtensionDetails;
 import com.addyai.models.assets.SitelinkDetails;
 import com.addyai.models.campaign_criterion.*;
 import com.google.ads.googleads.v12.enums.AssetTypeEnum;
@@ -241,6 +242,17 @@ public class GAQLHelper {
                 "FROM asset WHERE asset.sitelink_asset.link_text != ''" ;
     }
 
+    public static String getCallExtensionAssetQuery() {
+        return "SELECT " +
+                "asset.id, " +
+                "asset.name, " +
+                "asset.type, " +
+                "asset.source, " +
+                "asset.call_asset.country_code, " +
+                "asset.call_asset.phone_number " +
+                "FROM asset WHERE asset.call_asset.phone_number != ''" ;
+    }
+
     public static List<CampaignDetails> convertStreamResponseToCampaignDetailsList(ServerStream<SearchGoogleAdsStreamResponse> streamResponse) {
         GoogleAdsRowAdapter googleAdsRowAdapter = new GoogleAdsRowAdapterImpl();
         List<CampaignDetails> campaignDetailsList = new ArrayList<>();
@@ -349,6 +361,11 @@ public class GAQLHelper {
                         SitelinkDetails sitelinkDetails =
                                 googleAdsRowAdapter.getSitelinkDetails(googleAdsRow);
                         assetDetailsList.add(sitelinkDetails);
+                        break;
+                    case CALL:
+                        CallExtensionDetails callExtensionDetails =
+                                googleAdsRowAdapter.getCallExtensionDetails(googleAdsRow);
+                        assetDetailsList.add(callExtensionDetails);
                         break;
                     default:
                         break;

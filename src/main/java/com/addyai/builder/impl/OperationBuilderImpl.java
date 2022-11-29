@@ -22,6 +22,7 @@ import com.addyai.models.BudgetDetails;
 import com.addyai.models.CampaignDetails;
 import com.addyai.models.KeywordDetails;
 import com.addyai.models.assets.AssetDetails;
+import com.addyai.models.assets.CallExtensionDetails;
 import com.addyai.models.assets.SitelinkDetails;
 import com.addyai.models.campaign_criterion.*;
 import com.google.ads.googleads.lib.utils.FieldMasks;
@@ -368,25 +369,37 @@ public class OperationBuilderImpl implements OperationBuilder {
                 sitelinkAssetBuilder.setEndDate(sitelinkDetails.getEndDate());
 
                 assetBuilder.setSitelinkAsset(sitelinkAssetBuilder.build());
+                assetBuilder.addAllFinalUrls(sitelinkDetails.getFinalUrlList());
+                assetBuilder.addAllFinalMobileUrls(sitelinkDetails.getFinalMobileUrlList());
+                assetBuilder.setFinalUrlSuffix(sitelinkDetails.getFinalUrlSuffix());
+            } else if (assetDetails.getAssetType() == AssetTypeEnum.AssetType.CALL_VALUE) {
+                CallExtensionDetails callExtensionDetails = (CallExtensionDetails) assetDetails;
+                CallAsset.Builder callAssetBuilder = CallAsset.newBuilder();
+                callAssetBuilder.setPhoneNumber(callExtensionDetails.getPhoneNumber());
+                callAssetBuilder.setCountryCode(callExtensionDetails.getCountryCode());
+
+                if (callExtensionDetails.getStartHour() != 0 && callExtensionDetails.getStartMinute() != 0 &&
+                        callExtensionDetails.getEndHour() != 0 && callExtensionDetails.getEndMinute() != 0 &&
+                        callExtensionDetails.getDayOfWeek() != 0) {
+                    AdScheduleInfo.Builder adScheduleInfo = AdScheduleInfo.newBuilder();
+                    adScheduleInfo.setDayOfWeekValue(callExtensionDetails.getDayOfWeek());
+                    adScheduleInfo.setStartHour(callExtensionDetails.getStartHour());
+                    adScheduleInfo.setStartMinuteValue(callExtensionDetails.getStartMinute());
+                    adScheduleInfo.setEndHour(callExtensionDetails.getEndHour());
+                    adScheduleInfo.setEndMinuteValue(callExtensionDetails.getEndMinute());
+                    AdScheduleInfo scheduleInfo = adScheduleInfo.build();
+
+                    callAssetBuilder.addAdScheduleTargets(scheduleInfo);
+                }
+
+                assetBuilder.setCallAsset(callAssetBuilder.build());
             }
 
-            // add the final urls to the asset object
-            assetBuilder.addAllFinalUrls(assetDetails.getFinalUrlList());
-
-            // add the final mobile urls to the asset object
-            assetBuilder.addAllFinalMobileUrls(assetDetails.getFinalMobileUrlList());
-
-            // add a final suffix
-            assetBuilder.setFinalUrlSuffix(assetDetails.getFinalUrlSuffix());
-
-            Asset asset;
+            Asset asset = assetBuilder.build();
             if (operationType.equals(OperationType.CREATE)) {
-                asset = assetBuilder.build();
                 assetOperationBuilder.setCreate(asset);
             } else if (operationType.equals(OperationType.UPDATE)) {
                 assetBuilder.setResourceName(assetDetails.getAssetName());
-                asset = assetBuilder.build();
-
                 assetOperationBuilder.setUpdate(asset);
                 assetOperationBuilder.setUpdateMask(FieldMasks.allSetFieldsOf(asset));
             }
