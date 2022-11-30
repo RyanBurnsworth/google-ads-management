@@ -17,6 +17,7 @@ package com.addyai.adapter.impl;
 
 import com.addyai.adapter.GoogleAdsRowAdapter;
 import com.addyai.models.*;
+import com.addyai.models.ads.ResponsiveSearchAdDetails;
 import com.addyai.models.assets.CallExtensionDetails;
 import com.addyai.models.assets.SitelinkDetails;
 import com.addyai.models.campaign_criterion.*;
@@ -273,5 +274,38 @@ public class GoogleAdsRowAdapterImpl implements GoogleAdsRowAdapter {
         }
 
         return callExtensionDetails;
+    }
+
+    @Override
+    public ResponsiveSearchAdDetails getResponsiveSearchAdDetails(GoogleAdsRow googleAdsRow) {
+        List<String> headlines = new ArrayList<>();
+        List<String> descriptions = new ArrayList<>();
+        List<String> paths = new ArrayList<>();
+
+        googleAdsRow.getAdGroupAd().getAd().getResponsiveSearchAd().getHeadlinesList().forEach((headline) -> {
+            headlines.add(headline.getText());
+        });
+
+        googleAdsRow.getAdGroupAd().getAd().getResponsiveSearchAd().getDescriptionsList().forEach((description) -> {
+            descriptions.add(description.getText());
+        });
+
+        if (googleAdsRow.getAdGroupAd().getAd().getResponsiveSearchAd().hasPath1())
+            paths.add(googleAdsRow.getAdGroupAd().getAd().getResponsiveSearchAd().getPath1());
+
+        if (googleAdsRow.getAdGroupAd().getAd().getResponsiveSearchAd().hasPath2())
+            paths.add(googleAdsRow.getAdGroupAd().getAd().getResponsiveSearchAd().getPath2());
+
+        ResponsiveSearchAdDetails responsiveSearchAdDetails = new ResponsiveSearchAdDetails();
+        responsiveSearchAdDetails.setAdName(googleAdsRow.getAdGroupAd().getAd().getResourceName());
+        responsiveSearchAdDetails.setAdStatus(googleAdsRow.getAdGroupAd().getStatusValue());
+        responsiveSearchAdDetails.setAdGroupResourceName(googleAdsRow.getAdGroupAd().getAdGroup());
+        responsiveSearchAdDetails.setHeadlines(headlines);
+        responsiveSearchAdDetails.setDescriptions(descriptions);
+        responsiveSearchAdDetails.setPaths(paths);
+        if (!googleAdsRow.getAdGroupAd().getAd().getFinalUrlsList().isEmpty())
+            responsiveSearchAdDetails.setFinalUrl(googleAdsRow.getAdGroupAd().getAd().getFinalUrls(0));
+
+        return responsiveSearchAdDetails;
     }
 }

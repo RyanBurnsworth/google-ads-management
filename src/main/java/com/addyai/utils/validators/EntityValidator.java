@@ -21,10 +21,13 @@ import com.addyai.models.AdGroupDetails;
 import com.addyai.models.BudgetDetails;
 import com.addyai.models.CampaignDetails;
 import com.addyai.models.KeywordDetails;
+import com.addyai.models.ads.AdDetails;
+import com.addyai.models.ads.ResponsiveSearchAdDetails;
 import com.addyai.models.assets.AssetDetails;
 import com.addyai.models.assets.SitelinkDetails;
 import com.addyai.models.campaign_criterion.*;
 import com.addyai.utils.misc.Constants;
+import com.google.ads.googleads.v12.enums.AdGroupAdStatusEnum;
 import com.google.ads.googleads.v12.enums.AdGroupStatusEnum;
 import com.google.ads.googleads.v12.enums.AdGroupTypeEnum;
 import com.google.ads.googleads.v12.enums.CampaignStatusEnum;
@@ -46,6 +49,7 @@ public class EntityValidator {
     public static final String INVALID_LANGUAGE_DETAILS_ERR_CODE = "INVALID_LANGUAGE_DETAILS";
     public static final String INVALID_LOCATION_DETAILS_ERR_CODE = "INVALID_LOCATION_DETAILS";
     public static final String INVALID_PROXIMITY_DETAILS_ERR_CODE = "INVALID_PROXIMITY_DETAILS";
+    public static final String INVALID_RESPONSIVE_SEARCH_AD_ERR_CODE = "INVALID_RESPONSIVE_SEARCH_AD_DETAILS";
 
     public static final String GENERAL_NAME_EMPTY_ERR_MSG = "Name field cannot be empty";
     public static final String GENERAL_RES_NAME_EMPTY_ERR_MSG = "Resource name cannot be empty for update operations";
@@ -95,6 +99,10 @@ public class EntityValidator {
     public static final String INVALID_AD_GROUP_CPC_BID_ERR_MSG = "CPC bid must be greater than 0";
     public static final String INVALID_AD_GROUP_STATUS_ERR_MSG = "Invalid Ad Group status value";
     public static final String MISSING_LINK_TEXT_ERR_MSG = "Missing Link Text";
+    public static final String EMPTY_DESCRIPTIONS_LIST = "Descriptions list cannot be empty";
+    public static final String EMPTY_HEADLINES_LIST = "Headlines list cannot be empty";
+    public static final String BLANK_FINAL_URL = "Final url cannot be blank";
+    public static final String INVALID_AD_STATUS = "Status must be ENABLED, PAUSED OR REMOVED";
 
     /**
      * Validate the fields of the CampaignDetails object
@@ -552,11 +560,51 @@ public class EntityValidator {
         return null;
     }
 
+    public static ValidationErrorResponse isAdDetailsValid(List<AdDetails> adDetailsList) {
+        for (AdDetails adDetails : adDetailsList) {
+            if (adDetails instanceof ResponsiveSearchAdDetails) {
+                ValidationErrorResponse validationErrorResponse =
+                        isResponsiveSearchAdDetailsValid((ResponsiveSearchAdDetails) adDetails);
+
+                if (validationErrorResponse != null)
+                    return validationErrorResponse;
+            }
+        }
+        return null;
+    }
+
     private static ValidationErrorResponse isSitelinkAssetDetailsValid(SitelinkDetails sitelinkDetails) {
         if (sitelinkDetails.getLinkText().isEmpty()) {
             return new ValidationErrorResponse(
                     INVALID_SITELINK_DETAILS_ERR_CODE,
                     MISSING_LINK_TEXT_ERR_MSG);
+        }
+        return null;
+    }
+
+    private static ValidationErrorResponse isResponsiveSearchAdDetailsValid(ResponsiveSearchAdDetails responsiveSearchAdDetails) {
+        if (responsiveSearchAdDetails.getDescriptions().isEmpty()) {
+            return new ValidationErrorResponse(
+                    INVALID_RESPONSIVE_SEARCH_AD_ERR_CODE,
+                    EMPTY_DESCRIPTIONS_LIST
+            );
+        } else if (responsiveSearchAdDetails.getHeadlines().isEmpty()) {
+            return new ValidationErrorResponse(
+                    INVALID_RESPONSIVE_SEARCH_AD_ERR_CODE,
+                    EMPTY_HEADLINES_LIST
+            );
+        } else if (responsiveSearchAdDetails.getFinalUrl().isEmpty()) {
+            return new ValidationErrorResponse(
+                    INVALID_RESPONSIVE_SEARCH_AD_ERR_CODE,
+                    BLANK_FINAL_URL
+            );
+        } else if (responsiveSearchAdDetails.getAdStatus() != AdGroupAdStatusEnum.AdGroupAdStatus.PAUSED_VALUE &&
+                responsiveSearchAdDetails.getAdStatus() != AdGroupAdStatusEnum.AdGroupAdStatus.ENABLED_VALUE &&
+                responsiveSearchAdDetails.getAdStatus() != AdGroupAdStatusEnum.AdGroupAdStatus.REMOVED_VALUE) {
+            return new ValidationErrorResponse(
+                    INVALID_RESPONSIVE_SEARCH_AD_ERR_CODE,
+                    INVALID_AD_STATUS
+            );
         }
         return null;
     }

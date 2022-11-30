@@ -17,6 +17,7 @@ package com.addyai.builder;
 
 import com.addyai.enums.OperationType;
 import com.addyai.models.*;
+import com.addyai.models.ads.AdDetails;
 import com.addyai.models.assets.AssetDetails;
 import com.addyai.models.campaign_criterion.CriterionDetails;
 import com.google.ads.googleads.v12.services.*;
@@ -48,4 +49,7 @@ public interface OperationBuilder {
 
     List<CustomerAssetOperation> buildCustomerAssetOperationList(List<AssetLinkerDetails> assetLinkerDetailsList,
                                                                  OperationType operationType);
+
+    List<AdGroupAdOperation> buildAdGroupAdOperationList(List<AdDetails> adDetailsList,
+                                                         OperationType operationType, String adGroupResName);
 }
