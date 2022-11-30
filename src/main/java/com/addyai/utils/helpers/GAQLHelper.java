@@ -21,6 +21,8 @@ import com.addyai.models.AdGroupDetails;
 import com.addyai.models.BudgetDetails;
 import com.addyai.models.CampaignDetails;
 import com.addyai.models.KeywordDetails;
+import com.addyai.models.ads.AdDetails;
+import com.addyai.models.ads.ResponsiveSearchAdDetails;
 import com.addyai.models.assets.AssetDetails;
 import com.addyai.models.assets.CallExtensionDetails;
 import com.addyai.models.assets.SitelinkDetails;
@@ -33,6 +35,8 @@ import com.google.api.gax.rpc.ServerStream;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import static com.addyai.utils.misc.Constants.RESPONSIVE_AD_TYPE;
 
 public class GAQLHelper {
     public static String getCampaignDetailsQuery() {
@@ -254,6 +258,21 @@ public class GAQLHelper {
                 "FROM asset WHERE asset.call_asset.phone_number != ''" ;
     }
 
+    public static String getResponsiveSearchAdQuery(String adGroupResourceName) {
+        return "SELECT " +
+                "ad_group_ad.ad.resource_name, " +
+                "ad_group_ad.status, " +
+                "ad_group_ad.ad.display_url, " +
+                "ad_group_ad.ad.final_urls, " +
+                "ad_group_ad.ad.responsive_search_ad.headlines, " +
+                "ad_group_ad.ad.responsive_search_ad.descriptions, " +
+                "ad_group_ad.ad.responsive_search_ad.path1, " +
+                "ad_group_ad.ad.responsive_search_ad.path2 " +
+                "FROM ad_group_ad WHERE " +
+                "ad_group_ad.status IN ('ENABLED', 'PAUSED') " +
+                "AND ad_group_ad.ad_group='" + adGroupResourceName + "'";
+    }
+
     public static List<CampaignDetails> convertStreamResponseToCampaignDetailsList(ServerStream<SearchGoogleAdsStreamResponse> streamResponse) {
         GoogleAdsRowAdapter googleAdsRowAdapter = new GoogleAdsRowAdapterImpl();
         List<CampaignDetails> campaignDetailsList = new ArrayList<>();
@@ -351,7 +370,8 @@ public class GAQLHelper {
     }
 
     public static List<AssetDetails> convertStreamResponseToAssetDetails(
-            ServerStream<SearchGoogleAdsStreamResponse> streamResponse, AssetTypeEnum.AssetType assetType) {
+            ServerStream<SearchGoogleAdsStreamResponse> streamResponse,
+            AssetTypeEnum.AssetType assetType) {
         GoogleAdsRowAdapter googleAdsRowAdapter = new GoogleAdsRowAdapterImpl();
         List<AssetDetails> assetDetailsList = new ArrayList<>();
 
@@ -374,5 +394,28 @@ public class GAQLHelper {
             }
         }
         return assetDetailsList;
+    }
+
+    public static List<AdDetails> convertStreamToAdDetails(
+            ServerStream<SearchGoogleAdsStreamResponse> streamResponse,
+            String adType
+    ) {
+        GoogleAdsRowAdapter googleAdsRowAdapter = new GoogleAdsRowAdapterImpl();
+        List<AdDetails> adDetailsList = new ArrayList<>();
+
+        for (SearchGoogleAdsStreamResponse searchGoogleAdsStreamResponse : streamResponse) {
+            for (GoogleAdsRow googleAdsRow : searchGoogleAdsStreamResponse.getResultsList()) {
+                switch (adType.toLowerCase()) {
+                    case RESPONSIVE_AD_TYPE:
+                        ResponsiveSearchAdDetails adDetails =
+                                googleAdsRowAdapter.getResponsiveSearchAdDetails(googleAdsRow);
+                        adDetailsList.add(adDetails);
+                        break;
+                    default:
+                        break;
+                }
+            }
+        }
+        return adDetailsList;
     }
 }
