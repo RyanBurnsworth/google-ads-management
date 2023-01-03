@@ -21,6 +21,8 @@ import com.addyai.models.AdGroupDetails;
 import com.addyai.models.BudgetDetails;
 import com.addyai.models.CampaignDetails;
 import com.addyai.models.KeywordDetails;
+import com.addyai.models.ads.AdDetails;
+import com.addyai.models.ads.ResponsiveSearchAdDetails;
 import com.addyai.models.assets.AssetDetails;
 import com.addyai.models.assets.CallExtensionDetails;
 import com.addyai.models.assets.SitelinkDetails;
@@ -33,6 +35,8 @@ import com.google.api.gax.rpc.ServerStream;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import static com.addyai.utils.misc.Constants.RESPONSIVE_AD_TYPE;
 
 public class GAQLHelper {
     public static String getCampaignDetailsQuery() {
@@ -213,6 +217,12 @@ public class GAQLHelper {
                 "' AND ad_group.status IN ('ENABLED', 'PAUSED')";
     }
 
+    /**
+     * Return a search query for retrieving the keywords from an AdGroup
+     *
+     * @param adGroupResName the adGroup to search for keywords within
+     * @return a GAQL search query
+     */
     public static String getKeywordDetailsByAdGroup(String adGroupResName) {
         return "SELECT " +
                 "ad_group_criterion.criterion_id, " +
@@ -228,6 +238,11 @@ public class GAQLHelper {
                 "' AND ad_group_criterion.status IN ('ENABLED', 'PAUSED')";
     }
 
+    /**
+     * Return a string for retrieving the site link assets from an account
+     *
+     * @return a GAQL search query
+     */
     public static String getSitelinksAssetQuery() {
         return "SELECT " +
                 "asset.id, " +
@@ -239,9 +254,14 @@ public class GAQLHelper {
                 "asset.sitelink_asset.link_text, " +
                 "asset.sitelink_asset.start_date, " +
                 "asset.sitelink_asset.end_date " +
-                "FROM asset WHERE asset.sitelink_asset.link_text != ''" ;
+                "FROM asset WHERE asset.sitelink_asset.link_text != ''";
     }
 
+    /**
+     * Return a search query string for retrieving extension assets from an account
+     *
+     * @return a GAQL search query
+     */
     public static String getCallExtensionAssetQuery() {
         return "SELECT " +
                 "asset.id, " +
@@ -251,8 +271,89 @@ public class GAQLHelper {
                 "asset.call_asset.ad_schedule_targets, " +
                 "asset.call_asset.country_code, " +
                 "asset.call_asset.phone_number " +
-                "FROM asset WHERE asset.call_asset.phone_number != ''" ;
+                "FROM asset WHERE asset.call_asset.phone_number != ''";
     }
+
+    /**
+     * Return a search query string for retrieving the responsive search ads in an adgroup
+     *
+     * @param adGroupResourceName the name of the adGroup to search within
+     * @return a search query string for responsive search ads
+     */
+    public static String getResponsiveSearchAdQuery(String adGroupResourceName) {
+        return "SELECT " +
+                "ad_group_ad.ad.resource_name, " +
+                "ad_group_ad.status, " +
+                "ad_group_ad.ad.display_url, " +
+                "ad_group_ad.ad.final_urls, " +
+                "ad_group_ad.ad.responsive_search_ad.headlines, " +
+                "ad_group_ad.ad.responsive_search_ad.descriptions, " +
+                "ad_group_ad.ad.responsive_search_ad.path1, " +
+                "ad_group_ad.ad.responsive_search_ad.path2 " +
+                "FROM ad_group_ad WHERE " +
+                "ad_group_ad.status IN ('ENABLED', 'PAUSED') " +
+                "AND ad_group_ad.ad_group='" + adGroupResourceName + "'";
+    }
+
+    /**
+     * Create a query for retrieving metrics by the metric's name
+     *
+     * @param name the name of the metric
+     * @param metricType the type of metric (campaign, adgroup, ad, keyword)
+     * @return the query for metrics by name
+     */
+    public static String getMetricsByNameQuery(String name, String metricType) {
+        return "SELECT " +
+                " " + metricType + ".resource_name, " +
+                " " + metricType + ".name, " +
+                "  metrics.clicks, " +
+                "  metrics.impressions, " +
+                "  metrics.conversions, " +
+                "  metrics.phone_calls, " +
+                "  metrics.invalid_clicks, " +
+                "  metrics.average_cpc, " +
+                "  metrics.ctr, " +
+                "  metrics.invalid_click_rate, " +
+                "  metrics.cost_micros, " +
+                "  metrics.cost_per_conversion, " +
+                "  metrics.conversions_value " +
+                "FROM " + metricType + " WHERE " + metricType + ".name='" + name + "'";
+    }
+
+    /**
+     * Get a query for metrics related [campaigns, adgroups] for a given custom date range
+     *
+     * @param metricType the type of metric to get a query for
+     * @param startDate  the date to start reporting from. Use YYYY-MM-DD format
+     * @param endDate    the date to end reporting from. Use YYYY-MM-DD format.
+     * @return a query for  a given metric and date ranges
+     */
+    public static String getMetricsByCustomDateRange(String metricType, String startDate, String endDate) {
+        metricType = metricType.toLowerCase();
+        return "SELECT " +
+                " " + metricType + ".resource_name, " +
+                " " + metricType + ".name, " +
+                "  metrics.clicks, " +
+                "  metrics.impressions, " +
+                "  metrics.conversions, " +
+                "  metrics.phone_calls, " +
+                "  metrics.invalid_clicks, " +
+                "  metrics.average_cpc, " +
+                "  metrics.ctr, " +
+                "  metrics.invalid_click_rate, " +
+                "  metrics.cost_micros, " +
+                "  metrics.cost_per_conversion, " +
+                "  metrics.conversions_value " +
+                "FROM " + metricType + " WHERE segments.date >= " + startDate + " AND segments.date <=" + endDate;
+    }
+
+
+    /**
+     * Convert an incoming ServerStream response into campaign details
+     *
+     * @param streamResponse a stream response from Google's server
+     * @return a list of {@link CampaignDetails}
+     */
 
     public static List<CampaignDetails> convertStreamResponseToCampaignDetailsList(ServerStream<SearchGoogleAdsStreamResponse> streamResponse) {
         GoogleAdsRowAdapter googleAdsRowAdapter = new GoogleAdsRowAdapterImpl();
@@ -268,6 +369,13 @@ public class GAQLHelper {
         return campaignDetailsList;
     }
 
+
+    /**
+     * Convert an incoming ServerStream response into budgete details
+     *
+     * @param streamResponse a stream response from Google's server
+     * @return a list of {@link BudgetDetails}
+     */
     public static List<BudgetDetails> convertStreamResponseToBudgetDetails(ServerStream<SearchGoogleAdsStreamResponse> streamResponse) {
         GoogleAdsRowAdapter googleAdsRowAdapter = new GoogleAdsRowAdapterImpl();
         List<BudgetDetails> budgetDetailsList = new ArrayList<>();
@@ -281,6 +389,13 @@ public class GAQLHelper {
         return budgetDetailsList;
     }
 
+
+    /**
+     * Convert an incoming ServerStream response into AdGroup details
+     *
+     * @param streamResponse a stream response from Google's server
+     * @return a list of {@link AdGroupDetails}
+     */
     public static List<AdGroupDetails> convertStreamResponseToAdGroupDetails(ServerStream<SearchGoogleAdsStreamResponse> streamResponse) {
         GoogleAdsRowAdapterImpl googleAdsRowAdapter = new GoogleAdsRowAdapterImpl();
         List<AdGroupDetails> adGroupDetailsList = new ArrayList<>();
@@ -294,6 +409,13 @@ public class GAQLHelper {
         return adGroupDetailsList;
     }
 
+
+    /**
+     * Convert an incoming ServerStream response into keyword details
+     *
+     * @param streamResponses a stream response from Google's server
+     * @return a list of {@link KeywordDetails}
+     */
     public static List<KeywordDetails> convertStreamResponseToKeywordDetails(ServerStream<SearchGoogleAdsStreamResponse> streamResponses) {
         GoogleAdsRowAdapterImpl googleAdsRowAdapter = new GoogleAdsRowAdapterImpl();
         List<KeywordDetails> keywordDetailsList = new ArrayList<>();
@@ -307,6 +429,14 @@ public class GAQLHelper {
         return keywordDetailsList;
     }
 
+
+    /**
+     * Convert an incoming ServerStream response into criterion details
+     *
+     * @param streamResponse a stream response from Google's server
+     * @param criterionType  the type of criterion to return details for
+     * @return a list of {@link CriterionDetails}
+     */
     public static List<CriterionDetails> convertStreamResponseToCriterionDetails(
             ServerStream<SearchGoogleAdsStreamResponse> streamResponse, CriterionTypeEnum.CriterionType criterionType) {
         GoogleAdsRowAdapter googleAdsRowAdapter = new GoogleAdsRowAdapterImpl();
@@ -350,8 +480,17 @@ public class GAQLHelper {
         return criterionDetailsList;
     }
 
+
+    /**
+     * Convert an incoming ServerStream response into asset details
+     *
+     * @param streamResponse a stream response from Google's server
+     * @param assetType      the type of asset to convert to
+     * @return a list of {@link AssetDetails}
+     */
     public static List<AssetDetails> convertStreamResponseToAssetDetails(
-            ServerStream<SearchGoogleAdsStreamResponse> streamResponse, AssetTypeEnum.AssetType assetType) {
+            ServerStream<SearchGoogleAdsStreamResponse> streamResponse,
+            AssetTypeEnum.AssetType assetType) {
         GoogleAdsRowAdapter googleAdsRowAdapter = new GoogleAdsRowAdapterImpl();
         List<AssetDetails> assetDetailsList = new ArrayList<>();
 
@@ -375,4 +514,56 @@ public class GAQLHelper {
         }
         return assetDetailsList;
     }
+
+
+    /**
+     * Convert an incoming ServerStream response into ad details
+     *
+     * @param streamResponse a stream response from Google's server
+     * @return a list of {@link AdDetails}
+     */
+    public static List<AdDetails> convertStreamToAdDetails(
+            ServerStream<SearchGoogleAdsStreamResponse> streamResponse,
+            String adType
+    ) {
+        GoogleAdsRowAdapter googleAdsRowAdapter = new GoogleAdsRowAdapterImpl();
+        List<AdDetails> adDetailsList = new ArrayList<>();
+
+        for (SearchGoogleAdsStreamResponse searchGoogleAdsStreamResponse : streamResponse) {
+            for (GoogleAdsRow googleAdsRow : searchGoogleAdsStreamResponse.getResultsList()) {
+                switch (adType.toLowerCase()) {
+                    case RESPONSIVE_AD_TYPE:
+                        ResponsiveSearchAdDetails adDetails =
+                                googleAdsRowAdapter.getResponsiveSearchAdDetails(googleAdsRow);
+                        adDetailsList.add(adDetails);
+                        break;
+                    default:
+                        break;
+                }
+            }
+        }
+        return adDetailsList;
+    }
+
+    /**
+     * Convert an incoming ServerStream response into metric details
+     *
+     * @param streamResponse a stream response from Google's server
+     * @return a list of {@link }
+     */
+/*    public static List<BaseMetrics> convertStreamToMetrics(
+            ServerStream<SearchGoogleAdsStreamResponse> streamResponse
+    ) {
+        GoogleAdsRowAdapter googleAdsRowAdapter = new GoogleAdsRowAdapterImpl();
+        List<BaseMetrics> baseMetricsList = new ArrayList<>();
+
+        for (SearchGoogleAdsStreamResponse searchGoogleAdsStreamResponse : streamResponse) {
+            for (GoogleAdsRow googleAdsRow : searchGoogleAdsStreamResponse.getResultsList()) {
+                BaseMetrics baseMetrics =
+                        googleAdsRowAdapter.getMetrics(googleAdsRow);
+                baseMetricsList.add(baseMetrics);
+            }
+        }
+        return baseMetricsList;
+    }*/
 }

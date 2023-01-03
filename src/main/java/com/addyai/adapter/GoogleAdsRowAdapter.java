@@ -19,6 +19,7 @@ import com.addyai.models.AdGroupDetails;
 import com.addyai.models.BudgetDetails;
 import com.addyai.models.CampaignDetails;
 import com.addyai.models.KeywordDetails;
+import com.addyai.models.ads.ResponsiveSearchAdDetails;
 import com.addyai.models.assets.CallExtensionDetails;
 import com.addyai.models.assets.SitelinkDetails;
 import com.addyai.models.campaign_criterion.*;
@@ -48,4 +49,6 @@ public interface GoogleAdsRowAdapter {
     SitelinkDetails getSitelinkDetails(GoogleAdsRow googleAdsRow);
 
     CallExtensionDetails getCallExtensionDetails(GoogleAdsRow googleAdsRow);
+
+    ResponsiveSearchAdDetails getResponsiveSearchAdDetails(GoogleAdsRow googleAdsRow);
 }

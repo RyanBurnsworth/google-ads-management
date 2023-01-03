@@ -34,6 +34,7 @@ public class CampaignControllerImpl implements CampaignController {
     }
 
     @Override
+    @CrossOrigin(origins = "http://localhost:4200")
     @GetMapping("details")
     public ResponseEntity<List<CampaignDetails>> fetchAllCampaignDetails(@PathVariable String customerId) throws Exception {
         List<CampaignDetails> campaignDetails = campaignService.findAllCampaignDetails(Long.parseLong(customerId));
@@ -41,6 +42,7 @@ public class CampaignControllerImpl implements CampaignController {
     }
 
     @Override
+    @CrossOrigin(origins = "http://localhost:4200")
     @GetMapping("{campaignName}/details")
     public ResponseEntity<CampaignDetails> fetchCampaignDetailsByName(@PathVariable String customerId,
                                                                       @PathVariable String campaignName) throws Exception {

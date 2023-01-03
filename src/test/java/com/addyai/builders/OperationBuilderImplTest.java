@@ -18,7 +18,7 @@ package com.addyai.builders;
 import com.addyai.builder.OperationBuilder;
 import com.addyai.builder.impl.OperationBuilderImpl;
 import com.addyai.enums.OperationType;
-import com.addyai.utils.TestUtils;
+import com.addyai.mocks.CampaignMocks;
 import com.google.ads.googleads.v12.enums.CampaignCriterionStatusEnum;
 import com.google.ads.googleads.v12.enums.MinuteOfHourEnum;
 import com.google.ads.googleads.v12.enums.NegativeGeoTargetTypeEnum;
@@ -34,7 +34,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 
 import java.util.List;
 
-import static com.addyai.utils.TestUtils.*;
+import static com.addyai.mocks.CampaignMocks.*;
 import static com.addyai.utils.misc.Constants.*;
 import static com.google.ads.googleads.v12.enums.PositiveGeoTargetTypeEnum.PositiveGeoTargetType.PRESENCE;
 import static org.junit.jupiter.api.Assertions.*;
@@ -43,17 +43,17 @@ import static org.junit.jupiter.api.Assertions.*;
 public class OperationBuilderImplTest {
     @Autowired
     private OperationBuilder operationBuilder;
-    private TestUtils testUtils;
+    private CampaignMocks campaignMocks;
 
     @BeforeEach
     void setup() {
-        testUtils = new TestUtils();
+        campaignMocks = new CampaignMocks();
     }
 
     @Test
     void testBuildCampaignOperationListForCreateOperation() {
         List<CampaignOperation> campaignOperationList =
-                operationBuilder.buildCampaignOperationList(testUtils.getMockCampaignDetailsList(), OperationType.CREATE);
+                operationBuilder.buildCampaignOperationList(campaignMocks.getMockCampaignDetailsList(), OperationType.CREATE);
 
         assertEquals(1, campaignOperationList.size());
         assertTrue(campaignOperationList.get(0).hasCreate());
@@ -75,7 +75,7 @@ public class OperationBuilderImplTest {
     @Test
     void testBuildCampaignOperationListForUpdateOperation() {
         List<CampaignOperation> campaignOperationList =
-                operationBuilder.buildCampaignOperationList(testUtils.getMockCampaignDetailsList(), OperationType.UPDATE);
+                operationBuilder.buildCampaignOperationList(campaignMocks.getMockCampaignDetailsList(), OperationType.UPDATE);
 
         assertEquals(1, campaignOperationList.size());
         assertTrue(campaignOperationList.get(0).hasUpdate());
@@ -97,7 +97,7 @@ public class OperationBuilderImplTest {
     @Test
     void testBuildCampaignOperationListForRemoveOperation() {
         List<CampaignOperation> campaignOperationList =
-                operationBuilder.buildCampaignOperationList(testUtils.getMockCampaignDetailsList(), OperationType.REMOVE);
+                operationBuilder.buildCampaignOperationList(campaignMocks.getMockCampaignDetailsList(), OperationType.REMOVE);
 
         assertEquals(1, campaignOperationList.size());
         assertTrue(campaignOperationList.get(0).hasRemove());
@@ -110,7 +110,7 @@ public class OperationBuilderImplTest {
     @Test
     void testBuildCampaignBudgetOperationListForCreateOperation() {
         List<CampaignBudgetOperation> campaignBudgetOperationList =
-                operationBuilder.buildCampaignBudgetOperationList(testUtils.getMockBudgetDetailsList(), OperationType.CREATE);
+                operationBuilder.buildCampaignBudgetOperationList(campaignMocks.getMockBudgetDetailsList(), OperationType.CREATE);
 
         assertEquals(1, campaignBudgetOperationList.size());
 
@@ -124,7 +124,7 @@ public class OperationBuilderImplTest {
     @Test
     void testBuildCampaignBudgetOperationListForUpdateOperation() {
         List<CampaignBudgetOperation> campaignBudgetOperationList =
-                operationBuilder.buildCampaignBudgetOperationList(testUtils.getMockBudgetDetailsList(), OperationType.UPDATE);
+                operationBuilder.buildCampaignBudgetOperationList(campaignMocks.getMockBudgetDetailsList(), OperationType.UPDATE);
 
         assertEquals(1, campaignBudgetOperationList.size());
 
@@ -137,7 +137,7 @@ public class OperationBuilderImplTest {
     @Test
     void testBuildCampaignBudgetOperationListForRemoveOperation() {
         List<CampaignBudgetOperation> campaignBudgetOperationList =
-                operationBuilder.buildCampaignBudgetOperationList(testUtils.getMockBudgetDetailsList(), OperationType.REMOVE);
+                operationBuilder.buildCampaignBudgetOperationList(campaignMocks.getMockBudgetDetailsList(), OperationType.REMOVE);
 
         assertEquals(1, campaignBudgetOperationList.size());
         assertTrue(campaignBudgetOperationList.get(0).hasRemove());
@@ -150,7 +150,7 @@ public class OperationBuilderImplTest {
     @Test
     void testBuildCampaignCriterionOperationListForCreateOperation() {
         List<CampaignCriterionOperation> campaignCriterionOperationList =
-                operationBuilder.buildCampaignCriterionOperationList(testUtils.getMockCriterionMapping(),
+                operationBuilder.buildCampaignCriterionOperationList(campaignMocks.getMockCriterionMapping(),
                         OperationType.CREATE);
 
         assertEquals(9, campaignCriterionOperationList.size());
@@ -247,11 +247,10 @@ public class OperationBuilderImplTest {
         assertFalse(campaignCriterionOperationList.get(8).getCreate().hasBidModifier());
     }
 
-
     @Test
     void testBuildCampaignCriterionOperationListForRemoveOperation() {
         List<CampaignCriterionOperation> campaignCriterionOperationList =
-                operationBuilder.buildCampaignCriterionOperationList(testUtils.getMockCriterionMapping(),
+                operationBuilder.buildCampaignCriterionOperationList(campaignMocks.getMockCriterionMapping(),
                         OperationType.REMOVE);
 
         assertEquals(9, campaignCriterionOperationList.size());

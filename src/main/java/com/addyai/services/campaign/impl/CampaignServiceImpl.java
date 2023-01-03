@@ -164,6 +164,13 @@ public class CampaignServiceImpl implements CampaignService {
         // set the budget details object
         campaignDetails.setBudgetDetails(budgetDetails);
 
+        // retrieve the campaign criterion from the account
+        List<CriterionDetails> criterionDetailsList = criterionRepository.fetchCampaignCriterionDetails(customerId,
+                campaignDetails.getCampaignResourceName());
+
+        // update the CriterionDetails list in the CampaignDetails object
+        campaignDetails.setCampaignCriteriaList(criterionDetailsList);
+
         return campaignDetails;
     }
 
@@ -218,9 +225,10 @@ public class CampaignServiceImpl implements CampaignService {
                 throw new ServiceFailureException(INTERNAL_SERVICE_ERROR, BUDGET_OPERATIONS_FAILED_ERROR_MSG);
 
             // create the budget and extract the budget resource name
-            String budgetResourceName =
-                    budgetRepository.performCampaignBudgetOperations(customerId, campaignBudgetOperations).get(0);
+            List<String> budgetResourceNames =
+                    budgetRepository.performCampaignBudgetOperations(customerId, campaignBudgetOperations);
 
+            String budgetResourceName = budgetResourceNames.get(0);
             // associated the newly created budget with campaign
             campaignDetails.setBudgetResourceName(budgetResourceName);
             updateCampaignDetailsList.add(campaignDetails);
@@ -248,7 +256,20 @@ public class CampaignServiceImpl implements CampaignService {
         // if campaign resource names or details list are empty then continue
         if (campaignDetailsList.isEmpty() || campaignResourceNameList.isEmpty()) return;
 
-        // associate geotarget codes to location criterion
+        // remove campaigns that don't include campaign criterion details
+        List<CampaignDetails> campaignDetailsList1 = new ArrayList<>();
+        campaignDetailsList.forEach((campaignDetails -> {
+            if (!campaignDetails.getCampaignCriteriaList().isEmpty())
+                campaignDetailsList1.add(campaignDetails);
+        }));
+
+        // if there are no campaign criterion to be created/updated return
+        if (!campaignDetailsList1.isEmpty())
+            campaignDetailsList = campaignDetailsList1;
+        else
+            return;
+
+        // associate geo-target codes to location criterion
         associateGeoTargetConstantToLocation(campaignDetailsList);
 
         // to update criterion, first delete all user-created criterion and created new from list
@@ -315,12 +336,14 @@ public class CampaignServiceImpl implements CampaignService {
                         validationErrorResponse.getErrorCode(),
                         validationErrorResponse.getErrorMessage());
 
-            // validate the CriterionDetails
-            validationErrorResponse = EntityValidator.isCriterionDetailsValid(campaignDetails.getCampaignCriteriaList());
-            if (validationErrorResponse != null)
-                throw new InvalidRequestException(
-                        validationErrorResponse.getErrorCode(),
-                        validationErrorResponse.getErrorMessage());
+            if (!campaignDetails.getCampaignCriteriaList().isEmpty()) {
+                // validate the CriterionDetails
+                validationErrorResponse = EntityValidator.isCriterionDetailsValid(campaignDetails.getCampaignCriteriaList());
+                if (validationErrorResponse != null)
+                    throw new InvalidRequestException(
+                            validationErrorResponse.getErrorCode(),
+                            validationErrorResponse.getErrorMessage());
+            }
         }
     }
 
@@ -359,6 +382,9 @@ public class CampaignServiceImpl implements CampaignService {
             // fetch the existing criterion for the given campaign
             List<CriterionDetails> criterionDetailsList = criterionRepository.fetchCampaignCriterionDetails(
                     customerId, resourceName);
+
+            // NOTE: If you include only deviceDetails in your campaignCriterion for deletion
+            // the request will fail!
 
             // for each object that is not DeviceDetails, add its resource name to the list for removal
             criterionDetailsList.forEach((criterionDetails) -> {

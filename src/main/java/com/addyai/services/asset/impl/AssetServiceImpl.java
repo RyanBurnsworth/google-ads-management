@@ -81,6 +81,8 @@ public class AssetServiceImpl implements AssetService {
 
         if (operationType.equals(OperationType.CREATE) && assetResourceNameList.size() > 0) {
 
+            AssetFieldTypeEnum.AssetFieldType assetFieldType =
+                    AssetFieldTypeEnum.AssetFieldType.forNumber(assetDetailsList.get(0).getAssetType());
             if (assetLevel.equals(AssetLevel.ACCOUNT_LEVEL)) {
                 performCustomerAssetOperation(customerId,
                         assetResourceNameList,

@@ -24,6 +24,8 @@ public class Constants {
 
     public static final int NUM_CRITERION_CLASSES_SUPPORTED = 6;
 
+    public static final int NUM_SEARCH_AD_TYPES = 1;
+
     public static final int NUM_ASSET_CLASSES_SUPPORTED = 2;
 
     public static final String DEFAULT_LOCALE = "en";
@@ -42,6 +44,8 @@ public class Constants {
     public static final String MISSING_PARAMS = "Parameters are missing from the request query";
 
     public static final String LANGUAGE_CODE_PREFIX = "languageConstants/";
+
+    public static final String RESPONSIVE_AD_TYPE = "responsive";
 
     public static final int ADVERTISING_CHANNEL_TYPE_SEARCH
             = AdvertisingChannelTypeEnum.AdvertisingChannelType.SEARCH_VALUE;

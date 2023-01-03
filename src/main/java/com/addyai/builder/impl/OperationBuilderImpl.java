@@ -18,6 +18,8 @@ package com.addyai.builder.impl;
 import com.addyai.builder.OperationBuilder;
 import com.addyai.enums.OperationType;
 import com.addyai.models.*;
+import com.addyai.models.ads.AdDetails;
+import com.addyai.models.ads.ResponsiveSearchAdDetails;
 import com.addyai.models.assets.AssetDetails;
 import com.addyai.models.assets.CallExtensionDetails;
 import com.addyai.models.assets.SitelinkDetails;
@@ -33,6 +35,7 @@ import java.util.List;
 import java.util.Map;
 
 import static com.addyai.utils.misc.Constants.MICRO_FACTOR;
+import static com.addyai.utils.misc.Constants.RESPONSIVE_AD_TYPE;
 
 public class OperationBuilderImpl implements OperationBuilder {
     @Override
@@ -409,6 +412,13 @@ public class OperationBuilderImpl implements OperationBuilder {
         return campaignBuilder.build();
     }
 
+    /**
+     * Build a list of {@link AssetOperation} for a given operation type using a list of {@link AssetDetails}
+     *
+     * @param assetDetailsList a list of the details of each asset
+     * @param operationType    the type of operation being performed (CREATE or REMOVE)
+     * @return a list of {@link AssetOperation} to be performed on the client account
+     */
     @Override
     public List<AssetOperation> buildAssetOperationList(List<AssetDetails> assetDetailsList, OperationType operationType) {
         List<AssetOperation> assetOperationList = new ArrayList<>();
@@ -417,7 +427,7 @@ public class OperationBuilderImpl implements OperationBuilder {
         for (AssetDetails assetDetails : assetDetailsList) {
             Asset.Builder assetBuilder = Asset.newBuilder();
 
-            if (assetDetails.getAssetType() == AssetTypeEnum.AssetType.SITELINK_VALUE) {
+            if (assetDetails.getAssetType() == AssetFieldTypeEnum.AssetFieldType.SITELINK_VALUE) {
                 SitelinkDetails sitelinkDetails = (SitelinkDetails) assetDetails;
                 SitelinkAsset.Builder sitelinkAssetBuilder = SitelinkAsset.newBuilder();
                 sitelinkAssetBuilder.setDescription1(sitelinkDetails.getDescription1());
@@ -462,6 +472,88 @@ public class OperationBuilderImpl implements OperationBuilder {
             assetOperationList.add(assetOperationBuilder.build());
         }
         return assetOperationList;
+    }
+
+    /**
+     * Build a list of {@link AdGroupAdOperation} to be performed on the client account.
+     *
+     * @param adDetailsList  a list of details of each ad
+     * @param operationType  the type of operation to be performed (CREATE, UPDATE or REMOVE)
+     * @param adGroupResName the name of the adgroup holding the ad
+     * @return a list of {@link AdGroupAdOperation}
+     */
+    @Override
+    public List<AdGroupAdOperation> buildAdGroupAdOperationList(List<AdDetails> adDetailsList, OperationType operationType, String adGroupResName) {
+        List<AdGroupAdOperation> adGroupAdOperationList = new ArrayList<>();
+        if (adDetailsList.isEmpty())
+            return null;
+
+        if (adGroupResName.isEmpty())
+            return null;
+
+        for (AdDetails adDetails : adDetailsList) {
+            if (adDetails.getAdType().equals(RESPONSIVE_AD_TYPE)) {
+                ResponsiveSearchAdDetails details = (ResponsiveSearchAdDetails) adDetails;
+                ResponsiveSearchAdInfo.Builder responsiveSearchAdInfoBuilder
+                        = ResponsiveSearchAdInfo.newBuilder();
+
+                for (String headline : details.getHeadlines()) {
+                    responsiveSearchAdInfoBuilder.addHeadlines(createAdTextAsset(headline));
+                }
+
+                for (String description : details.getDescriptions()) {
+                    responsiveSearchAdInfoBuilder.addDescriptions(createAdTextAsset(description));
+                }
+
+                if (details.getPaths().size() == 1) {
+                    responsiveSearchAdInfoBuilder.setPath1(details.getPaths().get(0));
+                } else if (details.getPaths().size() == 2) {
+                    responsiveSearchAdInfoBuilder.setPath1(details.getPaths().get(0));
+                    responsiveSearchAdInfoBuilder.setPath2(details.getPaths().get(1));
+                }
+
+                // build the responsiveSearchAdInfo object
+                ResponsiveSearchAdInfo responsiveSearchAdInfo = responsiveSearchAdInfoBuilder.build();
+
+                Ad ad;
+                if (operationType.equals(OperationType.CREATE)) {
+                    // build the ad object
+                    ad = Ad.newBuilder()
+                            .setResponsiveSearchAd(responsiveSearchAdInfo)
+                            .addFinalUrls(details.getFinalUrl())
+                            .build();
+                } else {
+                    // build the ad object without final urls
+                    ad = Ad.newBuilder()
+                            .setResponsiveSearchAd(responsiveSearchAdInfo)
+                            .build();
+                }
+
+                // build the final ad group ad object
+                AdGroupAd adGroupAd = AdGroupAd.newBuilder()
+                        .setAd(ad)
+                        .setAdGroup(adGroupResName)
+                        .setStatusValue(details.getAdStatus())
+                        .build();
+
+                AdGroupAdOperation adGroupAdOperation;
+
+                if (operationType.equals(OperationType.CREATE)) {
+                    adGroupAdOperation = AdGroupAdOperation.newBuilder()
+                            .setCreate(adGroupAd)
+                            .build();
+                } else if (operationType.equals(OperationType.REMOVE)) {
+                    adGroupAdOperation = AdGroupAdOperation.newBuilder()
+                            .setRemove(details.getAdName())
+                            .build();
+                } else {
+                    continue;
+                }
+
+                adGroupAdOperationList.add(adGroupAdOperation);
+            }
+        }
+        return adGroupAdOperationList;
     }
 
     /**
@@ -652,5 +744,15 @@ public class OperationBuilderImpl implements OperationBuilder {
             }
         }
         return keywordBuilder.build();
+    }
+
+    /**
+     * Creates an AdTextAsset from a given string.
+     *
+     * @param text the text string to insert in the AdTextAsset.
+     * @return AdTextAsset.
+     */
+    private AdTextAsset createAdTextAsset(String text) {
+        return AdTextAsset.newBuilder().setText(text).build();
     }
 }

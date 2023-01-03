@@ -16,9 +16,9 @@
 package com.addyai.controllers;
 
 import com.addyai.error_handling.exceptions.InvalidRequestException;
+import com.addyai.mocks.CampaignMocks;
 import com.addyai.models.CampaignDetails;
 import com.addyai.services.campaign.CampaignService;
-import com.addyai.utils.TestUtils;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
@@ -35,7 +35,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.addyai.utils.TestUtils.MOCK_CAMPAIGN_RESOURCE_NAME;
+import static com.addyai.mocks.CampaignMocks.MOCK_CAMPAIGN_RESOURCE_NAME;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
@@ -59,7 +59,7 @@ public class CampaignControllerImplTest {
     @MockBean
     private CampaignService campaignService;
 
-    private final TestUtils testUtils = new TestUtils();
+    private final CampaignMocks campaignMocks = new CampaignMocks();
 
     private final Gson gson = new Gson();
 
@@ -72,7 +72,7 @@ public class CampaignControllerImplTest {
     @Test
     void testFetchAllCampaignDetailsReturnsList() throws Exception {
         List<CampaignDetails> campaignDetailsList = new ArrayList<>();
-        campaignDetailsList.add(testUtils.getMockCampaignDetails());
+        campaignDetailsList.add(campaignMocks.getMockCampaignDetails());
 
         when(campaignService.findAllCampaignDetails(CUSTOMER_ID))
                 .thenReturn(campaignDetailsList);
@@ -115,7 +115,7 @@ public class CampaignControllerImplTest {
     @Test
     void testCreateCampaignsIsSuccessful() throws Exception {
         List<CampaignDetails> campaignDetailsList = new ArrayList<>();
-        campaignDetailsList.add(testUtils.getMockCampaignDetails());
+        campaignDetailsList.add(campaignMocks.getMockCampaignDetails());
 
         mockMvc.perform(post(BASE_URL + "create")
                         .contentType(APPLICATION_JSON_UTF8)
@@ -126,7 +126,7 @@ public class CampaignControllerImplTest {
     @Test
     void testUpdateCampaignsIsSuccessful() throws Exception {
         List<CampaignDetails> campaignDetailsList = new ArrayList<>();
-        campaignDetailsList.add(testUtils.getMockCampaignDetails());
+        campaignDetailsList.add(campaignMocks.getMockCampaignDetails());
 
         mockMvc.perform(put(BASE_URL + "update")
                         .contentType(APPLICATION_JSON_UTF8)

@@ -17,6 +17,7 @@ package com.addyai.validators;
 
 import com.addyai.enums.OperationType;
 import com.addyai.error_handling.ValidationErrorResponse;
+import com.addyai.mocks.CampaignMocks;
 import com.addyai.models.AdGroupDetails;
 import com.addyai.models.BudgetDetails;
 import com.addyai.models.CampaignDetails;
@@ -30,25 +31,26 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import static com.addyai.utils.TestUtils.MOCK_CAMPAIGN_RESOURCE_NAME;
+import static com.addyai.mocks.CampaignMocks.MOCK_CAMPAIGN_RESOURCE_NAME;
 import static com.addyai.utils.misc.Constants.*;
 import static com.addyai.utils.validators.EntityValidator.*;
 import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
 public class EntityValidatorTest {
+    private final CampaignMocks campaignMocks = new CampaignMocks();
     private final TestUtils testUtils = new TestUtils();
 
     @Test
     void testValidCampaignReturnsNullValidationErrorResponse() {
         ValidationErrorResponse validationErrorResponse =
-                EntityValidator.isCampaignDetailsValid(testUtils.getMockCampaignDetails(), OperationType.CREATE);
+                EntityValidator.isCampaignDetailsValid(campaignMocks.getMockCampaignDetails(), OperationType.CREATE);
         assertNull(validationErrorResponse);
     }
 
     @Test
     void testCampaignDetailsWithMissingNameReturnValidationError() {
-        CampaignDetails campaignDetails = testUtils.getMockCampaignDetails();
+        CampaignDetails campaignDetails = campaignMocks.getMockCampaignDetails();
         campaignDetails.setCampaignName("");
 
         ValidationErrorResponse validationErrorResponse =
@@ -61,7 +63,7 @@ public class EntityValidatorTest {
 
     @Test
     void testCampaignDetailsWithMissingStatusReturnsValidationError() {
-        CampaignDetails campaignDetails = testUtils.getMockCampaignDetails();
+        CampaignDetails campaignDetails = campaignMocks.getMockCampaignDetails();
         campaignDetails.setStatus(-1);
 
         ValidationErrorResponse validationErrorResponse =
@@ -74,7 +76,7 @@ public class EntityValidatorTest {
 
     @Test
     void testCampaignDetailsWithMissingAdChannelTypeReturnsValidationError() {
-        CampaignDetails campaignDetails = testUtils.getMockCampaignDetails();
+        CampaignDetails campaignDetails = campaignMocks.getMockCampaignDetails();
         campaignDetails.setAdvertisingChannelType(-1);
 
         ValidationErrorResponse validationErrorResponse =
@@ -87,7 +89,7 @@ public class EntityValidatorTest {
 
     @Test
     void testCampaignDetailsWithInvalidPosGeoTargetReturnsValidationError() {
-        CampaignDetails campaignDetails = testUtils.getMockCampaignDetails();
+        CampaignDetails campaignDetails = campaignMocks.getMockCampaignDetails();
         campaignDetails.setPositiveGeoTargetType(100);
 
         ValidationErrorResponse validationErrorResponse =
@@ -100,7 +102,7 @@ public class EntityValidatorTest {
 
     @Test
     void testCampaignDetailsWithInvalidNegGeoTargetReturnsValidationError() {
-        CampaignDetails campaignDetails = testUtils.getMockCampaignDetails();
+        CampaignDetails campaignDetails = campaignMocks.getMockCampaignDetails();
         campaignDetails.setNegativeGeoTargetType(100);
 
         ValidationErrorResponse validationErrorResponse =
@@ -113,7 +115,7 @@ public class EntityValidatorTest {
 
     @Test
     void testCampaignDetailsWithInvalidStartDateReturnsValidationError() {
-        CampaignDetails campaignDetails = testUtils.getMockCampaignDetails();
+        CampaignDetails campaignDetails = campaignMocks.getMockCampaignDetails();
         campaignDetails.setStartDate("12-20-2022");
 
         ValidationErrorResponse validationErrorResponse =
@@ -126,7 +128,7 @@ public class EntityValidatorTest {
 
     @Test
     void testCampaignDetailsWithInvalidEndDateReturnsValidationError() {
-        CampaignDetails campaignDetails = testUtils.getMockCampaignDetails();
+        CampaignDetails campaignDetails = campaignMocks.getMockCampaignDetails();
         campaignDetails.setEndDate("12-20-2022");
 
         ValidationErrorResponse validationErrorResponse =
@@ -139,7 +141,7 @@ public class EntityValidatorTest {
 
     @Test
     void testCampaignDetailsWithNetworkSettingsNotSetReturnsValidationError() {
-        CampaignDetails campaignDetails = testUtils.getMockCampaignDetails();
+        CampaignDetails campaignDetails = campaignMocks.getMockCampaignDetails();
         campaignDetails.setTargetingSearchNetwork(false);
         campaignDetails.setTargetingGoogleSearchNetwork(false);
         campaignDetails.setTargetingContentNetwork(false);
@@ -154,7 +156,7 @@ public class EntityValidatorTest {
 
     @Test
     void testCampaignDetailsWithInvalidNetworkSettingsReturnsValidationError() {
-        CampaignDetails campaignDetails = testUtils.getMockCampaignDetails();
+        CampaignDetails campaignDetails = campaignMocks.getMockCampaignDetails();
         campaignDetails.setTargetingSearchNetwork(true);
         campaignDetails.setTargetingGoogleSearchNetwork(false);
         campaignDetails.setTargetingContentNetwork(false);
@@ -169,7 +171,7 @@ public class EntityValidatorTest {
 
     @Test
     void testValidBudgetDetailsReturnsNullValidationError() {
-        BudgetDetails budgetDetails = testUtils.getMockBudgetDetails();
+        BudgetDetails budgetDetails = campaignMocks.getMockBudgetDetails();
         ValidationErrorResponse validationErrorResponse =
                 EntityValidator.isBudgetDetailsValid(budgetDetails, OperationType.CREATE);
 
@@ -178,7 +180,7 @@ public class EntityValidatorTest {
 
     @Test
     void testBudgetDetailsWithZeroBudgetReturnsValidationError() {
-        BudgetDetails budgetDetails = testUtils.getMockBudgetDetails();
+        BudgetDetails budgetDetails = campaignMocks.getMockBudgetDetails();
         budgetDetails.setDailyBudgetAmount(0);
 
         ValidationErrorResponse validationErrorResponse =
@@ -191,7 +193,7 @@ public class EntityValidatorTest {
 
     @Test
     void testBudgetDetailsWithNoNameReturnsValidationError() {
-        BudgetDetails budgetDetails = testUtils.getMockBudgetDetails();
+        BudgetDetails budgetDetails = campaignMocks.getMockBudgetDetails();
         budgetDetails.setName("");
 
         ValidationErrorResponse validationErrorResponse =
@@ -204,7 +206,7 @@ public class EntityValidatorTest {
 
     @Test
     void testBudgetDetailsWithInvalidStatusReturnsValidationError() {
-        BudgetDetails budgetDetails = testUtils.getMockBudgetDetails();
+        BudgetDetails budgetDetails = campaignMocks.getMockBudgetDetails();
         budgetDetails.setStatus(100);
 
         ValidationErrorResponse validationErrorResponse =
@@ -217,7 +219,7 @@ public class EntityValidatorTest {
 
     @Test
     void testBudgetDetailsWithInvalidDeliveryMethodReturnsValidationError() {
-        BudgetDetails budgetDetails = testUtils.getMockBudgetDetails();
+        BudgetDetails budgetDetails = campaignMocks.getMockBudgetDetails();
         budgetDetails.setDeliveryMethod(100);
 
         ValidationErrorResponse validationErrorResponse =
@@ -231,7 +233,7 @@ public class EntityValidatorTest {
     @Test
     void testValidCriterionDetailsReturnsNullValidationErrorResponse() {
         List<CriterionDetails> criterionDetailsList =
-                testUtils.getMockCriterionMapping().get(MOCK_CAMPAIGN_RESOURCE_NAME);
+                campaignMocks.getMockCriterionMapping().get(MOCK_CAMPAIGN_RESOURCE_NAME);
 
         ValidationErrorResponse validationErrorResponse =
                 EntityValidator.isCriterionDetailsValid(criterionDetailsList);
@@ -241,7 +243,7 @@ public class EntityValidatorTest {
     @Test
     void testAdScheduleDetailsInvalidStatusReturnValidationError() {
         List<CriterionDetails> criterionDetailsList =
-                testUtils.getMockCriterionMapping().get(MOCK_CAMPAIGN_RESOURCE_NAME);
+                campaignMocks.getMockCriterionMapping().get(MOCK_CAMPAIGN_RESOURCE_NAME);
 
         List<CriterionDetails> singleCriterionDetailsList = new ArrayList<>();
 
@@ -260,7 +262,7 @@ public class EntityValidatorTest {
     @Test
     void testAdScheduleDetailsInvalidDayOfWeekReturnValidationError() {
         List<CriterionDetails> criterionDetailsList =
-                testUtils.getMockCriterionMapping().get(MOCK_CAMPAIGN_RESOURCE_NAME);
+                campaignMocks.getMockCriterionMapping().get(MOCK_CAMPAIGN_RESOURCE_NAME);
 
         List<CriterionDetails> singleCriterionDetailsList = new ArrayList<>();
 
@@ -279,7 +281,7 @@ public class EntityValidatorTest {
     @Test
     void testAdScheduleDetailsBidModifierTooLowReturnValidationError() {
         List<CriterionDetails> criterionDetailsList =
-                testUtils.getMockCriterionMapping().get(MOCK_CAMPAIGN_RESOURCE_NAME);
+                campaignMocks.getMockCriterionMapping().get(MOCK_CAMPAIGN_RESOURCE_NAME);
 
         List<CriterionDetails> singleCriterionDetailsList = new ArrayList<>();
 
@@ -298,7 +300,7 @@ public class EntityValidatorTest {
     @Test
     void testAdScheduleDetailsBidModifierTooHighReturnValidationError() {
         List<CriterionDetails> criterionDetailsList =
-                testUtils.getMockCriterionMapping().get(MOCK_CAMPAIGN_RESOURCE_NAME);
+                campaignMocks.getMockCriterionMapping().get(MOCK_CAMPAIGN_RESOURCE_NAME);
 
         List<CriterionDetails> singleCriterionDetailsList = new ArrayList<>();
 
@@ -317,7 +319,7 @@ public class EntityValidatorTest {
     @Test
     void testAdScheduleDetailsBidModifierInvalidStartHour1ReturnValidationError() {
         List<CriterionDetails> criterionDetailsList =
-                testUtils.getMockCriterionMapping().get(MOCK_CAMPAIGN_RESOURCE_NAME);
+                campaignMocks.getMockCriterionMapping().get(MOCK_CAMPAIGN_RESOURCE_NAME);
 
         List<CriterionDetails> singleCriterionDetailsList = new ArrayList<>();
 
@@ -336,7 +338,7 @@ public class EntityValidatorTest {
     @Test
     void testAdScheduleDetailsBidModifierInvalidStartHour2ReturnValidationError() {
         List<CriterionDetails> criterionDetailsList =
-                testUtils.getMockCriterionMapping().get(MOCK_CAMPAIGN_RESOURCE_NAME);
+                campaignMocks.getMockCriterionMapping().get(MOCK_CAMPAIGN_RESOURCE_NAME);
 
         List<CriterionDetails> singleCriterionDetailsList = new ArrayList<>();
 
@@ -355,7 +357,7 @@ public class EntityValidatorTest {
     @Test
     void testAdScheduleDetailsBidModifierInvalidEndHour1ReturnValidationError() {
         List<CriterionDetails> criterionDetailsList =
-                testUtils.getMockCriterionMapping().get(MOCK_CAMPAIGN_RESOURCE_NAME);
+                campaignMocks.getMockCriterionMapping().get(MOCK_CAMPAIGN_RESOURCE_NAME);
 
         List<CriterionDetails> singleCriterionDetailsList = new ArrayList<>();
 
@@ -374,7 +376,7 @@ public class EntityValidatorTest {
     @Test
     void testAdScheduleDetailsBidModifierInvalidEndHour2ReturnValidationError() {
         List<CriterionDetails> criterionDetailsList =
-                testUtils.getMockCriterionMapping().get(MOCK_CAMPAIGN_RESOURCE_NAME);
+                campaignMocks.getMockCriterionMapping().get(MOCK_CAMPAIGN_RESOURCE_NAME);
 
         List<CriterionDetails> singleCriterionDetailsList = new ArrayList<>();
 
@@ -393,7 +395,7 @@ public class EntityValidatorTest {
     @Test
     void testAdScheduleDetailsBidModifierInvalidStartMinReturnValidationError() {
         List<CriterionDetails> criterionDetailsList =
-                testUtils.getMockCriterionMapping().get(MOCK_CAMPAIGN_RESOURCE_NAME);
+                campaignMocks.getMockCriterionMapping().get(MOCK_CAMPAIGN_RESOURCE_NAME);
 
         List<CriterionDetails> singleCriterionDetailsList = new ArrayList<>();
 
@@ -412,7 +414,7 @@ public class EntityValidatorTest {
     @Test
     void testAdScheduleDetailsBidModifierInvalidEndMinReturnValidationError() {
         List<CriterionDetails> criterionDetailsList =
-                testUtils.getMockCriterionMapping().get(MOCK_CAMPAIGN_RESOURCE_NAME);
+                campaignMocks.getMockCriterionMapping().get(MOCK_CAMPAIGN_RESOURCE_NAME);
 
         List<CriterionDetails> singleCriterionDetailsList = new ArrayList<>();
 
@@ -431,7 +433,7 @@ public class EntityValidatorTest {
     @Test
     void testProximityDetailsInvalidStatusReturnValidationError() {
         List<CriterionDetails> criterionDetailsList =
-                testUtils.getMockCriterionMapping().get(MOCK_CAMPAIGN_RESOURCE_NAME);
+                campaignMocks.getMockCriterionMapping().get(MOCK_CAMPAIGN_RESOURCE_NAME);
 
         List<CriterionDetails> singleCriterionDetailsList = new ArrayList<>();
 
@@ -450,7 +452,7 @@ public class EntityValidatorTest {
     @Test
     void testProximityDetailsInvalidBidModifierReturnValidationError() {
         List<CriterionDetails> criterionDetailsList =
-                testUtils.getMockCriterionMapping().get(MOCK_CAMPAIGN_RESOURCE_NAME);
+                campaignMocks.getMockCriterionMapping().get(MOCK_CAMPAIGN_RESOURCE_NAME);
 
         List<CriterionDetails> singleCriterionDetailsList = new ArrayList<>();
 
@@ -469,7 +471,7 @@ public class EntityValidatorTest {
     @Test
     void testProximityDetailsInvalidCityNameReturnValidationError() {
         List<CriterionDetails> criterionDetailsList =
-                testUtils.getMockCriterionMapping().get(MOCK_CAMPAIGN_RESOURCE_NAME);
+                campaignMocks.getMockCriterionMapping().get(MOCK_CAMPAIGN_RESOURCE_NAME);
 
         List<CriterionDetails> singleCriterionDetailsList = new ArrayList<>();
 
@@ -488,7 +490,7 @@ public class EntityValidatorTest {
     @Test
     void testProximityDetailsInvalidPostalCodeReturnValidationError() {
         List<CriterionDetails> criterionDetailsList =
-                testUtils.getMockCriterionMapping().get(MOCK_CAMPAIGN_RESOURCE_NAME);
+                campaignMocks.getMockCriterionMapping().get(MOCK_CAMPAIGN_RESOURCE_NAME);
 
         List<CriterionDetails> singleCriterionDetailsList = new ArrayList<>();
 
@@ -507,7 +509,7 @@ public class EntityValidatorTest {
     @Test
     void testProximityDetailsMissingLocationDetailsReturnValidationError() {
         List<CriterionDetails> criterionDetailsList =
-                testUtils.getMockCriterionMapping().get(MOCK_CAMPAIGN_RESOURCE_NAME);
+                campaignMocks.getMockCriterionMapping().get(MOCK_CAMPAIGN_RESOURCE_NAME);
 
         List<CriterionDetails> singleCriterionDetailsList = new ArrayList<>();
 
@@ -526,7 +528,7 @@ public class EntityValidatorTest {
     @Test
     void testProximityDetailsMissingLocationDetails2ReturnValidationError() {
         List<CriterionDetails> criterionDetailsList =
-                testUtils.getMockCriterionMapping().get(MOCK_CAMPAIGN_RESOURCE_NAME);
+                campaignMocks.getMockCriterionMapping().get(MOCK_CAMPAIGN_RESOURCE_NAME);
 
         List<CriterionDetails> singleCriterionDetailsList = new ArrayList<>();
 
@@ -546,7 +548,7 @@ public class EntityValidatorTest {
     @Test
     void testProximityDetailsMissingLocationDetails3ReturnValidationError() {
         List<CriterionDetails> criterionDetailsList =
-                testUtils.getMockCriterionMapping().get(MOCK_CAMPAIGN_RESOURCE_NAME);
+                campaignMocks.getMockCriterionMapping().get(MOCK_CAMPAIGN_RESOURCE_NAME);
 
         List<CriterionDetails> singleCriterionDetailsList = new ArrayList<>();
 
@@ -566,7 +568,7 @@ public class EntityValidatorTest {
     @Test
     void testProximityDetailsInvalidRadiusReturnValidationError() {
         List<CriterionDetails> criterionDetailsList =
-                testUtils.getMockCriterionMapping().get(MOCK_CAMPAIGN_RESOURCE_NAME);
+                campaignMocks.getMockCriterionMapping().get(MOCK_CAMPAIGN_RESOURCE_NAME);
 
         List<CriterionDetails> singleCriterionDetailsList = new ArrayList<>();
 
@@ -585,7 +587,7 @@ public class EntityValidatorTest {
     @Test
     void testProximityDetailsInvalidRadiusUnitsReturnValidationError() {
         List<CriterionDetails> criterionDetailsList =
-                testUtils.getMockCriterionMapping().get(MOCK_CAMPAIGN_RESOURCE_NAME);
+                campaignMocks.getMockCriterionMapping().get(MOCK_CAMPAIGN_RESOURCE_NAME);
 
         List<CriterionDetails> singleCriterionDetailsList = new ArrayList<>();
 
@@ -604,7 +606,7 @@ public class EntityValidatorTest {
     @Test
     void testProximityDetailsInvalidCoordinatesReturnValidationError() {
         List<CriterionDetails> criterionDetailsList =
-                testUtils.getMockCriterionMapping().get(MOCK_CAMPAIGN_RESOURCE_NAME);
+                campaignMocks.getMockCriterionMapping().get(MOCK_CAMPAIGN_RESOURCE_NAME);
 
         List<CriterionDetails> singleCriterionDetailsList = new ArrayList<>();
 
@@ -627,7 +629,7 @@ public class EntityValidatorTest {
     @Test
     void testProximityDetailsInvalidCoordinates2ReturnValidationError() {
         List<CriterionDetails> criterionDetailsList =
-                testUtils.getMockCriterionMapping().get(MOCK_CAMPAIGN_RESOURCE_NAME);
+                campaignMocks.getMockCriterionMapping().get(MOCK_CAMPAIGN_RESOURCE_NAME);
 
         List<CriterionDetails> singleCriterionDetailsList = new ArrayList<>();
 
@@ -650,7 +652,7 @@ public class EntityValidatorTest {
     @Test
     void testNegativeKeywordDetailsInvalidStatusReturnValidationError() {
         List<CriterionDetails> criterionDetailsList =
-                testUtils.getMockCriterionMapping().get(MOCK_CAMPAIGN_RESOURCE_NAME);
+                campaignMocks.getMockCriterionMapping().get(MOCK_CAMPAIGN_RESOURCE_NAME);
 
         List<CriterionDetails> singleCriterionDetailsList = new ArrayList<>();
 
@@ -669,7 +671,7 @@ public class EntityValidatorTest {
     @Test
     void testNegativeKeywordDetailsEmptyKeywordTextValidationError() {
         List<CriterionDetails> criterionDetailsList =
-                testUtils.getMockCriterionMapping().get(MOCK_CAMPAIGN_RESOURCE_NAME);
+                campaignMocks.getMockCriterionMapping().get(MOCK_CAMPAIGN_RESOURCE_NAME);
 
         List<CriterionDetails> singleCriterionDetailsList = new ArrayList<>();
 
@@ -688,7 +690,7 @@ public class EntityValidatorTest {
     @Test
     void testNegativeKeywordDetailsInvalidKeywordMatchTypeValidationError() {
         List<CriterionDetails> criterionDetailsList =
-                testUtils.getMockCriterionMapping().get(MOCK_CAMPAIGN_RESOURCE_NAME);
+                campaignMocks.getMockCriterionMapping().get(MOCK_CAMPAIGN_RESOURCE_NAME);
 
         List<CriterionDetails> singleCriterionDetailsList = new ArrayList<>();
 
@@ -707,7 +709,7 @@ public class EntityValidatorTest {
     @Test
     void testDeviceDetailsInvalidStatusValidationError() {
         List<CriterionDetails> criterionDetailsList =
-                testUtils.getMockCriterionMapping().get(MOCK_CAMPAIGN_RESOURCE_NAME);
+                campaignMocks.getMockCriterionMapping().get(MOCK_CAMPAIGN_RESOURCE_NAME);
 
         List<CriterionDetails> singleCriterionDetailsList = new ArrayList<>();
 
@@ -726,7 +728,7 @@ public class EntityValidatorTest {
     @Test
     void testDeviceDetailsInvalidDeviceTypeValidationError() {
         List<CriterionDetails> criterionDetailsList =
-                testUtils.getMockCriterionMapping().get(MOCK_CAMPAIGN_RESOURCE_NAME);
+                campaignMocks.getMockCriterionMapping().get(MOCK_CAMPAIGN_RESOURCE_NAME);
 
         List<CriterionDetails> singleCriterionDetailsList = new ArrayList<>();
 
@@ -745,7 +747,7 @@ public class EntityValidatorTest {
     @Test
     void testDeviceDetailsBidModifierTooLowValidationError() {
         List<CriterionDetails> criterionDetailsList =
-                testUtils.getMockCriterionMapping().get(MOCK_CAMPAIGN_RESOURCE_NAME);
+                campaignMocks.getMockCriterionMapping().get(MOCK_CAMPAIGN_RESOURCE_NAME);
 
         List<CriterionDetails> singleCriterionDetailsList = new ArrayList<>();
 
@@ -764,7 +766,7 @@ public class EntityValidatorTest {
     @Test
     void testDeviceDetailsBidModifierTooHighValidationError() {
         List<CriterionDetails> criterionDetailsList =
-                testUtils.getMockCriterionMapping().get(MOCK_CAMPAIGN_RESOURCE_NAME);
+                campaignMocks.getMockCriterionMapping().get(MOCK_CAMPAIGN_RESOURCE_NAME);
 
         List<CriterionDetails> singleCriterionDetailsList = new ArrayList<>();
 
@@ -783,7 +785,7 @@ public class EntityValidatorTest {
     @Test
     void testLanguageDetailsInvalidStatusValidationError() {
         List<CriterionDetails> criterionDetailsList =
-                testUtils.getMockCriterionMapping().get(MOCK_CAMPAIGN_RESOURCE_NAME);
+                campaignMocks.getMockCriterionMapping().get(MOCK_CAMPAIGN_RESOURCE_NAME);
 
         List<CriterionDetails> singleCriterionDetailsList = new ArrayList<>();
 
@@ -802,7 +804,7 @@ public class EntityValidatorTest {
     @Test
     void testLanguageDetailsEmptyLanguageCodeValidationError() {
         List<CriterionDetails> criterionDetailsList =
-                testUtils.getMockCriterionMapping().get(MOCK_CAMPAIGN_RESOURCE_NAME);
+                campaignMocks.getMockCriterionMapping().get(MOCK_CAMPAIGN_RESOURCE_NAME);
 
         List<CriterionDetails> singleCriterionDetailsList = new ArrayList<>();
 
@@ -821,7 +823,7 @@ public class EntityValidatorTest {
     @Test
     void testLanguageDetailsInvalidLanguageCodeValidationError() {
         List<CriterionDetails> criterionDetailsList =
-                testUtils.getMockCriterionMapping().get(MOCK_CAMPAIGN_RESOURCE_NAME);
+                campaignMocks.getMockCriterionMapping().get(MOCK_CAMPAIGN_RESOURCE_NAME);
 
         List<CriterionDetails> singleCriterionDetailsList = new ArrayList<>();
 
@@ -840,7 +842,7 @@ public class EntityValidatorTest {
     @Test
     void testLocationDetailsInvalidLanguageCodeValidationError() {
         List<CriterionDetails> criterionDetailsList =
-                testUtils.getMockCriterionMapping().get(MOCK_CAMPAIGN_RESOURCE_NAME);
+                campaignMocks.getMockCriterionMapping().get(MOCK_CAMPAIGN_RESOURCE_NAME);
 
         List<CriterionDetails> singleCriterionDetailsList = new ArrayList<>();
 
@@ -859,7 +861,7 @@ public class EntityValidatorTest {
     @Test
     void testLocationDetailsBidModifierTooLowValidationError() {
         List<CriterionDetails> criterionDetailsList =
-                testUtils.getMockCriterionMapping().get(MOCK_CAMPAIGN_RESOURCE_NAME);
+                campaignMocks.getMockCriterionMapping().get(MOCK_CAMPAIGN_RESOURCE_NAME);
 
         List<CriterionDetails> singleCriterionDetailsList = new ArrayList<>();
 
@@ -878,7 +880,7 @@ public class EntityValidatorTest {
     @Test
     void testLocationDetailsBidModifierTooHighValidationError() {
         List<CriterionDetails> criterionDetailsList =
-                testUtils.getMockCriterionMapping().get(MOCK_CAMPAIGN_RESOURCE_NAME);
+                campaignMocks.getMockCriterionMapping().get(MOCK_CAMPAIGN_RESOURCE_NAME);
 
         List<CriterionDetails> singleCriterionDetailsList = new ArrayList<>();
 
@@ -897,7 +899,7 @@ public class EntityValidatorTest {
     @Test
     void testLocationDetailsBidModifierPlusNegativeValidationError() {
         List<CriterionDetails> criterionDetailsList =
-                testUtils.getMockCriterionMapping().get(MOCK_CAMPAIGN_RESOURCE_NAME);
+                campaignMocks.getMockCriterionMapping().get(MOCK_CAMPAIGN_RESOURCE_NAME);
 
         List<CriterionDetails> singleCriterionDetailsList = new ArrayList<>();
 
@@ -917,7 +919,7 @@ public class EntityValidatorTest {
     @Test
     void testLocationDetailsLocationEmptyValidationError() {
         List<CriterionDetails> criterionDetailsList =
-                testUtils.getMockCriterionMapping().get(MOCK_CAMPAIGN_RESOURCE_NAME);
+                campaignMocks.getMockCriterionMapping().get(MOCK_CAMPAIGN_RESOURCE_NAME);
 
         List<CriterionDetails> singleCriterionDetailsList = new ArrayList<>();
 
@@ -936,7 +938,7 @@ public class EntityValidatorTest {
     @Test
     void testLocationDetailsLocationContainsDigitsValidationError() {
         List<CriterionDetails> criterionDetailsList =
-                testUtils.getMockCriterionMapping().get(MOCK_CAMPAIGN_RESOURCE_NAME);
+                campaignMocks.getMockCriterionMapping().get(MOCK_CAMPAIGN_RESOURCE_NAME);
 
         List<CriterionDetails> singleCriterionDetailsList = new ArrayList<>();
 
@@ -955,13 +957,13 @@ public class EntityValidatorTest {
     @Test
     void testValidUpdateCampaignReturnsNullValidationErrorResponse() {
         ValidationErrorResponse validationErrorResponse =
-                EntityValidator.isCampaignDetailsValid(testUtils.getMockCampaignDetails(), OperationType.UPDATE);
+                EntityValidator.isCampaignDetailsValid(campaignMocks.getMockCampaignDetails(), OperationType.UPDATE);
         assertNull(validationErrorResponse);
     }
 
     @Test
     void testUpdateCampaignDetailsWithMissingResNameReturnValidationError() {
-        CampaignDetails campaignDetails = testUtils.getMockCampaignDetails();
+        CampaignDetails campaignDetails = campaignMocks.getMockCampaignDetails();
         campaignDetails.setCampaignResourceName("");
 
         ValidationErrorResponse validationErrorResponse =
@@ -974,7 +976,7 @@ public class EntityValidatorTest {
 
     @Test
     void testValidUpdateBudgetDetailsReturnsNullValidationError() {
-        BudgetDetails budgetDetails = testUtils.getMockBudgetDetails();
+        BudgetDetails budgetDetails = campaignMocks.getMockBudgetDetails();
         ValidationErrorResponse validationErrorResponse =
                 EntityValidator.isBudgetDetailsValid(budgetDetails, OperationType.UPDATE);
 
@@ -983,7 +985,7 @@ public class EntityValidatorTest {
 
     @Test
     void testUpdateBudgetDetailsMissingResNameReturnsValidationError() {
-        BudgetDetails budgetDetails = testUtils.getMockBudgetDetails();
+        BudgetDetails budgetDetails = campaignMocks.getMockBudgetDetails();
         budgetDetails.setResourceName("");
 
         ValidationErrorResponse validationErrorResponse =
@@ -996,7 +998,7 @@ public class EntityValidatorTest {
 
     @Test
     void testValidateNonEmptyCampaignResourceNamesReturnsNull() {
-        List<CampaignDetails> campaignDetailsList = testUtils.getMockCampaignDetailsList();
+        List<CampaignDetails> campaignDetailsList = campaignMocks.getMockCampaignDetailsList();
 
         ValidationErrorResponse validationErrorResponse =
                 EntityValidator.validateNonEmptyCampaignResourceNames(campaignDetailsList);
@@ -1006,7 +1008,7 @@ public class EntityValidatorTest {
 
     @Test
     void testValidateEmptyCampaignResourceNamesReturnsValidationError() {
-        List<CampaignDetails> campaignDetailsList = testUtils.getMockCampaignDetailsList();
+        List<CampaignDetails> campaignDetailsList = campaignMocks.getMockCampaignDetailsList();
         campaignDetailsList.get(0).setCampaignResourceName("");
 
         ValidationErrorResponse validationErrorResponse =

@@ -24,7 +24,7 @@ public class AdScheduleDetails extends CriterionDetails {
      *
      * @see com.google.ads.googleads.v12.enums.DayOfWeekEnum.DayOfWeek
      */
-    private int dayOfWeek = DAY_OF_WEEK_THURSDAY;
+    private int dayOfWeek = DAY_OF_WEEK_SUNDAY;
 
     /**
      * The hour the ad schedule should start targeting.
