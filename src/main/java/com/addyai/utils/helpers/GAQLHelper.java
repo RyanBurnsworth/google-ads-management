@@ -56,7 +56,7 @@ public class GAQLHelper {
                 " campaign.network_settings.target_content_network," +
                 " campaign.network_settings.target_google_search," +
                 " campaign.network_settings.target_search_network" +
-                " FROM campaign WHERE campaign.status IN ('ENABLED', 'PAUSED') ORDER BY campaign.id";
+                " FROM campaign ORDER BY campaign.id";
     }
 
     public static String getCampaignDetailsByNameQuery(String name) {
@@ -90,7 +90,7 @@ public class GAQLHelper {
                 " campaign_budget.resource_name," +
                 " campaign_budget.name," +
                 " campaign_budget.id" +
-                " FROM campaign_budget WHERE campaign_budget.status = 'ENABLED'";
+                " FROM campaign_budget";
     }
 
     public static String getAdScheduleCriterionQuery(String campaign) {
@@ -106,7 +106,7 @@ public class GAQLHelper {
                 "  campaign_criterion.ad_schedule.day_of_week, " +
                 "  campaign_criterion.ad_schedule.end_hour, " +
                 "  campaign_criterion.bid_modifier " +
-                "FROM campaign_criterion WHERE campaign_criterion.status = 'ENABLED' AND " +
+                "FROM campaign_criterion WHERE " +
                 "campaign_criterion.campaign = '" + campaign + "' AND campaign_criterion.ad_schedule.day_of_week IN " +
                 "('MONDAY', 'TUESDAY', 'WEDNESDAY', 'THURSDAY', 'FRIDAY', 'SATURDAY', 'SUNDAY')";
     }
@@ -121,8 +121,8 @@ public class GAQLHelper {
                 "  campaign_criterion.negative, " +
                 "  campaign_criterion.keyword.text, " +
                 "  campaign_criterion.keyword.match_type " +
-                "FROM campaign_criterion WHERE campaign_criterion.status = 'ENABLED' AND " +
-                "campaign_criterion.campaign ='" + campaign + "' AND campaign_criterion.keyword.text != '' AND " +
+                "FROM campaign_criterion WHERE campaign_criterion.campaign ='" + campaign +
+                "' AND campaign_criterion.keyword.text != '' AND " +
                 "campaign_criterion.negative = True";
     }
 
@@ -145,8 +145,8 @@ public class GAQLHelper {
                 "  campaign_criterion.proximity.radius, " +
                 "  campaign_criterion.proximity.radius_units, " +
                 "  campaign_criterion.bid_modifier " +
-                "FROM campaign_criterion WHERE campaign_criterion.status = 'ENABLED' AND " +
-                "campaign_criterion.campaign ='" + campaign + "' AND campaign_criterion.proximity.radius != 0";
+                "FROM campaign_criterion WHERE campaign_criterion.campaign ='" + campaign +
+                "' AND campaign_criterion.proximity.radius != 0";
     }
 
     public static String getDeviceQuery(String campaign) {
@@ -159,9 +159,8 @@ public class GAQLHelper {
                 "  campaign_criterion.negative, " +
                 "  campaign_criterion.device.type, " +
                 "  campaign_criterion.bid_modifier " +
-                "FROM campaign_criterion WHERE campaign_criterion.status = 'ENABLED' AND " +
-                "campaign_criterion.campaign ='" + campaign + "' AND campaign_criterion.device.type " +
-                "IN ('DESKTOP', 'MOBILE', 'TABLET')";
+                "FROM campaign_criterion WHERE campaign_criterion.campaign ='" + campaign +
+                "' AND campaign_criterion.device.type " + "IN ('DESKTOP', 'MOBILE', 'TABLET')";
     }
 
     public static String getLanguageQuery(String campaign) {
@@ -174,8 +173,7 @@ public class GAQLHelper {
                 "  campaign_criterion.negative, " +
                 "  campaign_criterion.bid_modifier, " +
                 "  campaign_criterion.language.language_constant " +
-                "FROM campaign_criterion WHERE campaign_criterion.status = 'ENABLED' AND " +
-                "campaign_criterion.campaign ='" + campaign + "'";
+                "FROM campaign_criterion WHERE campaign_criterion.campaign ='" + campaign + "'";
     }
 
     public static String getLocationQuery(String campaign) {
@@ -188,8 +186,7 @@ public class GAQLHelper {
                 "  campaign_criterion.negative, " +
                 "  campaign_criterion.bid_modifier, " +
                 "  campaign_criterion.location.geo_target_constant " +
-                "FROM campaign_criterion WHERE campaign_criterion.status = 'ENABLED' AND " +
-                "campaign_criterion.campaign ='" + campaign + "'";
+                "FROM campaign_criterion WHERE campaign_criterion.campaign ='" + campaign + "'";
     }
 
     public static String getAdGroupDetailsQuery() {
@@ -201,7 +198,7 @@ public class GAQLHelper {
                 "ad_group.type, " +
                 "ad_group.status, " +
                 "ad_group.cpc_bid_micros " +
-                "FROM ad_group WHERE ad_group.status IN ('ENABLED', 'PAUSED') ORDER BY ad_group.id";
+                "FROM ad_group ORDER BY ad_group.id";
     }
 
     public static String getAdGroupDetailsByCampaignQuery(String campaignResName) {
@@ -213,8 +210,7 @@ public class GAQLHelper {
                 "ad_group.type, " +
                 "ad_group.status, " +
                 "ad_group.cpc_bid_micros " +
-                "FROM ad_group WHERE ad_group.campaign ='" + campaignResName +
-                "' AND ad_group.status IN ('ENABLED', 'PAUSED')";
+                "FROM ad_group WHERE ad_group.campaign ='" + campaignResName + "'";
     }
 
     /**
@@ -234,8 +230,7 @@ public class GAQLHelper {
                 "ad_group_criterion.keyword.text, " +
                 "ad_group_criterion.cpc_bid_micros, " +
                 "ad_group_criterion.bid_modifier " +
-                "FROM ad_group_criterion WHERE ad_group_criterion.ad_group ='" + adGroupResName +
-                "' AND ad_group_criterion.status IN ('ENABLED', 'PAUSED')";
+                "FROM ad_group_criterion WHERE ad_group_criterion.ad_group ='" + adGroupResName + "'";
     }
 
     /**
@@ -291,8 +286,7 @@ public class GAQLHelper {
                 "ad_group_ad.ad.responsive_search_ad.path1, " +
                 "ad_group_ad.ad.responsive_search_ad.path2 " +
                 "FROM ad_group_ad WHERE " +
-                "ad_group_ad.status IN ('ENABLED', 'PAUSED') " +
-                "AND ad_group_ad.ad_group='" + adGroupResourceName + "'";
+                "ad_group_ad.ad_group='" + adGroupResourceName + "'";
     }
 
     /**
