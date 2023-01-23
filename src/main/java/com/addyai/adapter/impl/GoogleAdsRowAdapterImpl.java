@@ -21,6 +21,7 @@ import com.addyai.models.ads.ResponsiveSearchAdDetails;
 import com.addyai.models.assets.CallExtensionDetails;
 import com.addyai.models.assets.SitelinkDetails;
 import com.addyai.models.campaign_criterion.*;
+import com.addyai.models.metrics.CampaignMetrics;
 import com.google.ads.googleads.v12.common.AdScheduleInfo;
 import com.google.ads.googleads.v12.services.GoogleAdsRow;
 
@@ -307,5 +308,26 @@ public class GoogleAdsRowAdapterImpl implements GoogleAdsRowAdapter {
             responsiveSearchAdDetails.setFinalUrl(googleAdsRow.getAdGroupAd().getAd().getFinalUrls(0));
 
         return responsiveSearchAdDetails;
+    }
+
+    @Override
+    public CampaignMetrics getCampaignMetrics(GoogleAdsRow googleAdsRow) {
+        CampaignMetrics campaignMetrics = new CampaignMetrics();
+        campaignMetrics.setDate(googleAdsRow.getSegments().getDate());
+        campaignMetrics.setCampaignResourceId(googleAdsRow.getCampaign().getResourceName());
+        campaignMetrics.setClicks(googleAdsRow.getMetrics().getClicks());
+        campaignMetrics.setImpressions(googleAdsRow.getMetrics().getImpressions());
+        campaignMetrics.setCtr(googleAdsRow.getMetrics().getCtr());
+        campaignMetrics.setAverageCpc(googleAdsRow.getMetrics().getAverageCpc());
+        campaignMetrics.setConversions(googleAdsRow.getMetrics().getAllConversions());
+        campaignMetrics.setConversionValue(googleAdsRow.getMetrics().getAllConversionsValue());
+        campaignMetrics.setCostPerConversion(googleAdsRow.getMetrics().getCostPerAllConversions());
+        campaignMetrics.setInvalidClickRate(googleAdsRow.getMetrics().getInvalidClickRate());
+        campaignMetrics.setInvalidClicks(googleAdsRow.getMetrics().getInvalidClicks());
+        campaignMetrics.setPhoneImpressions(googleAdsRow.getMetrics().getPhoneImpressions());
+        campaignMetrics.setPhoneCalls(googleAdsRow.getMetrics().getPhoneCalls());
+        campaignMetrics.setPhoneThroughRate(googleAdsRow.getMetrics().getPhoneThroughRate());
+
+        return campaignMetrics;
     }
 }
