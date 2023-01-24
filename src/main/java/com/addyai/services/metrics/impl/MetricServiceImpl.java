@@ -17,14 +17,16 @@ public class MetricServiceImpl implements MetricService {
 
     @Override
     public List<CampaignMetrics> fetchCampaignMetricsByDate(String customerId,
-                                                            String campaignResourceName,
+                                                            String campaignId,
                                                             String startDate,
                                                             String endDate) throws Exception {
+        String campaignResourceName = "customers/" + customerId + "/campaigns/" + campaignId;
         return this.metricRepository.fetchCampaignMetricsByResourceName(customerId, campaignResourceName, startDate, endDate);
     }
 
     @Override
-    public List<CampaignMetrics> fetchAllCampaignMetrics(String customerId, String campaignResourceName) throws Exception {
+    public List<CampaignMetrics> fetchAllCampaignMetrics(String customerId, String campaignId) throws Exception {
+        String campaignResourceName = "customers/" + customerId + "/campaigns/" + campaignId;
         return metricRepository.fetchCampaignMetricsByResourceName(customerId,
                 campaignResourceName,
                 null,

@@ -2,7 +2,7 @@ package com.addyai.models.metrics;
 
 public class CampaignMetrics {
 
-    private String campaignResourceId;
+    private String campaignResourceName;
 
     private long clicks;
 
@@ -33,11 +33,11 @@ public class CampaignMetrics {
     private String date;
 
     public String getCampaignResourceId() {
-        return campaignResourceId;
+        return campaignResourceName;
     }
 
-    public void setCampaignResourceId(String campaignResourceId) {
-        this.campaignResourceId = campaignResourceId;
+    public void setCampaignResourceId(String campaignResourceName) {
+        this.campaignResourceName = campaignResourceName;
     }
 
     public long getClicks() {
