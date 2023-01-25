@@ -3,6 +3,7 @@ package com.addyai.repos.metrics.impl;
 import com.addyai.builder.GoogleAdsClientBuilder;
 import com.addyai.error_handling.ApiExceptionResolver;
 import com.addyai.models.metrics.CampaignMetrics;
+import com.addyai.models.metrics.Metrics;
 import com.addyai.repos.metrics.MetricRepository;
 import com.addyai.repos.request.StreamRequest;
 import com.addyai.repos.request.impl.StreamRequestImpl;
@@ -37,18 +38,46 @@ public class MetricRepositoryImpl implements MetricRepository {
                                                                     String campaignResourceName,
                                                                     @Nullable String startDate,
                                                                     @Nullable String endDate) throws Exception {
+        String query = MetricsHelper.getCampaignMetrics(customerId, campaignResourceName, startDate, endDate);
+
+        SearchGoogleAdsStreamRequest request = SearchGoogleAdsStreamRequest.newBuilder()
+                .setCustomerId(customerId)
+                .setQuery(query)
+                .build();
+
         try {
-            String query = MetricsHelper.getCampaignMetrics(customerId, campaignResourceName, startDate, endDate);
-
-            SearchGoogleAdsStreamRequest request = SearchGoogleAdsStreamRequest.newBuilder()
-                    .setCustomerId(customerId)
-                    .setQuery(query)
-                    .build();
-
             ServerStream<SearchGoogleAdsStreamResponse> stream =
                     googleAdsServiceClient.searchStreamCallable().call(request);
 
             return MetricsHelper.convertStreamToCampaignMetrics(stream);
+        } catch (Exception e) {
+            throw ApiExceptionResolver.doResolveException(e);
+        }
+    }
+
+    public List<Metrics> fetchMetricsForDateRange(String customerId,
+                                                  String resourceName,
+                                                  String type,
+                                                  String startDate,
+                                                  String endDate) throws Exception {
+        String query = "";
+        if (type.equals("CAMPAIGN")) {
+            query = MetricsHelper.getCampaignMetrics(customerId, resourceName, startDate, endDate);
+        }
+
+        SearchGoogleAdsStreamRequest request = SearchGoogleAdsStreamRequest.newBuilder()
+                .setCustomerId(customerId)
+                .setQuery(query)
+                .build();
+
+        try {
+            ServerStream<SearchGoogleAdsStreamResponse> stream =
+                    googleAdsServiceClient.searchStreamCallable().call(request);
+
+            if (type.equals("CAMPAIGN")) {
+                return MetricsHelper.convertStreamToCampaignMetrics(stream);
+            }
+            return null;
         } catch (Exception e) {
             throw ApiExceptionResolver.doResolveException(e);
         }

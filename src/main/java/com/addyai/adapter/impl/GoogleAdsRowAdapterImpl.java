@@ -315,9 +315,11 @@ public class GoogleAdsRowAdapterImpl implements GoogleAdsRowAdapter {
         CampaignMetrics campaignMetrics = new CampaignMetrics();
         campaignMetrics.setDate(googleAdsRow.getSegments().getDate());
         campaignMetrics.setCampaignResourceId(googleAdsRow.getCampaign().getResourceName());
+        campaignMetrics.setCampaignResourceName(googleAdsRow.getCampaign().getResourceName());
         campaignMetrics.setClicks(googleAdsRow.getMetrics().getClicks());
         campaignMetrics.setImpressions(googleAdsRow.getMetrics().getImpressions());
         campaignMetrics.setCtr(googleAdsRow.getMetrics().getCtr());
+        campaignMetrics.setCost((double) googleAdsRow.getMetrics().getCostMicros() / MICRO_FACTOR);
         campaignMetrics.setAverageCpc(googleAdsRow.getMetrics().getAverageCpc());
         campaignMetrics.setConversions(googleAdsRow.getMetrics().getAllConversions());
         campaignMetrics.setConversionValue(googleAdsRow.getMetrics().getAllConversionsValue());

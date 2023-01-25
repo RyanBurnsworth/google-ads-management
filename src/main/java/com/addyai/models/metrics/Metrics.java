@@ -1,45 +1,65 @@
 package com.addyai.models.metrics;
 
-public class CampaignMetrics {
-
-    private String campaignResourceName;
-
+public class Metrics {
+    private String type;
+    private String id;
+    private String parentId;
+    private String date;
+    private String resourceName;
     private long clicks;
-
     private long impressions;
-
     private double ctr;
-
+    private int qualityScore;
     private double averageCpc;
-
     private double cost;
-
     private double conversions;
-
     private double conversionRate;
-
     private double costPerConversion;
-
     private double conversionValue;
-
     private double invalidClickRate;
-
     private long invalidClicks;
-
     private long phoneCalls;
-
     private long phoneImpressions;
-
     private double phoneThroughRate;
 
-    private String date;
-
-    public String getCampaignResourceId() {
-        return campaignResourceName;
+    public String getType() {
+        return type;
     }
 
-    public void setCampaignResourceId(String campaignResourceName) {
-        this.campaignResourceName = campaignResourceName;
+    public void setType(String type) {
+        this.type = type;
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
+    }
+
+    public String getParentId() {
+        return parentId;
+    }
+
+    public void setParentId(String parentId) {
+        this.parentId = parentId;
+    }
+
+    public String getDate() {
+        return date;
+    }
+
+    public void setDate(String date) {
+        this.date = date;
+    }
+
+    public String getResourceName() {
+        return resourceName;
+    }
+
+    public void setResourceName(String resourceName) {
+        this.resourceName = resourceName;
     }
 
     public long getClicks() {
@@ -66,20 +86,20 @@ public class CampaignMetrics {
         this.ctr = ctr;
     }
 
+    public int getQualityScore() {
+        return qualityScore;
+    }
+
+    public void setQualityScore(int qualityScore) {
+        this.qualityScore = qualityScore;
+    }
+
     public double getAverageCpc() {
         return averageCpc;
     }
 
     public void setAverageCpc(double averageCpc) {
         this.averageCpc = averageCpc;
-    }
-
-    public String getCampaignResourceName() {
-        return campaignResourceName;
-    }
-
-    public void setCampaignResourceName(String campaignResourceName) {
-        this.campaignResourceName = campaignResourceName;
     }
 
     public double getCost() {
@@ -160,13 +180,5 @@ public class CampaignMetrics {
 
     public void setPhoneThroughRate(double phoneThroughRate) {
         this.phoneThroughRate = phoneThroughRate;
-    }
-
-    public String getDate() {
-        return date;
-    }
-
-    public void setDate(String date) {
-        this.date = date;
     }
 }
