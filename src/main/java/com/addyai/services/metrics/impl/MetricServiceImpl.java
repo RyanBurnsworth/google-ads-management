@@ -28,14 +28,36 @@ public class MetricServiceImpl implements MetricService {
 
     @Override
     public List<Metrics> fetchAdGroupMetricsByDate(String customerId,
-                                                   String campaignId,
                                                    String adGroupId,
                                                    String startDate,
                                                    String endDate) throws Exception {
         String adGroupResourceName = "customers/" + customerId + "/adGroups/" + adGroupId;
-        String campaignResourceName = "customers/" + customerId + "/campaigns/" + campaignId;
 
-        return this.metricRepository.fetchMetricsByResourceName(customerId, adGroupResourceName, campaignResourceName,
+        return this.metricRepository.fetchMetricsByResourceName(customerId, adGroupResourceName, null,
                 startDate, endDate, MetricType.ADGROUP);
+    }
+
+    @Override
+    public List<Metrics> fetchAdMetricsByDate(String customerId,
+                                              String adId,
+                                              String startDate,
+                                              String endDate) throws Exception {
+        String adResourceName = "customers/" + customerId + "/ads/" + adId;
+
+        return this.metricRepository.fetchMetricsByResourceName(customerId, adResourceName, null,
+                startDate, endDate, MetricType.AD);
+    }
+
+    @Override
+    public List<Metrics> fetchKeywordsByDate(String customerId,
+                                             String adGroupId,
+                                             String keywordId,
+                                             String startDate,
+                                             String endDate) throws Exception {
+        String adGroupResourceName = "customers/" + customerId + "/adGroups/" + adGroupId;
+        String keywordResourceName = "customers/" + customerId + "/keywordViews/" + adGroupId + "~" + keywordId;
+
+        return this.metricRepository.fetchMetricsByResourceName(customerId, keywordResourceName, adGroupResourceName,
+                startDate, endDate, MetricType.KEYWORD);
     }
 }

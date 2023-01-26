@@ -47,6 +47,8 @@ public class MetricRepositoryImpl implements MetricRepository {
             query = MetricsHelper.getAdGroupMetrics(customerId, resourceName, parentResourceName, startDate, endDate);
         } else if (metricType == MetricType.KEYWORD) {
             query = MetricsHelper.getKeywordMetrics(customerId, resourceName, startDate, endDate);
+        } else if (metricType == MetricType.AD) {
+            query = MetricsHelper.getAdMetrics(customerId, resourceName, parentResourceName, startDate, endDate);
         }
 
         SearchGoogleAdsStreamRequest request = SearchGoogleAdsStreamRequest.newBuilder()
@@ -64,6 +66,8 @@ public class MetricRepositoryImpl implements MetricRepository {
                 return MetricsHelper.convertStreamToAdGroupMetrics(stream);
             } else if (metricType == MetricType.KEYWORD) {
                 return MetricsHelper.convertStreamToKeywordMetrics(stream);
+            } else if (metricType == MetricType.AD) {
+                return MetricsHelper.convertStreamToAdMetrics(stream);
             }
 
             return new ArrayList<>();

@@ -83,8 +83,7 @@ public class MetricsHelper {
                 " WHERE" +
                 " segments.date > '" + startDate + "'" +
                 " AND segments.date < '" + endDate + "'" +
-                " AND ad_group.resource_name = '" + adGroupResourceName + "'" +
-                " AND ad_group.campaign = '" + campaignResourceName + "'";
+                " AND ad_group.resource_name = '" + adGroupResourceName + "'";
     }
 
     public static List<Metrics> convertStreamToAdGroupMetrics(ServerStream<SearchGoogleAdsStreamResponse> streamResponses) {
@@ -98,6 +97,49 @@ public class MetricsHelper {
             }
         }
         return adGroupMetricList;
+    }
+
+    public static String getAdMetrics(String customerId,
+                                      String adResourceName,
+                                      String adGroupResourceName,
+                                      String startDate,
+                                      String endDate) {
+        if (customerId.isEmpty() || adResourceName.isEmpty() || adGroupResourceName.isEmpty() || startDate.isEmpty() || endDate.isEmpty())
+            return "";
+
+        return "SELECT " +
+                " ad_group_ad.ad.id," +
+                " ad_group_ad.ad.resource_name," +
+                " ad_group_ad.ad.type," +
+                " ad_group_ad.ad_group," +
+                " segments.date," +
+                " metrics.clicks," +
+                " metrics.impressions," +
+                " metrics.ctr," +
+                " metrics.average_cpc," +
+                " metrics.cost_micros," +
+                " metrics.conversions," +
+                " metrics.cost_per_conversion," +
+                " metrics.conversions_value" +
+                " FROM ad_group_ad" +
+                " WHERE" +
+                " segments.date >= '" + startDate + "'" +
+                " AND segments.date <= '" + endDate + "'" +
+                " AND ad_group_ad.ad.resource_name = '" + adResourceName + "'" +
+                " AND ad_group_ad.ad_group = '" + adGroupResourceName + "'";
+    }
+
+    public static List<Metrics> convertStreamToAdMetrics(ServerStream<SearchGoogleAdsStreamResponse> streamResponses) {
+        GoogleAdsRowAdapterImpl googleAdsRowAdapter = new GoogleAdsRowAdapterImpl();
+        List<Metrics> adMetricsList = new ArrayList<>();
+
+        for (SearchGoogleAdsStreamResponse response : streamResponses) {
+            for (GoogleAdsRow googleAdsRow : response.getResultsList()) {
+                Metrics adMetrics = googleAdsRowAdapter.getAdMetrics(googleAdsRow);
+                adMetricsList.add(adMetrics);
+            }
+        }
+        return adMetricsList;
     }
 
     public static String getKeywordMetrics(String customerId,
@@ -119,11 +161,10 @@ public class MetricsHelper {
                 " metrics.average_cpc," +
                 " metrics.cost_micros," +
                 " metrics.conversions," +
-                " metrics.conversion_rate," +
                 " metrics.cost_per_conversion," +
-                " metrics.conversions_value," +
-                "FROM keyword_view" +
-                "WHERE" +
+                " metrics.conversions_value" +
+                " FROM keyword_view" +
+                " WHERE" +
                 " segments.date > '" + startDate + "'" +
                 " AND segments.date < '" + endDate + "'" +
                 " AND keyword_view.resource_name = '" + keywordResourceName + "'";

@@ -9,8 +9,14 @@ public interface MetricsController {
     ResponseEntity<List<Metrics>> getCampaignMetricsByDateRange(String customerId, String campaignId,
                                                                 String startDate, String endDate) throws Exception;
 
-    ResponseEntity<List<Metrics>> getAdGroupMetricsByDateRange(String customerId, String campaignId,
-                                                               String adGroupId, String startDate, String endDate) throws Exception;
+    ResponseEntity<List<Metrics>> getAdGroupMetricsByDateRange(String customerId, String adGroupId, String startDate,
+                                                               String endDate) throws Exception;
+
+    ResponseEntity<List<Metrics>> getAdMetricsByDateRange(String customerId, String adId, String startDate,
+                                                          String endDate) throws Exception;
+
+    ResponseEntity<List<Metrics>> getKeywordMetricsByDateRange(String customerId, String keywordId, String adGroupId,
+                                                               String startDate, String endDate) throws Exception;
 
     ResponseEntity<Object> getDummyCampaignMetrics(String customerId, String campaignResourceName);
 

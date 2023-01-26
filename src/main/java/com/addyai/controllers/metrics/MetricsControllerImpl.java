@@ -37,17 +37,37 @@ public class MetricsControllerImpl implements MetricsController {
     @Override
     @GetMapping("/adgroup/metrics")
     public ResponseEntity<List<Metrics>> getAdGroupMetricsByDateRange(@PathVariable String customerId,
-                                                                      @RequestParam String campaignId,
                                                                       @RequestParam String adGroupId,
                                                                       @RequestParam String startDate,
                                                                       @RequestParam String endDate) throws Exception {
         List<Metrics> adGroupMetrics = metricService.fetchAdGroupMetricsByDate(customerId,
-                campaignId,
                 adGroupId,
                 startDate,
                 endDate);
 
         return new ResponseEntity<>(adGroupMetrics, HttpStatus.OK);
+    }
+
+    @Override
+    @GetMapping("/ad/metrics")
+    public ResponseEntity<List<Metrics>> getAdMetricsByDateRange(@PathVariable String customerId,
+                                                                 @RequestParam String adId,
+                                                                 @RequestParam String startDate,
+                                                                 @RequestParam String endDate) throws Exception {
+        List<Metrics> adMetrics = metricService.fetchAdMetricsByDate(customerId, adId, startDate, endDate);
+        return new ResponseEntity<>(adMetrics, HttpStatus.OK);
+    }
+
+    @Override
+    @GetMapping("/keyword/metrics")
+    public ResponseEntity<List<Metrics>> getKeywordMetricsByDateRange(@PathVariable String customerId,
+                                                                      @RequestParam String keywordId,
+                                                                      @RequestParam String adGroupId,
+                                                                      @RequestParam String startDate,
+                                                                      @RequestParam String endDate) throws Exception {
+        List<Metrics> keywordMetrics = metricService.fetchKeywordsByDate(customerId,
+                adGroupId, keywordId, startDate, endDate);
+        return new ResponseEntity<>(keywordMetrics, HttpStatus.OK);
     }
 
     @Override
