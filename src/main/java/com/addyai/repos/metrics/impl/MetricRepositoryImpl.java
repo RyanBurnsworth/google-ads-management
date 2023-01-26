@@ -1,8 +1,8 @@
 package com.addyai.repos.metrics.impl;
 
 import com.addyai.builder.GoogleAdsClientBuilder;
+import com.addyai.enums.MetricType;
 import com.addyai.error_handling.ApiExceptionResolver;
-import com.addyai.models.metrics.CampaignMetrics;
 import com.addyai.models.metrics.Metrics;
 import com.addyai.repos.metrics.MetricRepository;
 import com.addyai.repos.request.StreamRequest;
@@ -14,7 +14,7 @@ import com.google.ads.googleads.v12.services.SearchGoogleAdsStreamResponse;
 import com.google.api.gax.rpc.ServerStream;
 import org.springframework.stereotype.Repository;
 
-import javax.annotation.Nullable;
+import java.util.ArrayList;
 import java.util.List;
 
 @Repository
@@ -34,35 +34,19 @@ public class MetricRepositoryImpl implements MetricRepository {
     }
 
     @Override
-    public List<CampaignMetrics> fetchCampaignMetricsByResourceName(String customerId,
-                                                                    String campaignResourceName,
-                                                                    @Nullable String startDate,
-                                                                    @Nullable String endDate) throws Exception {
-        String query = MetricsHelper.getCampaignMetrics(customerId, campaignResourceName, startDate, endDate);
-
-        SearchGoogleAdsStreamRequest request = SearchGoogleAdsStreamRequest.newBuilder()
-                .setCustomerId(customerId)
-                .setQuery(query)
-                .build();
-
-        try {
-            ServerStream<SearchGoogleAdsStreamResponse> stream =
-                    googleAdsServiceClient.searchStreamCallable().call(request);
-
-            return MetricsHelper.convertStreamToCampaignMetrics(stream);
-        } catch (Exception e) {
-            throw ApiExceptionResolver.doResolveException(e);
-        }
-    }
-
-    public List<Metrics> fetchMetricsForDateRange(String customerId,
-                                                  String resourceName,
-                                                  String type,
-                                                  String startDate,
-                                                  String endDate) throws Exception {
+    public List<Metrics> fetchMetricsByResourceName(String customerId,
+                                                    String resourceName,
+                                                    String parentResourceName,
+                                                    String startDate,
+                                                    String endDate,
+                                                    MetricType metricType) throws Exception {
         String query = "";
-        if (type.equals("CAMPAIGN")) {
+        if (metricType == MetricType.CAMPAIGN) {
             query = MetricsHelper.getCampaignMetrics(customerId, resourceName, startDate, endDate);
+        } else if (metricType == MetricType.ADGROUP) {
+            query = MetricsHelper.getAdGroupMetrics(customerId, resourceName, parentResourceName, startDate, endDate);
+        } else if (metricType == MetricType.KEYWORD) {
+            query = MetricsHelper.getKeywordMetrics(customerId, resourceName, startDate, endDate);
         }
 
         SearchGoogleAdsStreamRequest request = SearchGoogleAdsStreamRequest.newBuilder()
@@ -74,10 +58,15 @@ public class MetricRepositoryImpl implements MetricRepository {
             ServerStream<SearchGoogleAdsStreamResponse> stream =
                     googleAdsServiceClient.searchStreamCallable().call(request);
 
-            if (type.equals("CAMPAIGN")) {
+            if (metricType == MetricType.CAMPAIGN) {
                 return MetricsHelper.convertStreamToCampaignMetrics(stream);
+            } else if (metricType == MetricType.ADGROUP) {
+                return MetricsHelper.convertStreamToAdGroupMetrics(stream);
+            } else if (metricType == MetricType.KEYWORD) {
+                return MetricsHelper.convertStreamToKeywordMetrics(stream);
             }
-            return null;
+
+            return new ArrayList<>();
         } catch (Exception e) {
             throw ApiExceptionResolver.doResolveException(e);
         }

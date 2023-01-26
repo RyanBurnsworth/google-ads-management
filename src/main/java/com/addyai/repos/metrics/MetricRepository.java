@@ -1,13 +1,15 @@
 package com.addyai.repos.metrics;
 
-import com.addyai.models.metrics.CampaignMetrics;
+import com.addyai.enums.MetricType;
+import com.addyai.models.metrics.Metrics;
 
-import javax.annotation.Nullable;
 import java.util.List;
 
 public interface MetricRepository {
-    List<CampaignMetrics> fetchCampaignMetricsByResourceName(String customerId,
-                                                             String campaignResourceName,
-                                                             @Nullable String startDate,
-                                                             @Nullable String endDate) throws Exception;
+    List<Metrics> fetchMetricsByResourceName(String customerId,
+                                             String resourceName,
+                                             String parentResourceName,
+                                             String startDate,
+                                             String endDate,
+                                             MetricType metricType) throws Exception;
 }

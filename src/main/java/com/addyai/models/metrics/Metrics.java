@@ -1,7 +1,9 @@
 package com.addyai.models.metrics;
 
+import com.addyai.enums.MetricType;
+
 public class Metrics {
-    private String type;
+    private MetricType type;
     private String id;
     private String parentId;
     private String date;
@@ -22,11 +24,11 @@ public class Metrics {
     private long phoneImpressions;
     private double phoneThroughRate;
 
-    public String getType() {
+    public MetricType getType() {
         return type;
     }
 
-    public void setType(String type) {
+    public void setType(MetricType type) {
         this.type = type;
     }
 

@@ -1,6 +1,6 @@
 package com.addyai.controllers.metrics;
 
-import com.addyai.models.metrics.CampaignMetrics;
+import com.addyai.models.metrics.Metrics;
 import com.addyai.services.metrics.MetricService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.core.io.ClassPathResource;
@@ -22,11 +22,11 @@ public class MetricsControllerImpl implements MetricsController {
 
     @Override
     @GetMapping("/campaign/metrics")
-    public ResponseEntity<List<CampaignMetrics>> getCampaignMetricsByDateRange(@PathVariable String customerId,
-                                                                               @RequestParam String campaignId,
-                                                                               @RequestParam String startDate,
-                                                                               @RequestParam String endDate) throws Exception {
-        List<CampaignMetrics> campaignMetrics = metricService.fetchCampaignMetricsByDate(
+    public ResponseEntity<List<Metrics>> getCampaignMetricsByDateRange(@PathVariable String customerId,
+                                                                       @RequestParam String campaignId,
+                                                                       @RequestParam String startDate,
+                                                                       @RequestParam String endDate) throws Exception {
+        List<Metrics> campaignMetrics = metricService.fetchCampaignMetricsByDate(
                 customerId,
                 campaignId,
                 startDate,
@@ -35,14 +35,45 @@ public class MetricsControllerImpl implements MetricsController {
     }
 
     @Override
+    @GetMapping("/adgroup/metrics")
+    public ResponseEntity<List<Metrics>> getAdGroupMetricsByDateRange(@PathVariable String customerId,
+                                                                      @RequestParam String campaignId,
+                                                                      @RequestParam String adGroupId,
+                                                                      @RequestParam String startDate,
+                                                                      @RequestParam String endDate) throws Exception {
+        List<Metrics> adGroupMetrics = metricService.fetchAdGroupMetricsByDate(customerId,
+                campaignId,
+                adGroupId,
+                startDate,
+                endDate);
+
+        return new ResponseEntity<>(adGroupMetrics, HttpStatus.OK);
+    }
+
+    @Override
     @GetMapping("/campaign/metrics/dummy")
-    public ResponseEntity<Object> getDummyCampaignMetrics(String customerId, String campaignResourceName) throws Exception {
-        Object obj = getDummyJsonObject();
+    public ResponseEntity<Object> getDummyCampaignMetrics(@PathVariable String customerId,
+                                                          @RequestParam String campaignResourceName) {
+        Object obj = getDummyJsonObject(1);
         return new ResponseEntity<>(obj, HttpStatus.OK);
     }
 
-    private Object getDummyJsonObject() {
-        ClassPathResource resource = new ClassPathResource("dummy-campaign-metrics.json");
+    @Override
+    @GetMapping("/adgroup/metrics/dummy")
+    public ResponseEntity<Object> getDummyAdGroupMetrics(@PathVariable String customerId,
+                                                         @RequestParam String campaignId,
+                                                         @RequestParam String adGroupId) {
+        Object obj = getDummyJsonObject(2);
+        return new ResponseEntity<>(obj, HttpStatus.OK);
+    }
+
+    private Object getDummyJsonObject(int type) {
+        ClassPathResource resource;
+        if (type == 1)
+            resource = new ClassPathResource("dummy-campaign-metrics.json");
+        else
+            resource = new ClassPathResource("dummy-adgroup-metrics.json");
+
         try {
             ObjectMapper mapper = new ObjectMapper();
             return mapper.readValue(resource.getInputStream(), Object.class);

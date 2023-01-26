@@ -16,12 +16,13 @@
 package com.addyai.adapter.impl;
 
 import com.addyai.adapter.GoogleAdsRowAdapter;
+import com.addyai.enums.MetricType;
 import com.addyai.models.*;
 import com.addyai.models.ads.ResponsiveSearchAdDetails;
 import com.addyai.models.assets.CallExtensionDetails;
 import com.addyai.models.assets.SitelinkDetails;
 import com.addyai.models.campaign_criterion.*;
-import com.addyai.models.metrics.CampaignMetrics;
+import com.addyai.models.metrics.Metrics;
 import com.google.ads.googleads.v12.common.AdScheduleInfo;
 import com.google.ads.googleads.v12.services.GoogleAdsRow;
 
@@ -310,20 +311,27 @@ public class GoogleAdsRowAdapterImpl implements GoogleAdsRowAdapter {
         return responsiveSearchAdDetails;
     }
 
+    /*
+        End of Details Adaptions
+
+        Start Metrics Adaptions
+     */
     @Override
-    public CampaignMetrics getCampaignMetrics(GoogleAdsRow googleAdsRow) {
-        CampaignMetrics campaignMetrics = new CampaignMetrics();
+    public Metrics getCampaignMetrics(GoogleAdsRow googleAdsRow) {
+        Metrics campaignMetrics = new Metrics();
+        campaignMetrics.setType(MetricType.CAMPAIGN);
+        campaignMetrics.setId(String.valueOf(googleAdsRow.getCampaign().getId()));
+        campaignMetrics.setResourceName(googleAdsRow.getCampaign().getResourceName());
+
         campaignMetrics.setDate(googleAdsRow.getSegments().getDate());
-        campaignMetrics.setCampaignResourceId(googleAdsRow.getCampaign().getResourceName());
-        campaignMetrics.setCampaignResourceName(googleAdsRow.getCampaign().getResourceName());
         campaignMetrics.setClicks(googleAdsRow.getMetrics().getClicks());
         campaignMetrics.setImpressions(googleAdsRow.getMetrics().getImpressions());
         campaignMetrics.setCtr(googleAdsRow.getMetrics().getCtr());
         campaignMetrics.setCost((double) googleAdsRow.getMetrics().getCostMicros() / MICRO_FACTOR);
         campaignMetrics.setAverageCpc(googleAdsRow.getMetrics().getAverageCpc());
-        campaignMetrics.setConversions(googleAdsRow.getMetrics().getAllConversions());
-        campaignMetrics.setConversionValue(googleAdsRow.getMetrics().getAllConversionsValue());
-        campaignMetrics.setCostPerConversion(googleAdsRow.getMetrics().getCostPerAllConversions());
+        campaignMetrics.setConversions(googleAdsRow.getMetrics().getConversions());
+        campaignMetrics.setConversionValue(googleAdsRow.getMetrics().getConversionsValue());
+        campaignMetrics.setCostPerConversion(googleAdsRow.getMetrics().getCostPerConversion());
         campaignMetrics.setInvalidClickRate(googleAdsRow.getMetrics().getInvalidClickRate());
         campaignMetrics.setInvalidClicks(googleAdsRow.getMetrics().getInvalidClicks());
         campaignMetrics.setPhoneImpressions(googleAdsRow.getMetrics().getPhoneImpressions());
@@ -331,5 +339,72 @@ public class GoogleAdsRowAdapterImpl implements GoogleAdsRowAdapter {
         campaignMetrics.setPhoneThroughRate(googleAdsRow.getMetrics().getPhoneThroughRate());
 
         return campaignMetrics;
+    }
+
+    @Override
+    public Metrics getAdGroupMetrics(GoogleAdsRow googleAdsRow) {
+        Metrics adGroupMetrics = new Metrics();
+        adGroupMetrics.setType(MetricType.ADGROUP);
+        adGroupMetrics.setId(String.valueOf(googleAdsRow.getAdGroup().getId()));
+        adGroupMetrics.setParentId(googleAdsRow.getAdGroup().getCampaign());
+        adGroupMetrics.setResourceName(googleAdsRow.getAdGroup().getResourceName());
+
+        adGroupMetrics.setDate(googleAdsRow.getSegments().getDate());
+        adGroupMetrics.setClicks(googleAdsRow.getMetrics().getClicks());
+        adGroupMetrics.setImpressions(googleAdsRow.getMetrics().getImpressions());
+        adGroupMetrics.setCtr(googleAdsRow.getMetrics().getCtr());
+        adGroupMetrics.setCost((double) googleAdsRow.getMetrics().getCostMicros() / MICRO_FACTOR);
+        adGroupMetrics.setAverageCpc(googleAdsRow.getMetrics().getAverageCpc());
+        adGroupMetrics.setConversions(googleAdsRow.getMetrics().getConversions());
+        adGroupMetrics.setConversionValue(googleAdsRow.getMetrics().getConversionsValue());
+        adGroupMetrics.setCostPerConversion(googleAdsRow.getMetrics().getCostPerConversion());
+        adGroupMetrics.setPhoneImpressions(googleAdsRow.getMetrics().getPhoneImpressions());
+        adGroupMetrics.setPhoneCalls(googleAdsRow.getMetrics().getPhoneCalls());
+        adGroupMetrics.setPhoneThroughRate(googleAdsRow.getMetrics().getPhoneThroughRate());
+
+        return adGroupMetrics;
+    }
+
+    @Override
+    public Metrics getAdMetrics(GoogleAdsRow googleAdsRow) {
+        Metrics adMetrics = new Metrics();
+        adMetrics.setType(MetricType.AD);
+        adMetrics.setId(String.valueOf(googleAdsRow.getAdGroupAd().getAd().getId()));
+        adMetrics.setParentId(googleAdsRow.getAdGroupAd().getAdGroup());
+        adMetrics.setResourceName(googleAdsRow.getAdGroupAd().getAd().getResourceName());
+
+        adMetrics.setDate(googleAdsRow.getSegments().getDate());
+        adMetrics.setClicks(googleAdsRow.getMetrics().getClicks());
+        adMetrics.setImpressions(googleAdsRow.getMetrics().getImpressions());
+        adMetrics.setCtr(googleAdsRow.getMetrics().getCtr());
+        adMetrics.setCost((double) googleAdsRow.getMetrics().getCostMicros() / MICRO_FACTOR);
+        adMetrics.setAverageCpc(googleAdsRow.getMetrics().getAverageCpc());
+        adMetrics.setConversions(googleAdsRow.getMetrics().getConversions());
+        adMetrics.setConversionValue(googleAdsRow.getMetrics().getConversionsValue());
+        adMetrics.setCostPerConversion(googleAdsRow.getMetrics().getCostPerConversion());
+
+        return adMetrics;
+    }
+
+    @Override
+    public Metrics getKeywordMetrics(GoogleAdsRow googleAdsRow) {
+        Metrics keywordMetrics = new Metrics();
+        keywordMetrics.setType(MetricType.KEYWORD);
+        keywordMetrics.setId(String.valueOf(googleAdsRow.getAdGroupCriterion().getCriterionId()));
+        keywordMetrics.setParentId(googleAdsRow.getAdGroupCriterion().getAdGroup());
+        keywordMetrics.setResourceName(googleAdsRow.getAdGroupCriterion().getResourceName());
+
+        keywordMetrics.setDate(googleAdsRow.getSegments().getDate());
+        keywordMetrics.setClicks(googleAdsRow.getMetrics().getClicks());
+        keywordMetrics.setImpressions(googleAdsRow.getMetrics().getImpressions());
+        keywordMetrics.setCtr(googleAdsRow.getMetrics().getCtr());
+        keywordMetrics.setCost((double) googleAdsRow.getMetrics().getCostMicros() / MICRO_FACTOR);
+        keywordMetrics.setAverageCpc(googleAdsRow.getMetrics().getAverageCpc());
+        keywordMetrics.setConversions(googleAdsRow.getMetrics().getConversions());
+        keywordMetrics.setConversionValue(googleAdsRow.getMetrics().getConversionsValue());
+        keywordMetrics.setCostPerConversion(googleAdsRow.getMetrics().getCostPerConversion());
+        keywordMetrics.setQualityScore(googleAdsRow.getAdGroupCriterion().getQualityInfo().getQualityScore());
+
+        return keywordMetrics;
     }
 }
