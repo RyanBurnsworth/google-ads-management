@@ -23,6 +23,7 @@ import com.addyai.models.assets.CallExtensionDetails;
 import com.addyai.models.assets.SitelinkDetails;
 import com.addyai.models.campaign_criterion.*;
 import com.addyai.models.metrics.Metrics;
+import com.addyai.utils.helpers.DateTimeHelper;
 import com.google.ads.googleads.v12.common.AdScheduleInfo;
 import com.google.ads.googleads.v12.services.GoogleAdsRow;
 
@@ -320,7 +321,7 @@ public class GoogleAdsRowAdapterImpl implements GoogleAdsRowAdapter {
     public Metrics getCampaignMetrics(GoogleAdsRow googleAdsRow) {
         Metrics campaignMetrics = new Metrics();
         campaignMetrics.setType(MetricType.CAMPAIGN);
-        campaignMetrics.setId(String.valueOf(googleAdsRow.getCampaign().getId()));
+        campaignMetrics.setResourceId(String.valueOf(googleAdsRow.getCampaign().getId()));
         campaignMetrics.setResourceName(googleAdsRow.getCampaign().getResourceName());
 
         campaignMetrics.setDate(googleAdsRow.getSegments().getDate());
@@ -337,7 +338,7 @@ public class GoogleAdsRowAdapterImpl implements GoogleAdsRowAdapter {
         campaignMetrics.setPhoneImpressions(googleAdsRow.getMetrics().getPhoneImpressions());
         campaignMetrics.setPhoneCalls(googleAdsRow.getMetrics().getPhoneCalls());
         campaignMetrics.setPhoneThroughRate(googleAdsRow.getMetrics().getPhoneThroughRate());
-
+        campaignMetrics.setLastUpdated(DateTimeHelper.getCurrentTimestamp().toString());
         return campaignMetrics;
     }
 
@@ -345,7 +346,7 @@ public class GoogleAdsRowAdapterImpl implements GoogleAdsRowAdapter {
     public Metrics getAdGroupMetrics(GoogleAdsRow googleAdsRow) {
         Metrics adGroupMetrics = new Metrics();
         adGroupMetrics.setType(MetricType.ADGROUP);
-        adGroupMetrics.setId(String.valueOf(googleAdsRow.getAdGroup().getId()));
+        adGroupMetrics.setResourceId(String.valueOf(googleAdsRow.getAdGroup().getId()));
         adGroupMetrics.setParentId(googleAdsRow.getAdGroup().getCampaign());
         adGroupMetrics.setResourceName(googleAdsRow.getAdGroup().getResourceName());
 
@@ -361,7 +362,7 @@ public class GoogleAdsRowAdapterImpl implements GoogleAdsRowAdapter {
         adGroupMetrics.setPhoneImpressions(googleAdsRow.getMetrics().getPhoneImpressions());
         adGroupMetrics.setPhoneCalls(googleAdsRow.getMetrics().getPhoneCalls());
         adGroupMetrics.setPhoneThroughRate(googleAdsRow.getMetrics().getPhoneThroughRate());
-
+        adGroupMetrics.setLastUpdated(DateTimeHelper.getCurrentTimestamp().toString());
         return adGroupMetrics;
     }
 
@@ -369,7 +370,7 @@ public class GoogleAdsRowAdapterImpl implements GoogleAdsRowAdapter {
     public Metrics getAdMetrics(GoogleAdsRow googleAdsRow) {
         Metrics adMetrics = new Metrics();
         adMetrics.setType(MetricType.AD);
-        adMetrics.setId(String.valueOf(googleAdsRow.getAdGroupAd().getAd().getId()));
+        adMetrics.setResourceId(String.valueOf(googleAdsRow.getAdGroupAd().getAd().getId()));
         adMetrics.setParentId(googleAdsRow.getAdGroupAd().getAdGroup());
         adMetrics.setResourceName(googleAdsRow.getAdGroupAd().getAd().getResourceName());
 
@@ -382,6 +383,7 @@ public class GoogleAdsRowAdapterImpl implements GoogleAdsRowAdapter {
         adMetrics.setConversions(googleAdsRow.getMetrics().getConversions());
         adMetrics.setConversionValue(googleAdsRow.getMetrics().getConversionsValue());
         adMetrics.setCostPerConversion(googleAdsRow.getMetrics().getCostPerConversion());
+        adMetrics.setLastUpdated(DateTimeHelper.getCurrentTimestamp().toString());
 
         return adMetrics;
     }
@@ -390,7 +392,7 @@ public class GoogleAdsRowAdapterImpl implements GoogleAdsRowAdapter {
     public Metrics getKeywordMetrics(GoogleAdsRow googleAdsRow) {
         Metrics keywordMetrics = new Metrics();
         keywordMetrics.setType(MetricType.KEYWORD);
-        keywordMetrics.setId(String.valueOf(googleAdsRow.getAdGroupCriterion().getCriterionId()));
+        keywordMetrics.setResourceId(String.valueOf(googleAdsRow.getAdGroupCriterion().getCriterionId()));
         keywordMetrics.setParentId(googleAdsRow.getAdGroupCriterion().getAdGroup());
         keywordMetrics.setResourceName(googleAdsRow.getAdGroupCriterion().getResourceName());
 
@@ -404,6 +406,7 @@ public class GoogleAdsRowAdapterImpl implements GoogleAdsRowAdapter {
         keywordMetrics.setConversionValue(googleAdsRow.getMetrics().getConversionsValue());
         keywordMetrics.setCostPerConversion(googleAdsRow.getMetrics().getCostPerConversion());
         keywordMetrics.setQualityScore(googleAdsRow.getAdGroupCriterion().getQualityInfo().getQualityScore());
+        keywordMetrics.setLastUpdated(DateTimeHelper.getCurrentTimestamp().toString());
 
         return keywordMetrics;
     }

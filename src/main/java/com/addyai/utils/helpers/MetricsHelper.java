@@ -10,12 +10,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class MetricsHelper {
-    public static String getCampaignMetrics(String customerId,
-                                            String campaignResourceName,
+    public static String getCampaignMetrics(String campaignResourceName,
                                             String startDate,
                                             String endDate) {
 
-        if (customerId.isEmpty() || campaignResourceName.isEmpty() || startDate.isEmpty() || endDate.isEmpty())
+        if (campaignResourceName.isEmpty() || startDate.isEmpty() || endDate.isEmpty())
             return "";
 
         return "SELECT" +
@@ -55,12 +54,10 @@ public class MetricsHelper {
         return campaignMetricsList;
     }
 
-    public static String getAdGroupMetrics(String customerId,
-                                           String adGroupResourceName,
-                                           String campaignResourceName,
+    public static String getAdGroupMetrics(String adGroupResourceName,
                                            String startDate,
                                            String endDate) {
-        if (customerId.isEmpty() || adGroupResourceName.isEmpty() || startDate.isEmpty() || endDate.isEmpty())
+        if (adGroupResourceName.isEmpty() || startDate.isEmpty() || endDate.isEmpty())
             return "";
 
         return "SELECT" +
@@ -99,12 +96,10 @@ public class MetricsHelper {
         return adGroupMetricList;
     }
 
-    public static String getAdMetrics(String customerId,
-                                      String adResourceName,
-                                      String adGroupResourceName,
+    public static String getAdMetrics(String adResourceName,
                                       String startDate,
                                       String endDate) {
-        if (customerId.isEmpty() || adResourceName.isEmpty() || adGroupResourceName.isEmpty() || startDate.isEmpty() || endDate.isEmpty())
+        if (adResourceName.isEmpty() || startDate.isEmpty() || endDate.isEmpty())
             return "";
 
         return "SELECT " +
@@ -125,8 +120,7 @@ public class MetricsHelper {
                 " WHERE" +
                 " segments.date >= '" + startDate + "'" +
                 " AND segments.date <= '" + endDate + "'" +
-                " AND ad_group_ad.ad.resource_name = '" + adResourceName + "'" +
-                " AND ad_group_ad.ad_group = '" + adGroupResourceName + "'";
+                " AND ad_group_ad.ad.resource_name = '" + adResourceName + "'";
     }
 
     public static List<Metrics> convertStreamToAdMetrics(ServerStream<SearchGoogleAdsStreamResponse> streamResponses) {
@@ -142,11 +136,10 @@ public class MetricsHelper {
         return adMetricsList;
     }
 
-    public static String getKeywordMetrics(String customerId,
-                                           String keywordResourceName,
+    public static String getKeywordMetrics(String keywordResourceName,
                                            String startDate,
                                            String endDate) {
-        if (customerId.isEmpty() || keywordResourceName.isEmpty() || startDate.isEmpty() || endDate.isEmpty())
+        if (keywordResourceName.isEmpty() || startDate.isEmpty() || endDate.isEmpty())
             return "";
 
         return "SELECT" +

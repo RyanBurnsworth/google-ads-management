@@ -42,13 +42,13 @@ public class MetricRepositoryImpl implements MetricRepository {
                                                     MetricType metricType) throws Exception {
         String query = "";
         if (metricType == MetricType.CAMPAIGN) {
-            query = MetricsHelper.getCampaignMetrics(customerId, resourceName, startDate, endDate);
+            query = MetricsHelper.getCampaignMetrics(resourceName, startDate, endDate);
         } else if (metricType == MetricType.ADGROUP) {
-            query = MetricsHelper.getAdGroupMetrics(customerId, resourceName, parentResourceName, startDate, endDate);
+            query = MetricsHelper.getAdGroupMetrics(resourceName, startDate, endDate);
         } else if (metricType == MetricType.KEYWORD) {
-            query = MetricsHelper.getKeywordMetrics(customerId, resourceName, startDate, endDate);
+            query = MetricsHelper.getKeywordMetrics(resourceName, startDate, endDate);
         } else if (metricType == MetricType.AD) {
-            query = MetricsHelper.getAdMetrics(customerId, resourceName, parentResourceName, startDate, endDate);
+            query = MetricsHelper.getAdMetrics(resourceName, startDate, endDate);
         }
 
         SearchGoogleAdsStreamRequest request = SearchGoogleAdsStreamRequest.newBuilder()

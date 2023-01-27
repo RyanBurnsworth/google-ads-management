@@ -4,7 +4,8 @@ import com.addyai.enums.MetricType;
 
 public class Metrics {
     private MetricType type;
-    private String id;
+    private String customerId;
+    private String resourceId;
     private String parentId;
     private String date;
     private String resourceName;
@@ -23,6 +24,7 @@ public class Metrics {
     private long phoneCalls;
     private long phoneImpressions;
     private double phoneThroughRate;
+    private String lastUpdated;
 
     public MetricType getType() {
         return type;
@@ -32,12 +34,20 @@ public class Metrics {
         this.type = type;
     }
 
-    public String getId() {
-        return id;
+    public String getCustomerId() {
+        return customerId;
     }
 
-    public void setId(String id) {
-        this.id = id;
+    public void setCustomerId(String customerId) {
+        this.customerId = customerId;
+    }
+
+    public String getResourceId() {
+        return resourceId;
+    }
+
+    public void setResourceId(String resourceId) {
+        this.resourceId = resourceId;
     }
 
     public String getParentId() {
@@ -182,5 +192,13 @@ public class Metrics {
 
     public void setPhoneThroughRate(double phoneThroughRate) {
         this.phoneThroughRate = phoneThroughRate;
+    }
+
+    public String getLastUpdated() {
+        return lastUpdated;
+    }
+
+    public void setLastUpdated(String lastUpdated) {
+        this.lastUpdated = lastUpdated;
     }
 }
