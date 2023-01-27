@@ -83,7 +83,7 @@ public class MetricsControllerImpl implements MetricsController {
     public ResponseEntity<Object> getDummyAdGroupMetrics(@PathVariable String customerId,
                                                          @RequestParam String campaignId,
                                                          @RequestParam String adGroupId) {
-        Object obj = getDummyJsonObject(2);
+        Object obj = getDummyJsonObject(3);
         return new ResponseEntity<>(obj, HttpStatus.OK);
     }
 
@@ -91,8 +91,12 @@ public class MetricsControllerImpl implements MetricsController {
         ClassPathResource resource;
         if (type == 1)
             resource = new ClassPathResource("dummy-campaign-metrics.json");
-        else
+        else if (type == 2)
             resource = new ClassPathResource("dummy-adgroup-metrics.json");
+        else if (type == 3)
+            resource = new ClassPathResource("dummy-ad-metrics.json");
+        else
+            resource = new ClassPathResource("dummy-keyword-metrics.json");
 
         try {
             ObjectMapper mapper = new ObjectMapper();
