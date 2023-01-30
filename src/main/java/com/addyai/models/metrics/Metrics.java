@@ -4,10 +4,11 @@ import com.addyai.enums.MetricType;
 
 public class Metrics {
     private MetricType type;
+    private String date;
+    private String deviceType;
     private String customerId;
     private String resourceId;
     private String parentId;
-    private String date;
     private String resourceName;
     private long clicks;
     private long impressions;
@@ -16,7 +17,6 @@ public class Metrics {
     private double averageCpc;
     private double cost;
     private double conversions;
-    private double conversionRate;
     private double costPerConversion;
     private double conversionValue;
     private double invalidClickRate;
@@ -64,6 +64,14 @@ public class Metrics {
 
     public void setDate(String date) {
         this.date = date;
+    }
+
+    public String getDeviceType() {
+        return deviceType;
+    }
+
+    public void setDeviceType(String deviceType) {
+        this.deviceType = deviceType;
     }
 
     public String getResourceName() {
@@ -128,14 +136,6 @@ public class Metrics {
 
     public void setConversions(double conversions) {
         this.conversions = conversions;
-    }
-
-    public double getConversionRate() {
-        return conversionRate;
-    }
-
-    public void setConversionRate(double conversionRate) {
-        this.conversionRate = conversionRate;
     }
 
     public double getCostPerConversion() {

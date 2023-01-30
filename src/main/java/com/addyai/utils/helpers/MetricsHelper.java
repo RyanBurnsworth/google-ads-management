@@ -27,6 +27,7 @@ public class MetricsHelper {
                 " metrics.average_cpc," +
                 " metrics.cost_micros," +
                 " metrics.conversions," +
+                " metrics.cost_per_conversion," +
                 " metrics.conversions_value," +
                 " metrics.cost_per_conversion," +
                 " metrics.invalid_click_rate," +
@@ -174,5 +175,39 @@ public class MetricsHelper {
             }
         }
         return keywordMetricsList;
+    }
+
+    public static String getDeviceMetricsByCampaign(String campaignResourceName) {
+        return "SELECT" +
+                " segments.device," +
+                " campaign.id," +
+                " campaign.name," +
+                " campaign.resource_name," +
+                " metrics.clicks," +
+                " metrics.impressions," +
+                " metrics.ctr," +
+                " metrics.average_cpc," +
+                " metrics.cost_micros," +
+                " metrics.conversions," +
+                " metrics.cost_per_conversion," +
+                " metrics.conversions_value," +
+                " metrics.invalid_click_rate," +
+                " metrics.invalid_clicks" +
+                " FROM campaign" +
+                " WHERE" +
+                " campaign.resource_name = '" + campaignResourceName + "'";
+    }
+
+    public static List<Metrics> convertStreamToCampaignDeviceDetails(ServerStream<SearchGoogleAdsStreamResponse> streamResponses) {
+        GoogleAdsRowAdapterImpl googleAdsRowAdapter = new GoogleAdsRowAdapterImpl();
+        List<Metrics> campaignDeviceDataList = new ArrayList<>();
+
+        for (SearchGoogleAdsStreamResponse response : streamResponses) {
+            for (GoogleAdsRow googleAdsRow : response.getResultsList()) {
+                Metrics deviceMetrics = googleAdsRowAdapter.getDeviceMetricsByCampaign(googleAdsRow);
+                campaignDeviceDataList.add(deviceMetrics);
+            }
+        }
+        return campaignDeviceDataList;
     }
 }

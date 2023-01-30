@@ -410,4 +410,28 @@ public class GoogleAdsRowAdapterImpl implements GoogleAdsRowAdapter {
 
         return keywordMetrics;
     }
+
+    @Override
+    public Metrics getDeviceMetricsByCampaign(GoogleAdsRow googleAdsRow) {
+        Metrics campaignDeviceMetrics = new Metrics();
+        campaignDeviceMetrics.setType(MetricType.DEVICE_CAMPAIGN);
+        campaignDeviceMetrics.setResourceId(String.valueOf(googleAdsRow.getAdGroupCriterion().getCriterionId()));
+        campaignDeviceMetrics.setParentId(googleAdsRow.getAdGroupCriterion().getAdGroup());
+        campaignDeviceMetrics.setResourceName(googleAdsRow.getAdGroupCriterion().getResourceName());
+
+        campaignDeviceMetrics.setDeviceType(googleAdsRow.getSegments().getDevice().name());
+        campaignDeviceMetrics.setClicks(googleAdsRow.getMetrics().getClicks());
+        campaignDeviceMetrics.setImpressions(googleAdsRow.getMetrics().getImpressions());
+        campaignDeviceMetrics.setCtr(googleAdsRow.getMetrics().getCtr());
+        campaignDeviceMetrics.setCost((double) googleAdsRow.getMetrics().getCostMicros() / MICRO_FACTOR);
+        campaignDeviceMetrics.setAverageCpc(googleAdsRow.getMetrics().getAverageCpc());
+        campaignDeviceMetrics.setConversions(googleAdsRow.getMetrics().getConversions());
+        campaignDeviceMetrics.setConversionValue(googleAdsRow.getMetrics().getConversionsValue());
+        campaignDeviceMetrics.setCostPerConversion(googleAdsRow.getMetrics().getCostPerConversion());
+        campaignDeviceMetrics.setInvalidClickRate(googleAdsRow.getMetrics().getInvalidClickRate());
+        campaignDeviceMetrics.setInvalidClicks(googleAdsRow.getMetrics().getInvalidClicks());
+        campaignDeviceMetrics.setLastUpdated(DateTimeHelper.getCurrentTimestamp().toString());
+
+        return campaignDeviceMetrics;
+    }
 }
