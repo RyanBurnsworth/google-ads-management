@@ -317,6 +317,29 @@ public class GoogleAdsRowAdapterImpl implements GoogleAdsRowAdapter {
 
         Start Metrics Adaptions
      */
+
+    @Override
+    public Metrics getAccountMetrics(GoogleAdsRow googleAdsRow) {
+        Metrics accountMetrics = new Metrics();
+        accountMetrics.setType(MetricType.ACCOUNT);
+        accountMetrics.setResourceId(String.valueOf(googleAdsRow.getCustomer().getId()));
+        accountMetrics.setResourceName(googleAdsRow.getCustomer().getResourceName());
+
+        accountMetrics.setDate(googleAdsRow.getSegments().getDate());
+        accountMetrics.setClicks(googleAdsRow.getMetrics().getClicks());
+        accountMetrics.setImpressions(googleAdsRow.getMetrics().getImpressions());
+        accountMetrics.setCtr(googleAdsRow.getMetrics().getCtr());
+        accountMetrics.setCost((double) googleAdsRow.getMetrics().getCostMicros() / MICRO_FACTOR);
+        accountMetrics.setAverageCpc(googleAdsRow.getMetrics().getAverageCpc());
+        accountMetrics.setConversions(googleAdsRow.getMetrics().getConversions());
+        accountMetrics.setConversionValue(googleAdsRow.getMetrics().getConversionsValue());
+        accountMetrics.setCostPerConversion(googleAdsRow.getMetrics().getCostPerConversion());
+        accountMetrics.setInvalidClickRate(googleAdsRow.getMetrics().getInvalidClickRate());
+        accountMetrics.setInvalidClicks(googleAdsRow.getMetrics().getInvalidClicks());
+        accountMetrics.setLastUpdated(DateTimeHelper.getCurrentTimestamp().toString());
+        return accountMetrics;
+    }
+
     @Override
     public Metrics getCampaignMetrics(GoogleAdsRow googleAdsRow) {
         Metrics campaignMetrics = new Metrics();

@@ -37,7 +37,9 @@ public class MetricRepositoryImpl implements MetricRepository {
                                                     @Nullable String endDate,
                                                     MetricType metricType) throws Exception {
         String query = "";
-        if (metricType == MetricType.CAMPAIGN) {
+        if (metricType == MetricType.ACCOUNT) {
+            query = MetricsHelper.getAccountMetrics(customerId, startDate, endDate);
+        } else if (metricType == MetricType.CAMPAIGN) {
             query = MetricsHelper.getCampaignMetrics(resourceName, startDate, endDate);
         } else if (metricType == MetricType.ADGROUP) {
             query = MetricsHelper.getAdGroupMetrics(resourceName, startDate, endDate);
@@ -64,7 +66,9 @@ public class MetricRepositoryImpl implements MetricRepository {
             ServerStream<SearchGoogleAdsStreamResponse> stream =
                     googleAdsServiceClient.searchStreamCallable().call(request);
 
-            if (metricType == MetricType.CAMPAIGN) {
+            if (metricType == MetricType.ACCOUNT) {
+                return MetricsHelper.convertStreamToAccountMetrics(stream);
+            } else if (metricType == MetricType.CAMPAIGN) {
                 return MetricsHelper.convertStreamToCampaignMetrics(stream);
             } else if (metricType == MetricType.ADGROUP) {
                 return MetricsHelper.convertStreamToAdGroupMetrics(stream);

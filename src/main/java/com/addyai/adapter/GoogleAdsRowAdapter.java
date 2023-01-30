@@ -53,6 +53,8 @@ public interface GoogleAdsRowAdapter {
 
     ResponsiveSearchAdDetails getResponsiveSearchAdDetails(GoogleAdsRow googleAdsRow);
 
+    Metrics getAccountMetrics(GoogleAdsRow googleAdsRow);
+
     Metrics getCampaignMetrics(GoogleAdsRow googleAdsRow);
 
     Metrics getAdGroupMetrics(GoogleAdsRow googleAdsRow);
