@@ -1,6 +1,7 @@
 package com.addyai.controllers.metrics.impl;
 
 import com.addyai.controllers.metrics.MetricsController;
+import com.addyai.enums.MetricType;
 import com.addyai.models.metrics.Metrics;
 import com.addyai.services.metrics.MetricService;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -27,11 +28,13 @@ public class MetricsControllerImpl implements MetricsController {
                                                                        @RequestParam String campaignId,
                                                                        @RequestParam String startDate,
                                                                        @RequestParam String endDate) throws Exception {
-        List<Metrics> campaignMetrics = metricService.fetchCampaignMetricsByDate(
+        List<Metrics> campaignMetrics = metricService.fetchMetricsByDate(
                 customerId,
                 campaignId,
+                null,
                 startDate,
-                endDate);
+                endDate,
+                MetricType.CAMPAIGN);
         return new ResponseEntity<>(campaignMetrics, HttpStatus.OK);
     }
 
@@ -41,10 +44,12 @@ public class MetricsControllerImpl implements MetricsController {
                                                                       @RequestParam String adGroupId,
                                                                       @RequestParam String startDate,
                                                                       @RequestParam String endDate) throws Exception {
-        List<Metrics> adGroupMetrics = metricService.fetchAdGroupMetricsByDate(customerId,
+        List<Metrics> adGroupMetrics = metricService.fetchMetricsByDate(customerId,
                 adGroupId,
+                null,
                 startDate,
-                endDate);
+                endDate,
+                MetricType.ADGROUP);
 
         return new ResponseEntity<>(adGroupMetrics, HttpStatus.OK);
     }
@@ -55,7 +60,7 @@ public class MetricsControllerImpl implements MetricsController {
                                                                  @RequestParam String adId,
                                                                  @RequestParam String startDate,
                                                                  @RequestParam String endDate) throws Exception {
-        List<Metrics> adMetrics = metricService.fetchAdMetricsByDate(customerId, adId, startDate, endDate);
+        List<Metrics> adMetrics = metricService.fetchMetricsByDate(customerId, adId, null, startDate, endDate, MetricType.AD);
         return new ResponseEntity<>(adMetrics, HttpStatus.OK);
     }
 
@@ -66,8 +71,8 @@ public class MetricsControllerImpl implements MetricsController {
                                                                       @RequestParam String adGroupId,
                                                                       @RequestParam String startDate,
                                                                       @RequestParam String endDate) throws Exception {
-        List<Metrics> keywordMetrics = metricService.fetchKeywordsByDate(customerId,
-                adGroupId, keywordId, startDate, endDate);
+        List<Metrics> keywordMetrics = metricService.fetchMetricsByDate(customerId,
+                adGroupId, keywordId, startDate, endDate, MetricType.KEYWORD);
         return new ResponseEntity<>(keywordMetrics, HttpStatus.OK);
     }
 

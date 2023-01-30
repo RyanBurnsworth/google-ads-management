@@ -9,6 +9,8 @@ import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.addyai.enums.MetricType.KEYWORD;
+
 @Service
 public class MetricServiceImpl implements MetricService {
     private final MetricRepository metricRepository;
@@ -18,55 +20,45 @@ public class MetricServiceImpl implements MetricService {
     }
 
     @Override
-    public List<Metrics> fetchCampaignMetricsByDate(String customerId,
-                                                    String campaignId,
-                                                    String startDate,
-                                                    String endDate) throws Exception {
-        String campaignResourceName = "customers/" + customerId + "/campaigns/" + campaignId;
-        return this.metricRepository.fetchMetricsByResourceName(customerId, campaignResourceName, null,
-                startDate, endDate, MetricType.CAMPAIGN);
+    public List<Metrics> fetchMetricsByDate(String customerId, String resourceId, String parentResourceId, String startDate, String endDate, MetricType type) throws Exception {
+        String resourceName;
+        String parentResourceName;
+
+        switch (type) {
+            case ACCOUNT:
+                return this.metricRepository.fetchMetricsByResourceName(customerId, "",
+                        null, startDate, endDate, MetricType.ACCOUNT);
+            case CAMPAIGN:
+                resourceName = "customers/" + customerId + "/campaigns/" + resourceId;
+                return this.metricRepository.fetchMetricsByResourceName(customerId, resourceName, null,
+                        startDate, endDate, MetricType.CAMPAIGN);
+            case ADGROUP:
+                resourceName = "customers/" + customerId + "/adGroups/" + resourceId;
+
+                return this.metricRepository.fetchMetricsByResourceName(customerId, resourceName, null,
+                        startDate, endDate, MetricType.ADGROUP);
+            case AD:
+                resourceName = "customers/" + customerId + "/ads/" + resourceId;
+
+                return this.metricRepository.fetchMetricsByResourceName(customerId, resourceName, null,
+                        startDate, endDate, MetricType.AD);
+            case KEYWORD:
+                resourceName = "customers/" + customerId + "/keywordViews/" + parentResourceId + "~" + resourceId;
+                parentResourceName = "customers/" + customerId + "/adGroups/" + parentResourceId;
+
+                return this.metricRepository.fetchMetricsByResourceName(customerId, resourceName, parentResourceName,
+                        startDate, endDate, KEYWORD);
+            default:
+                break;
+        }
+        return new ArrayList<>();
     }
 
     @Override
-    public List<Metrics> fetchAdGroupMetricsByDate(String customerId,
-                                                   String adGroupId,
-                                                   String startDate,
-                                                   String endDate) throws Exception {
-        String adGroupResourceName = "customers/" + customerId + "/adGroups/" + adGroupId;
-
-        return this.metricRepository.fetchMetricsByResourceName(customerId, adGroupResourceName, null,
-                startDate, endDate, MetricType.ADGROUP);
-    }
-
-    @Override
-    public List<Metrics> fetchAdMetricsByDate(String customerId,
-                                              String adId,
-                                              String startDate,
-                                              String endDate) throws Exception {
-        String adResourceName = "customers/" + customerId + "/ads/" + adId;
-
-        return this.metricRepository.fetchMetricsByResourceName(customerId, adResourceName, null,
-                startDate, endDate, MetricType.AD);
-    }
-
-    @Override
-    public List<Metrics> fetchKeywordsByDate(String customerId,
-                                             String adGroupId,
-                                             String keywordId,
-                                             String startDate,
-                                             String endDate) throws Exception {
-        String adGroupResourceName = "customers/" + customerId + "/adGroups/" + adGroupId;
-        String keywordResourceName = "customers/" + customerId + "/keywordViews/" + adGroupId + "~" + keywordId;
-
-        return this.metricRepository.fetchMetricsByResourceName(customerId, keywordResourceName, adGroupResourceName,
-                startDate, endDate, MetricType.KEYWORD);
-    }
-
-    @Override
-    public List<Metrics> fetchDeviceMetrics(String customerId,
-                                            String resourceId,
-                                            String parentResourceId,
-                                            MetricType type) throws Exception {
+    public List<Metrics> fetchMetricsByDevice(String customerId,
+                                              String resourceId,
+                                              String parentResourceId,
+                                              MetricType type) throws Exception {
         String resourceName = "";
         String parentResourceName = "";
         switch (type) {
