@@ -20,7 +20,7 @@ public interface MetricsController {
 
     ResponseEntity<Object> getDummyCampaignMetrics(String customerId, String campaignResourceName);
 
-    ResponseEntity<Object> getDummyAdGroupMetrics(String customerId, String campaignId, String adGroupId);
+    ResponseEntity<Object> getDummyAdGroupMetrics(String customerId, String campaignId, String adGroupId) throws Exception;
 
     ResponseEntity<Object> getDummyDeviceMetrics(String customerId, String resourceName);
 }

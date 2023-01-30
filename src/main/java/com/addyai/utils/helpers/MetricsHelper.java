@@ -225,9 +225,7 @@ public class MetricsHelper {
                 " metrics.cost_micros," +
                 " metrics.conversions," +
                 " metrics.cost_per_conversion," +
-                " metrics.conversions_value," +
-                " metrics.invalid_click_rate," +
-                " metrics.invalid_clicks" +
+                " metrics.conversions_value" +
                 " FROM ad_group" +
                 " WHERE" +
                 " ad_group.resource_name = '" + adGroupResourceName + "'";
@@ -260,9 +258,7 @@ public class MetricsHelper {
                 " metrics.cost_micros," +
                 " metrics.conversions," +
                 " metrics.cost_per_conversion," +
-                " metrics.conversions_value," +
-                " metrics.invalid_click_rate," +
-                " metrics.invalid_clicks" +
+                " metrics.conversions_value" +
                 " FROM ad_group_ad" +
                 " WHERE" +
                 " ad_group_ad.ad.resource_name = '" + adResourceName + "'";

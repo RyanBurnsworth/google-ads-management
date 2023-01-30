@@ -76,23 +76,23 @@ public class MetricServiceImpl implements MetricService {
                 return this.metricRepository.fetchMetricsByResourceName(customerId,
                         resourceName, "", null, null, MetricType.DEVICE_CAMPAIGN);
             case DEVICE_ADGROUP:
-                resourceName = "customers/" + customerId + "adGroups/" + resourceId;
-                parentResourceName = "customers/" + customerId + "campaigns/" + parentResourceId;
+                resourceName = "customers/" + customerId + "/adGroups/" + resourceId;
+                parentResourceName = "customers/" + customerId + "/campaigns/" + parentResourceId;
 
                 return this.metricRepository.fetchMetricsByResourceName(customerId,
                         resourceName, parentResourceName, null, null, MetricType.DEVICE_ADGROUP);
             case DEVICE_AD:
-                resourceName = "customers/" + customerId + "ads/" + resourceId;
-                parentResourceName = "customers/" + customerId + "adGroups/" + parentResourceId;
+                resourceName = "customers/" + customerId + "/ads/" + resourceId;
+                parentResourceName = "customers/" + customerId + "/adGroups/" + parentResourceId;
 
                 return this.metricRepository.fetchMetricsByResourceName(customerId,
                         resourceName, parentResourceName, null, null, MetricType.DEVICE_AD);
             case DEVICE_KEYWORD:
-                resourceName = "customers/" + customerId + "keywordViews/" + parentResourceId + "~" + resourceId;
-                parentResourceName = "customers/" + customerId + "adGroups/" + parentResourceId;
+                resourceName = "customers/" + customerId + "/keywordViews/" + parentResourceId + "~" + resourceId;
+                parentResourceName = "customers/" + customerId + "/adGroups/" + parentResourceId;
 
                 return this.metricRepository.fetchMetricsByResourceName(customerId,
-                        resourceName, parentResourceName, null, null, MetricType.DEVICE_AD);
+                        resourceName, parentResourceName, null, null, MetricType.DEVICE_KEYWORD);
             default:
                 return new ArrayList<>();
         }
