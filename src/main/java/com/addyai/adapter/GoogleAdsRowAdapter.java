@@ -62,4 +62,10 @@ public interface GoogleAdsRowAdapter {
     Metrics getKeywordMetrics(GoogleAdsRow googleAdsRow);
 
     Metrics getDeviceMetricsByCampaign(GoogleAdsRow googleAdsRow);
+
+    Metrics getDeviceMetricsByAdGroup(GoogleAdsRow googleAdsRow);
+
+    Metrics getDeviceMetricsByAd(GoogleAdsRow googleAdsRow);
+
+    Metrics getDeviceMetricsByKeyword(GoogleAdsRow googleAdsRow);
 }

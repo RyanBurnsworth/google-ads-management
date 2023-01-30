@@ -6,6 +6,7 @@ import com.addyai.repos.metrics.MetricRepository;
 import com.addyai.services.metrics.MetricService;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -59,5 +60,41 @@ public class MetricServiceImpl implements MetricService {
 
         return this.metricRepository.fetchMetricsByResourceName(customerId, keywordResourceName, adGroupResourceName,
                 startDate, endDate, MetricType.KEYWORD);
+    }
+
+    @Override
+    public List<Metrics> fetchDeviceMetrics(String customerId,
+                                            String resourceId,
+                                            String parentResourceId,
+                                            MetricType type) throws Exception {
+        String resourceName = "";
+        String parentResourceName = "";
+        switch (type) {
+            case DEVICE_CAMPAIGN:
+                resourceName = "customers/" + customerId + "/campaigns/" + resourceId;
+
+                return this.metricRepository.fetchMetricsByResourceName(customerId,
+                        resourceName, "", null, null, MetricType.DEVICE_CAMPAIGN);
+            case DEVICE_ADGROUP:
+                resourceName = "customers/" + customerId + "adGroups/" + resourceId;
+                parentResourceName = "customers/" + customerId + "campaigns/" + parentResourceId;
+
+                return this.metricRepository.fetchMetricsByResourceName(customerId,
+                        resourceName, parentResourceName, null, null, MetricType.DEVICE_ADGROUP);
+            case DEVICE_AD:
+                resourceName = "customers/" + customerId + "ads/" + resourceId;
+                parentResourceName = "customers/" + customerId + "adGroups/" + parentResourceId;
+
+                return this.metricRepository.fetchMetricsByResourceName(customerId,
+                        resourceName, parentResourceName, null, null, MetricType.DEVICE_AD);
+            case DEVICE_KEYWORD:
+                resourceName = "customers/" + customerId + "keywordViews/" + parentResourceId + "~" + resourceId;
+                parentResourceName = "customers/" + customerId + "adGroups/" + parentResourceId;
+
+                return this.metricRepository.fetchMetricsByResourceName(customerId,
+                        resourceName, parentResourceName, null, null, MetricType.DEVICE_AD);
+            default:
+                return new ArrayList<>();
+        }
     }
 }

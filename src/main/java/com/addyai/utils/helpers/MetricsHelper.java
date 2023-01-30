@@ -210,4 +210,106 @@ public class MetricsHelper {
         }
         return campaignDeviceDataList;
     }
+
+    public static String getDeviceMetricsByAdGroup(String adGroupResourceName) {
+        return "SELECT" +
+                " segments.device," +
+                " ad_group.id," +
+                " ad_group.name," +
+                " ad_group.resource_name," +
+                " ad_group.campaign," +
+                " metrics.clicks," +
+                " metrics.impressions," +
+                " metrics.ctr," +
+                " metrics.average_cpc," +
+                " metrics.cost_micros," +
+                " metrics.conversions," +
+                " metrics.cost_per_conversion," +
+                " metrics.conversions_value," +
+                " metrics.invalid_click_rate," +
+                " metrics.invalid_clicks" +
+                " FROM ad_group" +
+                " WHERE" +
+                " ad_group.resource_name = '" + adGroupResourceName + "'";
+    }
+
+    public static List<Metrics> convertStreamToAdGroupDeviceDetails(ServerStream<SearchGoogleAdsStreamResponse> streamResponses) {
+        GoogleAdsRowAdapterImpl googleAdsRowAdapter = new GoogleAdsRowAdapterImpl();
+        List<Metrics> adGroupDeviceDataList = new ArrayList<>();
+
+        for (SearchGoogleAdsStreamResponse response : streamResponses) {
+            for (GoogleAdsRow googleAdsRow : response.getResultsList()) {
+                Metrics deviceMetrics = googleAdsRowAdapter.getDeviceMetricsByAdGroup(googleAdsRow);
+                adGroupDeviceDataList.add(deviceMetrics);
+            }
+        }
+        return adGroupDeviceDataList;
+    }
+
+    public static String getDeviceMetricsByAd(String adResourceName) {
+        return "SELECT" +
+                " segments.device," +
+                " ad_group_ad.ad.id," +
+                " ad_group_ad.ad.resource_name," +
+                " ad_group_ad.ad.type," +
+                " ad_group_ad.ad_group," +
+                " metrics.clicks," +
+                " metrics.impressions," +
+                " metrics.ctr," +
+                " metrics.average_cpc," +
+                " metrics.cost_micros," +
+                " metrics.conversions," +
+                " metrics.cost_per_conversion," +
+                " metrics.conversions_value," +
+                " metrics.invalid_click_rate," +
+                " metrics.invalid_clicks" +
+                " FROM ad_group_ad" +
+                " WHERE" +
+                " ad_group_ad.ad.resource_name = '" + adResourceName + "'";
+    }
+
+    public static List<Metrics> convertStreamToAdDeviceDetails(ServerStream<SearchGoogleAdsStreamResponse> streamResponses) {
+        GoogleAdsRowAdapterImpl googleAdsRowAdapter = new GoogleAdsRowAdapterImpl();
+        List<Metrics> adDeviceDataList = new ArrayList<>();
+
+        for (SearchGoogleAdsStreamResponse response : streamResponses) {
+            for (GoogleAdsRow googleAdsRow : response.getResultsList()) {
+                Metrics deviceMetrics = googleAdsRowAdapter.getDeviceMetricsByAd(googleAdsRow);
+                adDeviceDataList.add(deviceMetrics);
+            }
+        }
+        return adDeviceDataList;
+    }
+
+    public static String getDeviceMetricsByKeyword(String keywordResourceName) {
+        return "SELECT" +
+                " segments.device," +
+                " keyword_view.resource_name," +
+                " ad_group_criterion.ad_group," +
+                " ad_group_criterion.criterion_id," +
+                " metrics.clicks," +
+                " metrics.impressions," +
+                " metrics.ctr," +
+                " metrics.average_cpc," +
+                " metrics.cost_micros," +
+                " metrics.conversions," +
+                " metrics.cost_per_conversion," +
+                " metrics.conversions_value" +
+                " FROM keyword_view" +
+                " WHERE" +
+                " keyword_view.resource_name = '" + keywordResourceName + "'";
+    }
+
+    public static List<Metrics> convertStreamToKeywordDeviceDetails(ServerStream<SearchGoogleAdsStreamResponse> streamResponses) {
+        GoogleAdsRowAdapterImpl googleAdsRowAdapter = new GoogleAdsRowAdapterImpl();
+        List<Metrics> keywordDeviceDataList = new ArrayList<>();
+
+        for (SearchGoogleAdsStreamResponse response : streamResponses) {
+            for (GoogleAdsRow googleAdsRow : response.getResultsList()) {
+                Metrics deviceMetrics = googleAdsRowAdapter.getDeviceMetricsByKeyword(googleAdsRow);
+                keywordDeviceDataList.add(deviceMetrics);
+            }
+        }
+        return keywordDeviceDataList;
+    }
 }

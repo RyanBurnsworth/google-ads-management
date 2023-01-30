@@ -7,5 +7,10 @@ public enum MetricType {
     AD,
     KEYWORD,
     ASSET,
-    DEVICE_CAMPAIGN
+    DEVICE_ACCOUNT,
+    DEVICE_CAMPAIGN,
+    DEVICE_ADGROUP,
+    DEVICE_AD,
+    DEVICE_KEYWORD,
+    DEVICE_ASSET
 }

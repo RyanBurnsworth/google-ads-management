@@ -434,4 +434,70 @@ public class GoogleAdsRowAdapterImpl implements GoogleAdsRowAdapter {
 
         return campaignDeviceMetrics;
     }
+
+    @Override
+    public Metrics getDeviceMetricsByAdGroup(GoogleAdsRow googleAdsRow) {
+        Metrics adGroupDeviceMetrics = new Metrics();
+        adGroupDeviceMetrics.setType(MetricType.DEVICE_ADGROUP);
+        adGroupDeviceMetrics.setResourceId(String.valueOf(googleAdsRow.getAdGroupCriterion().getCriterionId()));
+        adGroupDeviceMetrics.setParentId(googleAdsRow.getAdGroupCriterion().getAdGroup());
+        adGroupDeviceMetrics.setResourceName(googleAdsRow.getAdGroupCriterion().getResourceName());
+
+        adGroupDeviceMetrics.setDeviceType(googleAdsRow.getSegments().getDevice().name());
+        adGroupDeviceMetrics.setClicks(googleAdsRow.getMetrics().getClicks());
+        adGroupDeviceMetrics.setImpressions(googleAdsRow.getMetrics().getImpressions());
+        adGroupDeviceMetrics.setCtr(googleAdsRow.getMetrics().getCtr());
+        adGroupDeviceMetrics.setCost((double) googleAdsRow.getMetrics().getCostMicros() / MICRO_FACTOR);
+        adGroupDeviceMetrics.setAverageCpc(googleAdsRow.getMetrics().getAverageCpc());
+        adGroupDeviceMetrics.setConversions(googleAdsRow.getMetrics().getConversions());
+        adGroupDeviceMetrics.setConversionValue(googleAdsRow.getMetrics().getConversionsValue());
+        adGroupDeviceMetrics.setCostPerConversion(googleAdsRow.getMetrics().getCostPerConversion());
+        adGroupDeviceMetrics.setLastUpdated(DateTimeHelper.getCurrentTimestamp().toString());
+
+        return adGroupDeviceMetrics;
+    }
+
+    @Override
+    public Metrics getDeviceMetricsByAd(GoogleAdsRow googleAdsRow) {
+        Metrics adDeviceMetrics = new Metrics();
+        adDeviceMetrics.setType(MetricType.DEVICE_AD);
+        adDeviceMetrics.setResourceId(String.valueOf(googleAdsRow.getAdGroupAd().getAd().getId()));
+        adDeviceMetrics.setParentId(googleAdsRow.getAdGroupAd().getAdGroup());
+        adDeviceMetrics.setResourceName(googleAdsRow.getAdGroupAd().getAd().getResourceName());
+
+        adDeviceMetrics.setDeviceType(googleAdsRow.getSegments().getDevice().name());
+        adDeviceMetrics.setClicks(googleAdsRow.getMetrics().getClicks());
+        adDeviceMetrics.setImpressions(googleAdsRow.getMetrics().getImpressions());
+        adDeviceMetrics.setCtr(googleAdsRow.getMetrics().getCtr());
+        adDeviceMetrics.setCost((double) googleAdsRow.getMetrics().getCostMicros() / MICRO_FACTOR);
+        adDeviceMetrics.setAverageCpc(googleAdsRow.getMetrics().getAverageCpc());
+        adDeviceMetrics.setConversions(googleAdsRow.getMetrics().getConversions());
+        adDeviceMetrics.setConversionValue(googleAdsRow.getMetrics().getConversionsValue());
+        adDeviceMetrics.setCostPerConversion(googleAdsRow.getMetrics().getCostPerConversion());
+        adDeviceMetrics.setLastUpdated(DateTimeHelper.getCurrentTimestamp().toString());
+
+        return adDeviceMetrics;
+    }
+
+    @Override
+    public Metrics getDeviceMetricsByKeyword(GoogleAdsRow googleAdsRow) {
+        Metrics keywordDeviceMetrics = new Metrics();
+        keywordDeviceMetrics.setType(MetricType.DEVICE_KEYWORD);
+        keywordDeviceMetrics.setResourceId(String.valueOf(googleAdsRow.getAdGroupCriterion().getCriterionId()));
+        keywordDeviceMetrics.setParentId(googleAdsRow.getAdGroupCriterion().getAdGroup());
+        keywordDeviceMetrics.setResourceName(googleAdsRow.getKeywordView().getResourceName());
+
+        keywordDeviceMetrics.setDeviceType(googleAdsRow.getSegments().getDevice().name());
+        keywordDeviceMetrics.setClicks(googleAdsRow.getMetrics().getClicks());
+        keywordDeviceMetrics.setImpressions(googleAdsRow.getMetrics().getImpressions());
+        keywordDeviceMetrics.setCtr(googleAdsRow.getMetrics().getCtr());
+        keywordDeviceMetrics.setCost((double) googleAdsRow.getMetrics().getCostMicros() / MICRO_FACTOR);
+        keywordDeviceMetrics.setAverageCpc(googleAdsRow.getMetrics().getAverageCpc());
+        keywordDeviceMetrics.setConversions(googleAdsRow.getMetrics().getConversions());
+        keywordDeviceMetrics.setConversionValue(googleAdsRow.getMetrics().getConversionsValue());
+        keywordDeviceMetrics.setCostPerConversion(googleAdsRow.getMetrics().getCostPerConversion());
+        keywordDeviceMetrics.setLastUpdated(DateTimeHelper.getCurrentTimestamp().toString());
+
+        return keywordDeviceMetrics;
+    }
 }

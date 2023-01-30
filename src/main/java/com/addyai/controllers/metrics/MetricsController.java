@@ -21,4 +21,6 @@ public interface MetricsController {
     ResponseEntity<Object> getDummyCampaignMetrics(String customerId, String campaignResourceName);
 
     ResponseEntity<Object> getDummyAdGroupMetrics(String customerId, String campaignId, String adGroupId);
+
+    ResponseEntity<Object> getDummyDeviceMetrics(String customerId, String resourceName);
 }

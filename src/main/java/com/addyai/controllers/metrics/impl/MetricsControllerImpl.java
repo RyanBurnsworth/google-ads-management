@@ -1,5 +1,6 @@
-package com.addyai.controllers.metrics;
+package com.addyai.controllers.metrics.impl;
 
+import com.addyai.controllers.metrics.MetricsController;
 import com.addyai.models.metrics.Metrics;
 import com.addyai.services.metrics.MetricService;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -85,6 +86,11 @@ public class MetricsControllerImpl implements MetricsController {
                                                          @RequestParam String adGroupId) {
         Object obj = getDummyJsonObject(3);
         return new ResponseEntity<>(obj, HttpStatus.OK);
+    }
+
+    @Override
+    public ResponseEntity<Object> getDummyDeviceMetrics(String customerId, String resourceName) {
+        return null;
     }
 
     private Object getDummyJsonObject(int type) {
