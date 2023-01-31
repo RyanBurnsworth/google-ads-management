@@ -6,21 +6,12 @@ import org.springframework.http.ResponseEntity;
 import java.util.List;
 
 public interface MetricsController {
-    ResponseEntity<List<Metrics>> getCampaignMetricsByDateRange(String customerId, String campaignId,
-                                                                String startDate, String endDate) throws Exception;
+    ResponseEntity<List<Metrics>> getMetricsByDateRange(String customerId, String resourceId, String parentResourceId,
+                                                        String startDate, String endDate, String resourceType) throws Exception;
+    ResponseEntity<List<Metrics>> getMetricsByDevice(String customerId, String resourceId, String parentResourceId,
+                                                     String resourceType) throws Exception;
 
-    ResponseEntity<List<Metrics>> getAdGroupMetricsByDateRange(String customerId, String adGroupId, String startDate,
-                                                               String endDate) throws Exception;
+    ResponseEntity<Object> getDummyMetricsByDate(String resourceType);
 
-    ResponseEntity<List<Metrics>> getAdMetricsByDateRange(String customerId, String adId, String startDate,
-                                                          String endDate) throws Exception;
-
-    ResponseEntity<List<Metrics>> getKeywordMetricsByDateRange(String customerId, String keywordId, String adGroupId,
-                                                               String startDate, String endDate) throws Exception;
-
-    ResponseEntity<Object> getDummyCampaignMetrics(String customerId, String campaignResourceName);
-
-    ResponseEntity<Object> getDummyAdGroupMetrics(String customerId, String campaignId, String adGroupId) throws Exception;
-
-    ResponseEntity<Object> getDummyDeviceMetrics(String customerId, String resourceName);
+    ResponseEntity<Object> getDummyMetricsByDevice(String resourceType);
 }

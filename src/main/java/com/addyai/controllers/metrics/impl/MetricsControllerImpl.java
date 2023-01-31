@@ -11,11 +11,18 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1/{customerId}")
 public class MetricsControllerImpl implements MetricsController {
+    private static final String RESOURCE_ACCOUNT = "account";
+    private static final String RESOURCE_CAMPAIGN = "campaign";
+    private static final String RESOURCE_ADGROUP = "adgroup";
+    private static final String RESOURCE_AD = "ad";
+    private static final String RESOURCE_KEYWORD = "keyword";
+
     private final MetricService metricService;
 
     public MetricsControllerImpl(MetricService metricService) {
@@ -23,78 +30,103 @@ public class MetricsControllerImpl implements MetricsController {
     }
 
     @Override
-    @GetMapping("/campaign/metrics")
-    public ResponseEntity<List<Metrics>> getCampaignMetricsByDateRange(@PathVariable String customerId,
-                                                                       @RequestParam String campaignId,
-                                                                       @RequestParam String startDate,
-                                                                       @RequestParam String endDate) throws Exception {
-        List<Metrics> campaignMetrics = metricService.fetchMetricsByDate(
-                customerId,
-                campaignId,
-                null,
-                startDate,
-                endDate,
-                MetricType.CAMPAIGN);
-        return new ResponseEntity<>(campaignMetrics, HttpStatus.OK);
+    @GetMapping("/metrics/date")
+    public ResponseEntity<List<Metrics>> getMetricsByDateRange(@PathVariable String customerId,
+                                                               @RequestParam String resourceId,
+                                                               @RequestParam String parentResourceId,
+                                                               @RequestParam String startDate,
+                                                               @RequestParam String endDate,
+                                                               @RequestParam String resourceType) throws Exception {
+        List<Metrics> metricsList = new ArrayList<>();
+
+        switch (resourceType) {
+            case RESOURCE_ACCOUNT:
+                metricsList = metricService.fetchMetricsByDate(customerId, resourceId, parentResourceId, startDate,
+                        endDate, MetricType.ACCOUNT);
+                break;
+            case RESOURCE_CAMPAIGN:
+                metricsList = metricService.fetchMetricsByDate(customerId, resourceId, parentResourceId, startDate,
+                        endDate, MetricType.CAMPAIGN);
+                break;
+            case RESOURCE_ADGROUP:
+                metricsList = metricService.fetchMetricsByDate(customerId, resourceId, parentResourceId, startDate,
+                        endDate, MetricType.ADGROUP);
+                break;
+            case RESOURCE_AD:
+                metricsList = metricService.fetchMetricsByDate(customerId, resourceId, parentResourceId, startDate,
+                        endDate, MetricType.AD);
+                break;
+            case RESOURCE_KEYWORD:
+                metricsList = metricService.fetchMetricsByDate(customerId, resourceId, parentResourceId, startDate,
+                        endDate, MetricType.KEYWORD);
+                break;
+            default:
+                break;
+        }
+
+        return new ResponseEntity<>(metricsList, HttpStatus.OK);
     }
 
     @Override
-    @GetMapping("/adgroup/metrics")
-    public ResponseEntity<List<Metrics>> getAdGroupMetricsByDateRange(@PathVariable String customerId,
-                                                                      @RequestParam String adGroupId,
-                                                                      @RequestParam String startDate,
-                                                                      @RequestParam String endDate) throws Exception {
-        List<Metrics> adGroupMetrics = metricService.fetchMetricsByDate(customerId,
-                adGroupId,
-                null,
-                startDate,
-                endDate,
-                MetricType.ADGROUP);
+    @GetMapping("/metrics/device")
+    public ResponseEntity<List<Metrics>> getMetricsByDevice(@PathVariable String customerId,
+                                                            @RequestParam String resourceId,
+                                                            @RequestParam String parentResourceId,
+                                                            @RequestParam String resourceType) throws Exception {
+        List<Metrics> metricsList = new ArrayList<>();
 
-        return new ResponseEntity<>(adGroupMetrics, HttpStatus.OK);
+        switch (resourceType) {
+            case RESOURCE_ACCOUNT:
+                metricsList = metricService.fetchMetricsByDevice(customerId, resourceId, parentResourceId, MetricType.ACCOUNT);
+                break;
+            case RESOURCE_CAMPAIGN:
+                metricsList = metricService.fetchMetricsByDevice(customerId, resourceId, parentResourceId, MetricType.CAMPAIGN);
+                break;
+            case RESOURCE_ADGROUP:
+                metricsList = metricService.fetchMetricsByDevice(customerId, resourceId, parentResourceId, MetricType.ADGROUP);
+                break;
+            case RESOURCE_AD:
+                metricsList = metricService.fetchMetricsByDevice(customerId, resourceId, parentResourceId, MetricType.AD);
+                break;
+            case RESOURCE_KEYWORD:
+                metricsList = metricService.fetchMetricsByDevice(customerId, resourceId, parentResourceId, MetricType.KEYWORD);
+                break;
+            default:
+                break;
+        }
+
+        return new ResponseEntity<>(metricsList, HttpStatus.OK);
     }
 
     @Override
-    @GetMapping("/ad/metrics")
-    public ResponseEntity<List<Metrics>> getAdMetricsByDateRange(@PathVariable String customerId,
-                                                                 @RequestParam String adId,
-                                                                 @RequestParam String startDate,
-                                                                 @RequestParam String endDate) throws Exception {
-        List<Metrics> adMetrics = metricService.fetchMetricsByDate(customerId, adId, null, startDate, endDate, MetricType.AD);
-        return new ResponseEntity<>(adMetrics, HttpStatus.OK);
-    }
-
-    @Override
-    @GetMapping("/keyword/metrics")
-    public ResponseEntity<List<Metrics>> getKeywordMetricsByDateRange(@PathVariable String customerId,
-                                                                      @RequestParam String keywordId,
-                                                                      @RequestParam String adGroupId,
-                                                                      @RequestParam String startDate,
-                                                                      @RequestParam String endDate) throws Exception {
-        List<Metrics> keywordMetrics = metricService.fetchMetricsByDate(customerId,
-                adGroupId, keywordId, startDate, endDate, MetricType.KEYWORD);
-        return new ResponseEntity<>(keywordMetrics, HttpStatus.OK);
-    }
-
-    @Override
-    @GetMapping("/campaign/metrics/dummy")
-    public ResponseEntity<Object> getDummyCampaignMetrics(@PathVariable String customerId,
-                                                          @RequestParam String campaignResourceName) {
-        Object obj = getDummyJsonObject(1);
+    @GetMapping("/metrics/date/demo")
+    public ResponseEntity<Object> getDummyMetricsByDate(@RequestParam String resourceType) {
+        Object obj = new Object();
+        switch (resourceType) {
+            case RESOURCE_ACCOUNT:
+                obj = getDummyJsonObject(0);
+                break;
+            case RESOURCE_CAMPAIGN:
+                obj = getDummyJsonObject(1);
+                break;
+            case RESOURCE_ADGROUP:
+                obj = getDummyJsonObject(2);
+                break;
+            case RESOURCE_AD:
+                obj = getDummyJsonObject(3);
+                break;
+            case RESOURCE_KEYWORD:
+                obj = getDummyJsonObject(4);
+                break;
+            default:
+                break;
+        }
         return new ResponseEntity<>(obj, HttpStatus.OK);
     }
 
     @Override
-    @GetMapping("/adgroup/metrics/dummy")
-    public ResponseEntity<Object> getDummyAdGroupMetrics(@PathVariable String customerId,
-                                                         @RequestParam String campaignId,
-                                                         @RequestParam String adGroupId) {
-        Object obj = getDummyJsonObject(3);
-        return new ResponseEntity<>(obj, HttpStatus.OK);
-    }
-
-    @Override
-    public ResponseEntity<Object> getDummyDeviceMetrics(String customerId, String resourceName) {
+    @GetMapping("/metrics/device/demo")
+    public ResponseEntity<Object> getDummyMetricsByDevice(@RequestParam String resourceType) {
         return null;
     }
 
