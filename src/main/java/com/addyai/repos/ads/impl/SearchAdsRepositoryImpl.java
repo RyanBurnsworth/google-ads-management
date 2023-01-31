@@ -46,7 +46,7 @@ public class SearchAdsRepositoryImpl implements SearchAdsRepository {
             SearchGoogleAdsStreamRequest request = requestBuilder.buildStreamRequest(customerId, query);
             ServerStream<SearchGoogleAdsStreamResponse> response = requestBuilder.callStreamRequest(request);
 
-            adDetailsList = GAQLHelper.convertStreamToAdDetails(response, adType);
+            adDetailsList = GAQLHelper.convertStreamResponseToAdDetails(response, adType);
 
             return adDetailsList;
         } catch (Exception e) {

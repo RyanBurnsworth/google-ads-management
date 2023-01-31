@@ -15,10 +15,7 @@
 
 package com.addyai.adapter;
 
-import com.addyai.models.AdGroupDetails;
-import com.addyai.models.BudgetDetails;
-import com.addyai.models.CampaignDetails;
-import com.addyai.models.KeywordDetails;
+import com.addyai.models.*;
 import com.addyai.models.ads.ResponsiveSearchAdDetails;
 import com.addyai.models.assets.CallExtensionDetails;
 import com.addyai.models.assets.SitelinkDetails;
@@ -27,6 +24,7 @@ import com.addyai.models.metrics.Metrics;
 import com.google.ads.googleads.v12.services.GoogleAdsRow;
 
 public interface GoogleAdsRowAdapter {
+    AccountDetails getAccountDetails(GoogleAdsRow googleAdsRow);
     CampaignDetails getCampaignDetails(GoogleAdsRow googleAdsRow);
 
     BudgetDetails getBudgetDetails(GoogleAdsRow googleAdsRow);

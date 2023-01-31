@@ -34,6 +34,23 @@ import static com.addyai.utils.misc.Constants.*;
 
 public class GoogleAdsRowAdapterImpl implements GoogleAdsRowAdapter {
     @Override
+    public AccountDetails getAccountDetails(GoogleAdsRow googleAdsRow) {
+        AccountDetails accountDetails = new AccountDetails();
+
+        accountDetails.setCustomerId(String.valueOf(googleAdsRow.getCustomer().getId()));
+        accountDetails.setCurrencyCode(googleAdsRow.getCustomer().getCurrencyCode());
+        accountDetails.setTimeZone(googleAdsRow.getCustomer().getTimeZone());
+        accountDetails.setStatus(googleAdsRow.getCustomer().getStatusValue());
+        accountDetails.setResourceName(googleAdsRow.getCustomer().getResourceName());
+        accountDetails.setCallReportingEnabled(googleAdsRow.getCustomer().getCallReportingSetting().getCallReportingEnabled());
+        accountDetails.setCallConversionActionResourceName(googleAdsRow.getCustomer().getCallReportingSetting().getCallConversionAction());
+        accountDetails.setCallConversionReportingEnabled(googleAdsRow.getCustomer().getCallReportingSetting().getCallConversionReportingEnabled());
+        accountDetails.setOptimizationScore(googleAdsRow.getCustomer().getOptimizationScore());
+        accountDetails.setRemarketingTag(googleAdsRow.getCustomer().getRemarketingSetting().getGoogleGlobalSiteTag());
+        return accountDetails;
+    }
+
+    @Override
     public CampaignDetails getCampaignDetails(GoogleAdsRow googleAdsRow) {
         CampaignDetails details = new CampaignDetails();
 

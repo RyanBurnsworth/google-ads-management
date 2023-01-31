@@ -17,10 +17,7 @@ package com.addyai.utils.helpers;
 
 import com.addyai.adapter.GoogleAdsRowAdapter;
 import com.addyai.adapter.impl.GoogleAdsRowAdapterImpl;
-import com.addyai.models.AdGroupDetails;
-import com.addyai.models.BudgetDetails;
-import com.addyai.models.CampaignDetails;
-import com.addyai.models.KeywordDetails;
+import com.addyai.models.*;
 import com.addyai.models.ads.AdDetails;
 import com.addyai.models.ads.ResponsiveSearchAdDetails;
 import com.addyai.models.assets.AssetDetails;
@@ -39,6 +36,23 @@ import java.util.List;
 import static com.addyai.utils.misc.Constants.RESPONSIVE_AD_TYPE;
 
 public class GAQLHelper {
+    public static String getAccountDetailsQuery(String customerId) {
+        return "SELECT" +
+                " customer.id," +
+                " customer.status," +
+                " customer.currency_code," +
+                " customer.time_zone," +
+                " customer.resource_name," +
+                " customer.call_reporting_setting.call_reporting_enabled," +
+                " customer.call_reporting_setting.call_conversion_reporting_enabled," +
+                " customer.call_reporting_setting.call_conversion_action," +
+                " customer.optimization_score," +
+                " customer.remarketing_setting.google_global_site_tag" +
+                " FROM customer" +
+                " WHERE" +
+                " customer.id = " + customerId;
+    }
+
     public static String getCampaignDetailsQuery() {
         return "SELECT campaign.id," +
                 " campaign.name," +
@@ -243,7 +257,7 @@ public class GAQLHelper {
                 "asset.sitelink_asset.link_text, " +
                 "asset.sitelink_asset.start_date, " +
                 "asset.sitelink_asset.end_date " +
-                "FROM asset WHERE asset.sitelink_asset.link_text != ''" ;
+                "FROM asset WHERE asset.sitelink_asset.link_text != ''";
     }
 
     public static String getCallExtensionAssetQuery() {
@@ -255,7 +269,7 @@ public class GAQLHelper {
                 "asset.call_asset.ad_schedule_targets, " +
                 "asset.call_asset.country_code, " +
                 "asset.call_asset.phone_number " +
-                "FROM asset WHERE asset.call_asset.phone_number != ''" ;
+                "FROM asset WHERE asset.call_asset.phone_number != ''";
     }
 
     public static String getResponsiveSearchAdQuery(String adGroupResourceName) {
@@ -273,7 +287,19 @@ public class GAQLHelper {
                 "AND ad_group_ad.ad_group='" + adGroupResourceName + "'";
     }
 
-    public static List<CampaignDetails> convertStreamResponseToCampaignDetailsList(ServerStream<SearchGoogleAdsStreamResponse> streamResponse) {
+    public static AccountDetails convertStreamResponseToAccountDetails(ServerStream<SearchGoogleAdsStreamResponse> streamResponse) {
+        GoogleAdsRowAdapter googleAdsRowAdapter = new GoogleAdsRowAdapterImpl();
+        AccountDetails accountDetails = new AccountDetails();
+
+        for (SearchGoogleAdsStreamResponse response : streamResponse) {
+            for (GoogleAdsRow googleAdsRow : response.getResultsList()) {
+                accountDetails = googleAdsRowAdapter.getAccountDetails(googleAdsRow);
+            }
+        }
+        return accountDetails;
+    }
+
+    public static List<CampaignDetails> convertStreamResponseToCampaignDetails(ServerStream<SearchGoogleAdsStreamResponse> streamResponse) {
         GoogleAdsRowAdapter googleAdsRowAdapter = new GoogleAdsRowAdapterImpl();
         List<CampaignDetails> campaignDetailsList = new ArrayList<>();
 
@@ -396,7 +422,7 @@ public class GAQLHelper {
         return assetDetailsList;
     }
 
-    public static List<AdDetails> convertStreamToAdDetails(
+    public static List<AdDetails> convertStreamResponseToAdDetails(
             ServerStream<SearchGoogleAdsStreamResponse> streamResponse,
             String adType
     ) {

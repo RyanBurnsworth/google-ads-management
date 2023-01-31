@@ -69,7 +69,7 @@ public class CampaignRepositoryImpl implements CampaignRepository {
             SearchGoogleAdsStreamRequest request = requestBuilder.buildStreamRequest(customerId, query);
             ServerStream<SearchGoogleAdsStreamResponse> response = requestBuilder.callStreamRequest(request);
 
-            campaignDetailsList = GAQLHelper.convertStreamResponseToCampaignDetailsList(response);
+            campaignDetailsList = GAQLHelper.convertStreamResponseToCampaignDetails(response);
 
             return campaignDetailsList;
         } catch (Exception e) {
@@ -95,7 +95,7 @@ public class CampaignRepositoryImpl implements CampaignRepository {
             SearchGoogleAdsStreamRequest request = requestBuilder.buildStreamRequest(customerId, query);
             ServerStream<SearchGoogleAdsStreamResponse> response = requestBuilder.callStreamRequest(request);
 
-            campaignDetailsList = GAQLHelper.convertStreamResponseToCampaignDetailsList(response);
+            campaignDetailsList = GAQLHelper.convertStreamResponseToCampaignDetails(response);
 
             if (campaignDetailsList.size() > 0)
                 return campaignDetailsList.get(0);
