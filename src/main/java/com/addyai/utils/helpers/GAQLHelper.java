@@ -287,6 +287,22 @@ public class GAQLHelper {
                 "AND ad_group_ad.ad_group='" + adGroupResourceName + "'";
     }
 
+    public static String getConversionDetailsQuery() {
+        return "SELECT" +
+                " conversion_action.id," +
+                " conversion_action.name," +
+                " conversion_action.resource_name," +
+                " conversion_action.status," +
+                " conversion_action.category," +
+                " conversion_action.phone_call_duration_seconds," +
+                " conversion_action.tag_snippets," +
+                " conversion_action.type," +
+                " conversion_action.counting_type," +
+                " conversion_action.value_settings.default_currency_code," +
+                " conversion_action.value_settings.default_value" +
+                " FROM conversion_action ";
+    }
+
     public static AccountDetails convertStreamResponseToAccountDetails(ServerStream<SearchGoogleAdsStreamResponse> streamResponse) {
         GoogleAdsRowAdapter googleAdsRowAdapter = new GoogleAdsRowAdapterImpl();
         AccountDetails accountDetails = new AccountDetails();
@@ -443,5 +459,19 @@ public class GAQLHelper {
             }
         }
         return adDetailsList;
+    }
+
+    public static List<ConversionDetails> convertStreamResponseToConversionDetails(
+            ServerStream<SearchGoogleAdsStreamResponse> streamResponse) {
+        GoogleAdsRowAdapter googleAdsRowAdapter = new GoogleAdsRowAdapterImpl();
+        List<ConversionDetails> conversionDetailsList = new ArrayList<>();
+
+        for (SearchGoogleAdsStreamResponse searchGoogleAdsStreamResponse : streamResponse) {
+            for (GoogleAdsRow googleAdsRow : searchGoogleAdsStreamResponse.getResultsList()) {
+                ConversionDetails conversionDetails = googleAdsRowAdapter.getConversionDetails(googleAdsRow);
+                conversionDetailsList.add(conversionDetails);
+            }
+        }
+        return conversionDetailsList;
     }
 }

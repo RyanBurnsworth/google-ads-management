@@ -329,7 +329,22 @@ public class GoogleAdsRowAdapterImpl implements GoogleAdsRowAdapter {
         return responsiveSearchAdDetails;
     }
 
-    /*
+    @Override
+    public ConversionDetails getConversionDetails(GoogleAdsRow googleAdsRow) {
+        ConversionDetails conversionDetails = new ConversionDetails();
+        conversionDetails.setActionId(String.valueOf(googleAdsRow.getConversionAction().getId()));
+        conversionDetails.setActionName(googleAdsRow.getConversionAction().getName());
+        conversionDetails.setResourceName(googleAdsRow.getConversionAction().getResourceName());
+        conversionDetails.setCategory(googleAdsRow.getConversionAction().getCategoryValue());
+        conversionDetails.setCurrencyCode(googleAdsRow.getConversionAction().getValueSettings().getDefaultCurrencyCode());
+        conversionDetails.setDefaultValue(googleAdsRow.getConversionAction().getValueSettings().getDefaultValue());
+        conversionDetails.setActionCountingType(googleAdsRow.getConversionAction().getCountingTypeValue());
+        conversionDetails.setCallDurationSeconds(googleAdsRow.getConversionAction().getPhoneCallDurationSeconds());
+        conversionDetails.setType(googleAdsRow.getConversionAction().getTypeValue());
+
+        return conversionDetails;
+    }
+/*
         End of Details Adaptions
 
         Start Metrics Adaptions
