@@ -214,6 +214,37 @@ public class MetricsHelper {
         return keywordMetricsList;
     }
 
+    public static String getDeviceMetricsByAccount(String customerId) {
+        return "SELECT" +
+                " segments.device," +
+                " customer.id," +
+                " customer.resource_name," +
+                " metrics.clicks," +
+                " metrics.impressions," +
+                " metrics.ctr," +
+                " metrics.average_cpc," +
+                " metrics.cost_micros," +
+                " metrics.conversions," +
+                " metrics.cost_per_conversion," +
+                " metrics.conversions_value" +
+                " FROM customer" +
+                " WHERE" +
+                " customer.id = " + customerId;
+    }
+
+    public static List<Metrics> convertStreamToAccountDeviceDetails(ServerStream<SearchGoogleAdsStreamResponse> streamResponses) {
+        GoogleAdsRowAdapterImpl googleAdsRowAdapter = new GoogleAdsRowAdapterImpl();
+        List<Metrics> accountDeviceMetrics = new ArrayList<>();
+
+        for (SearchGoogleAdsStreamResponse response : streamResponses) {
+            for (GoogleAdsRow googleAdsRow : response.getResultsList()) {
+                Metrics deviceMetrics = googleAdsRowAdapter.getDeviceMetricsByAccount(googleAdsRow);
+                accountDeviceMetrics.add(deviceMetrics);
+            }
+        }
+        return accountDeviceMetrics;
+    }
+
     public static String getDeviceMetricsByCampaign(String campaignResourceName) {
         return "SELECT" +
                 " segments.device," +

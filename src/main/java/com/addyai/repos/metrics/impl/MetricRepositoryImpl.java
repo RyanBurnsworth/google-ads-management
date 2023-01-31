@@ -47,6 +47,8 @@ public class MetricRepositoryImpl implements MetricRepository {
             query = MetricsHelper.getKeywordMetrics(resourceName, startDate, endDate);
         } else if (metricType == MetricType.AD) {
             query = MetricsHelper.getAdMetrics(resourceName, startDate, endDate);
+        } else if (metricType == MetricType.DEVICE_ACCOUNT) {
+            query = MetricsHelper.getDeviceMetricsByAccount(customerId);
         } else if (metricType == MetricType.DEVICE_CAMPAIGN) {
             query = MetricsHelper.getDeviceMetricsByCampaign(resourceName);
         } else if (metricType == MetricType.DEVICE_ADGROUP) {
@@ -76,6 +78,8 @@ public class MetricRepositoryImpl implements MetricRepository {
                 return MetricsHelper.convertStreamToKeywordMetrics(stream);
             } else if (metricType == MetricType.AD) {
                 return MetricsHelper.convertStreamToAdMetrics(stream);
+            } else if (metricType == MetricType.DEVICE_ACCOUNT) {
+                return MetricsHelper.convertStreamToAccountDeviceDetails(stream);
             } else if (metricType == MetricType.DEVICE_CAMPAIGN) {
                 return MetricsHelper.convertStreamToCampaignDeviceDetails(stream);
             } else if (metricType == MetricType.DEVICE_ADGROUP) {

@@ -435,12 +435,32 @@ public class GoogleAdsRowAdapterImpl implements GoogleAdsRowAdapter {
     }
 
     @Override
+    public Metrics getDeviceMetricsByAccount(GoogleAdsRow googleAdsRow) {
+        Metrics accountDeviceMetrics = new Metrics();
+        accountDeviceMetrics.setType(MetricType.DEVICE_ACCOUNT);
+        accountDeviceMetrics.setResourceId(String.valueOf(googleAdsRow.getCustomer().getId()));
+        accountDeviceMetrics.setResourceName(googleAdsRow.getCustomer().getResourceName());
+
+        accountDeviceMetrics.setDeviceType(googleAdsRow.getSegments().getDevice().name());
+        accountDeviceMetrics.setClicks(googleAdsRow.getMetrics().getClicks());
+        accountDeviceMetrics.setImpressions(googleAdsRow.getMetrics().getImpressions());
+        accountDeviceMetrics.setCtr(googleAdsRow.getMetrics().getCtr());
+        accountDeviceMetrics.setCost((double) googleAdsRow.getMetrics().getCostMicros() / MICRO_FACTOR);
+        accountDeviceMetrics.setAverageCpc(googleAdsRow.getMetrics().getAverageCpc());
+        accountDeviceMetrics.setConversions(googleAdsRow.getMetrics().getConversions());
+        accountDeviceMetrics.setConversionValue(googleAdsRow.getMetrics().getConversionsValue());
+        accountDeviceMetrics.setCostPerConversion(googleAdsRow.getMetrics().getCostPerConversion());
+        accountDeviceMetrics.setLastUpdated(DateTimeHelper.getCurrentTimestamp().toString());
+
+        return accountDeviceMetrics;
+    }
+
+    @Override
     public Metrics getDeviceMetricsByCampaign(GoogleAdsRow googleAdsRow) {
         Metrics campaignDeviceMetrics = new Metrics();
         campaignDeviceMetrics.setType(MetricType.DEVICE_CAMPAIGN);
-        campaignDeviceMetrics.setResourceId(String.valueOf(googleAdsRow.getAdGroupCriterion().getCriterionId()));
-        campaignDeviceMetrics.setParentId(googleAdsRow.getAdGroupCriterion().getAdGroup());
-        campaignDeviceMetrics.setResourceName(googleAdsRow.getAdGroupCriterion().getResourceName());
+        campaignDeviceMetrics.setResourceId(String.valueOf(googleAdsRow.getCampaign().getId()));
+        campaignDeviceMetrics.setResourceName(googleAdsRow.getCampaign().getResourceName());
 
         campaignDeviceMetrics.setDeviceType(googleAdsRow.getSegments().getDevice().name());
         campaignDeviceMetrics.setClicks(googleAdsRow.getMetrics().getClicks());
