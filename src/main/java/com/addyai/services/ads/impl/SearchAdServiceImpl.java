@@ -8,7 +8,7 @@ import com.addyai.error_handling.exceptions.InvalidRequestException;
 import com.addyai.models.ads.AdDetails;
 import com.addyai.repos.ads.SearchAdsRepository;
 import com.addyai.services.ads.SearchAdService;
-import com.addyai.utils.helpers.ResourceNameCreator;
+import com.addyai.utils.helpers.ResourceNameHelper;
 import com.addyai.utils.validators.EntityValidator;
 import com.google.ads.googleads.v12.services.AdGroupAdOperation;
 import org.springframework.stereotype.Service;
@@ -74,7 +74,7 @@ public class SearchAdServiceImpl implements SearchAdService {
         // update the adName to match
         // customers/{customer_id}/adGroupAds/{ad_group_id}~{ad_id}
         for(AdDetails adDetails : adDetailsList) {
-            adDetails.setAdName(ResourceNameCreator
+            adDetails.setAdName(ResourceNameHelper
                     .getAdResourceName(customerId, adGroupResName, adDetails.getAdName()));
         }
 

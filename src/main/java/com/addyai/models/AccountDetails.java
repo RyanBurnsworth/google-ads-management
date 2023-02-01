@@ -1,6 +1,6 @@
 package com.addyai.models;
 
-import com.google.ads.googleads.v10.enums.CustomerStatusEnum;
+import com.google.ads.googleads.v12.enums.CustomerStatusEnum;
 
 public class AccountDetails {
     String customerId = "";

@@ -24,6 +24,7 @@ import com.addyai.models.assets.SitelinkDetails;
 import com.addyai.models.campaign_criterion.*;
 import com.addyai.models.metrics.Metrics;
 import com.addyai.utils.helpers.DateTimeHelper;
+import com.addyai.utils.helpers.ResourceNameHelper;
 import com.google.ads.googleads.v12.common.AdScheduleInfo;
 import com.google.ads.googleads.v12.services.GoogleAdsRow;
 
@@ -402,7 +403,7 @@ public class GoogleAdsRowAdapterImpl implements GoogleAdsRowAdapter {
         Metrics adGroupMetrics = new Metrics();
         adGroupMetrics.setType(MetricType.ADGROUP);
         adGroupMetrics.setResourceId(String.valueOf(googleAdsRow.getAdGroup().getId()));
-        adGroupMetrics.setParentId(googleAdsRow.getAdGroup().getCampaign());
+        adGroupMetrics.setParentId(ResourceNameHelper.getCampaignIdFromResName(googleAdsRow.getAdGroup().getCampaign()));
         adGroupMetrics.setResourceName(googleAdsRow.getAdGroup().getResourceName());
 
         adGroupMetrics.setDate(googleAdsRow.getSegments().getDate());
@@ -426,7 +427,7 @@ public class GoogleAdsRowAdapterImpl implements GoogleAdsRowAdapter {
         Metrics adMetrics = new Metrics();
         adMetrics.setType(MetricType.AD);
         adMetrics.setResourceId(String.valueOf(googleAdsRow.getAdGroupAd().getAd().getId()));
-        adMetrics.setParentId(googleAdsRow.getAdGroupAd().getAdGroup());
+        adMetrics.setParentId(ResourceNameHelper.getAdGroupIdFromResName(googleAdsRow.getAdGroupAd().getAdGroup()));
         adMetrics.setResourceName(googleAdsRow.getAdGroupAd().getAd().getResourceName());
 
         adMetrics.setDate(googleAdsRow.getSegments().getDate());
@@ -448,7 +449,7 @@ public class GoogleAdsRowAdapterImpl implements GoogleAdsRowAdapter {
         Metrics keywordMetrics = new Metrics();
         keywordMetrics.setType(MetricType.KEYWORD);
         keywordMetrics.setResourceId(String.valueOf(googleAdsRow.getAdGroupCriterion().getCriterionId()));
-        keywordMetrics.setParentId(googleAdsRow.getAdGroupCriterion().getAdGroup());
+        keywordMetrics.setParentId(ResourceNameHelper.getAdGroupIdFromResName(googleAdsRow.getAdGroupCriterion().getAdGroup()));
         keywordMetrics.setResourceName(googleAdsRow.getAdGroupCriterion().getResourceName());
 
         keywordMetrics.setDate(googleAdsRow.getSegments().getDate());
@@ -515,7 +516,7 @@ public class GoogleAdsRowAdapterImpl implements GoogleAdsRowAdapter {
         Metrics adGroupDeviceMetrics = new Metrics();
         adGroupDeviceMetrics.setType(MetricType.DEVICE_ADGROUP);
         adGroupDeviceMetrics.setResourceId(String.valueOf(googleAdsRow.getAdGroupCriterion().getCriterionId()));
-        adGroupDeviceMetrics.setParentId(googleAdsRow.getAdGroupCriterion().getAdGroup());
+        adGroupDeviceMetrics.setParentId(ResourceNameHelper.getAdGroupIdFromResName(googleAdsRow.getAdGroupCriterion().getAdGroup()));
         adGroupDeviceMetrics.setResourceName(googleAdsRow.getAdGroupCriterion().getResourceName());
 
         adGroupDeviceMetrics.setDeviceType(googleAdsRow.getSegments().getDevice().name());
@@ -537,7 +538,7 @@ public class GoogleAdsRowAdapterImpl implements GoogleAdsRowAdapter {
         Metrics adDeviceMetrics = new Metrics();
         adDeviceMetrics.setType(MetricType.DEVICE_AD);
         adDeviceMetrics.setResourceId(String.valueOf(googleAdsRow.getAdGroupAd().getAd().getId()));
-        adDeviceMetrics.setParentId(googleAdsRow.getAdGroupAd().getAdGroup());
+        adDeviceMetrics.setParentId(ResourceNameHelper.getAdGroupIdFromResName(googleAdsRow.getAdGroupAd().getAdGroup()));
         adDeviceMetrics.setResourceName(googleAdsRow.getAdGroupAd().getAd().getResourceName());
 
         adDeviceMetrics.setDeviceType(googleAdsRow.getSegments().getDevice().name());
@@ -559,7 +560,7 @@ public class GoogleAdsRowAdapterImpl implements GoogleAdsRowAdapter {
         Metrics keywordDeviceMetrics = new Metrics();
         keywordDeviceMetrics.setType(MetricType.DEVICE_KEYWORD);
         keywordDeviceMetrics.setResourceId(String.valueOf(googleAdsRow.getAdGroupCriterion().getCriterionId()));
-        keywordDeviceMetrics.setParentId(googleAdsRow.getAdGroupCriterion().getAdGroup());
+        keywordDeviceMetrics.setParentId(ResourceNameHelper.getAdGroupIdFromResName(googleAdsRow.getAdGroupCriterion().getAdGroup()));
         keywordDeviceMetrics.setResourceName(googleAdsRow.getKeywordView().getResourceName());
 
         keywordDeviceMetrics.setDeviceType(googleAdsRow.getSegments().getDevice().name());
