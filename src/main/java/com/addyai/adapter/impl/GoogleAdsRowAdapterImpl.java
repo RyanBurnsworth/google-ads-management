@@ -232,6 +232,7 @@ public class GoogleAdsRowAdapterImpl implements GoogleAdsRowAdapter {
     @Override
     public AdGroupDetails getAdGroupDetails(GoogleAdsRow googleAdsRow) {
         AdGroupDetails adGroupDetails = new AdGroupDetails();
+        adGroupDetails.setAdGroupId(googleAdsRow.getAdGroup().getId());
         adGroupDetails.setCpcBid((int) (googleAdsRow.getAdGroup().getCpcBidMicros() / MICRO_FACTOR));
         adGroupDetails.setAdGroupResourceName(googleAdsRow.getAdGroup().getResourceName());
         adGroupDetails.setCampaignResourceName(googleAdsRow.getAdGroup().getCampaign());
@@ -318,6 +319,8 @@ public class GoogleAdsRowAdapterImpl implements GoogleAdsRowAdapter {
             paths.add(googleAdsRow.getAdGroupAd().getAd().getResponsiveSearchAd().getPath2());
 
         ResponsiveSearchAdDetails responsiveSearchAdDetails = new ResponsiveSearchAdDetails();
+        responsiveSearchAdDetails.setAdType("responsive");
+        responsiveSearchAdDetails.setAdId(googleAdsRow.getAdGroupAd().getAd().getId());
         responsiveSearchAdDetails.setAdName(googleAdsRow.getAdGroupAd().getAd().getResourceName());
         responsiveSearchAdDetails.setAdStatus(googleAdsRow.getAdGroupAd().getStatusValue());
         responsiveSearchAdDetails.setAdGroupResourceName(googleAdsRow.getAdGroupAd().getAdGroup());
@@ -345,7 +348,8 @@ public class GoogleAdsRowAdapterImpl implements GoogleAdsRowAdapter {
 
         return conversionDetails;
     }
-/*
+
+    /*
         End of Details Adaptions
 
         Start Metrics Adaptions

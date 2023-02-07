@@ -274,6 +274,8 @@ public class GAQLHelper {
 
     public static String getResponsiveSearchAdQuery(String adGroupResourceName) {
         return "SELECT " +
+                "ad_group_ad.ad_group, " +
+                "ad_group_ad.ad.id, " +
                 "ad_group_ad.ad.resource_name, " +
                 "ad_group_ad.status, " +
                 "ad_group_ad.ad.display_url, " +

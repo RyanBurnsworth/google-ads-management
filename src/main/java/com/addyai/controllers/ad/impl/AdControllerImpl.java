@@ -21,36 +21,40 @@ public class AdControllerImpl implements AdController {
     @Override
     @GetMapping("details")
     public ResponseEntity<List<AdDetails>> fetchAdDetailsByAdGroup(@PathVariable long customerId,
-                                                                   @RequestParam String adGroupResName) throws Exception {
-        List<AdDetails> adDetailsList = searchAdService.findAllAdsByAdGroup(customerId, adGroupResName);
+                                                                   @RequestParam String adGroupId) throws Exception {
+        String adGroupResourceName = "customers/" + customerId + "/adGroups/" + adGroupId;
+        List<AdDetails> adDetailsList = searchAdService.findAllAdsByAdGroup(customerId, adGroupResourceName);
         return new ResponseEntity<>(adDetailsList, HttpStatus.OK);
     }
 
     @Override
     @PostMapping("create")
     public ResponseEntity<Void> addAdsToAdGroup(@PathVariable long customerId,
-                                                @RequestParam String adGroupResName,
+                                                @RequestParam String adGroupId,
                                                 @RequestBody List<AdDetails> adDetailsList) throws Exception {
-        searchAdService.upsertAds(customerId, adGroupResName, adDetailsList, true);
+        String adGroupResourceName = "customers/" + customerId + "/adGroups/" + adGroupId;
+        searchAdService.upsertAds(customerId, adGroupResourceName, adDetailsList, true);
         return new ResponseEntity<>(HttpStatus.CREATED);
     }
 
     @Override
     @PutMapping("update")
     public ResponseEntity<Void> updateAdsInAdGroup(@PathVariable long customerId,
-                                                   @RequestParam String adGroupResName,
+                                                   @RequestParam String adGroupId,
                                                    @RequestBody List<AdDetails> adDetailsList) throws Exception {
-        searchAdService.deleteAds(customerId, adDetailsList, adGroupResName);
-        searchAdService.upsertAds(customerId, adGroupResName, adDetailsList, true);
+        String adGroupResourceName = "customers/" + customerId + "/adGroups/" + adGroupId;
+        searchAdService.deleteAds(customerId, adDetailsList, adGroupResourceName);
+        searchAdService.upsertAds(customerId, adGroupResourceName, adDetailsList, true);
         return new ResponseEntity<>(HttpStatus.ACCEPTED);
     }
 
     @Override
     @PostMapping("remove")
     public ResponseEntity<Void> deleteAdsInAdGroup(@PathVariable long customerId,
-                                                   @RequestParam String adGroupResName,
+                                                   @RequestParam String adGroupId,
                                                    @RequestBody List<AdDetails> adDetailsList) throws Exception {
-        searchAdService.deleteAds(customerId, adDetailsList, adGroupResName);
+        String adGroupResourceName = "customers/" + customerId + "/adGroups/" + adGroupId;
+        searchAdService.deleteAds(customerId, adDetailsList, adGroupResourceName);
         return new ResponseEntity<>(HttpStatus.ACCEPTED);
     }
 }
