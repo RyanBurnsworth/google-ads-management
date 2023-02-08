@@ -13,22 +13,22 @@ public class MetricsHelper {
     public static String getAccountMetrics(String customerId,
                                            String startDate,
                                            String endDate) {
-        return "SELECT \n" +
-                " customer.id, \n" +
-                " customer.resource_name, \n" +
-                " segments.date, \n" +
-                " metrics.clicks, \n" +
-                " metrics.impressions, \n" +
-                " metrics.ctr, \n" +
-                " metrics.average_cpc, \n" +
-                " metrics.cost_micros, \n" +
-                " metrics.conversions, \n" +
-                " metrics.cost_per_conversion, \n" +
-                " metrics.conversions_value, \n" +
-                " metrics.invalid_click_rate, \n" +
-                " metrics.invalid_clicks \n" +
-                " FROM customer \n" +
-                " WHERE \n" +
+        return "SELECT " +
+                " customer.id, " +
+                " customer.resource_name, " +
+                " segments.date, " +
+                " metrics.clicks, " +
+                " metrics.impressions, " +
+                " metrics.ctr, " +
+                " metrics.average_cpc, " +
+                " metrics.cost_micros, " +
+                " metrics.conversions, " +
+                " metrics.cost_per_conversion, " +
+                " metrics.conversions_value, " +
+                " metrics.invalid_click_rate, " +
+                " metrics.invalid_clicks " +
+                " FROM customer " +
+                " WHERE " +
                 " customer.id = " + customerId +
                 " AND segments.date >= '" + startDate + "'" +
                 " AND segments.date <= '" + endDate + "'";
