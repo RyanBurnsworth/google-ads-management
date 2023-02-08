@@ -36,7 +36,8 @@ public class AdGroupControllerImpl implements AdGroupController {
     @Override
     @GetMapping("details")
     public ResponseEntity<List<AdGroupDetails>> fetchAllAdGroupDetails(@PathVariable long customerId,
-                                                                       @RequestParam String campaignResName) throws Exception {
+                                                                       @RequestParam String campaignId) throws Exception {
+        String campaignResName = "customers/" + customerId + "/campaigns/" + campaignId;
         List<AdGroupDetails> adGroupDetailsList = adGroupService.findAllAdGroupsByCampaign(customerId, campaignResName);
         return new ResponseEntity<>(adGroupDetailsList, HttpStatus.OK);
     }

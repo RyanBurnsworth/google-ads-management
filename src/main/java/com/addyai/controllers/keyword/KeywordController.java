@@ -21,7 +21,7 @@ import org.springframework.http.ResponseEntity;
 import java.util.List;
 
 public interface KeywordController {
-    ResponseEntity<List<KeywordDetails>> findKeywordDetailsByAdGroup(String customerId, String adGroupResourceName) throws Exception;
+    ResponseEntity<List<KeywordDetails>> findKeywordDetailsByAdGroup(String customerId, String adGroupId) throws Exception;
 
     ResponseEntity<Void> addKeywordsToAdGroup(String customerId, List<KeywordDetails> keywordDetailsList) throws Exception;
 

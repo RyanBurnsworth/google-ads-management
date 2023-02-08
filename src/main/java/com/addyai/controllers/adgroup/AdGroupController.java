@@ -21,7 +21,7 @@ import org.springframework.http.ResponseEntity;
 import java.util.List;
 
 public interface AdGroupController {
-    ResponseEntity<List<AdGroupDetails>> fetchAllAdGroupDetails(long customerId, String campaignResName) throws Exception;
+    ResponseEntity<List<AdGroupDetails>> fetchAllAdGroupDetails(long customerId, String campaignId) throws Exception;
 
     ResponseEntity<Void> createAdGroups(String customerId, List<AdGroupDetails> adGroupDetailsList) throws Exception;
 

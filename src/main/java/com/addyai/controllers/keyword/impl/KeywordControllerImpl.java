@@ -36,7 +36,8 @@ public class KeywordControllerImpl implements KeywordController {
     @Override
     @GetMapping("details")
     public ResponseEntity<List<KeywordDetails>> findKeywordDetailsByAdGroup(@PathVariable String customerId,
-                                                                            @RequestParam String adGroupResName) throws Exception {
+                                                                            @RequestParam String adGroupId) throws Exception {
+        String adGroupResName = "customers/" + customerId + "/adGroups/" + adGroupId;
         List<KeywordDetails> keywordDetailsList =
                 keywordService.findAllKeywordsByAdGroup(Long.parseLong(customerId), adGroupResName);
 
