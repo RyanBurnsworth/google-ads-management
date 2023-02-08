@@ -260,6 +260,9 @@ public class GoogleAdsRowAdapterImpl implements GoogleAdsRowAdapter {
     public SitelinkDetails getSitelinkDetails(GoogleAdsRow googleAdsRow) {
         SitelinkDetails sitelinkDetails = new SitelinkDetails();
         sitelinkDetails.setAssetId(googleAdsRow.getAsset().getId());
+        sitelinkDetails.setFinalUrlList(googleAdsRow.getAsset().getFinalUrlsList());
+        sitelinkDetails.setFinalMobileUrlList(googleAdsRow.getAsset().getFinalMobileUrlsList());
+        sitelinkDetails.setFinalUrlSuffix(googleAdsRow.getAsset().getFinalUrlSuffix());
         sitelinkDetails.setAssetName(googleAdsRow.getAsset().getResourceName());
         sitelinkDetails.setAssetSource(googleAdsRow.getAsset().getSourceValue());
         sitelinkDetails.setAssetType(googleAdsRow.getAsset().getTypeValue());
@@ -320,6 +323,7 @@ public class GoogleAdsRowAdapterImpl implements GoogleAdsRowAdapter {
 
         ResponsiveSearchAdDetails responsiveSearchAdDetails = new ResponsiveSearchAdDetails();
         responsiveSearchAdDetails.setAdType("responsive");
+        responsiveSearchAdDetails.setFinalUrl(googleAdsRow.getAdGroupAd().getAd().getFinalUrls(0));
         responsiveSearchAdDetails.setAdId(googleAdsRow.getAdGroupAd().getAd().getId());
         responsiveSearchAdDetails.setAdName(googleAdsRow.getAdGroupAd().getAd().getResourceName());
         responsiveSearchAdDetails.setAdStatus(googleAdsRow.getAdGroupAd().getStatusValue());

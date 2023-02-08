@@ -1,5 +1,6 @@
-package com.addyai.controllers.conversion;
+package com.addyai.controllers.conversion.impl;
 
+import com.addyai.controllers.conversion.ConversionController;
 import com.addyai.models.ConversionDetails;
 import com.addyai.repos.conversion.ConversionRepository;
 import org.springframework.http.HttpStatus;

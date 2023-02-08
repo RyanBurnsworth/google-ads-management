@@ -252,6 +252,9 @@ public class GAQLHelper {
                 "asset.name, " +
                 "asset.type, " +
                 "asset.source, " +
+                "asset.final_urls, " +
+                "asset.final_url_suffix, " +
+                "asset.final_mobile_urls, " +
                 "asset.sitelink_asset.description1, " +
                 "asset.sitelink_asset.description2, " +
                 "asset.sitelink_asset.link_text, " +
