@@ -10,6 +10,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.annotation.Nullable;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -100,7 +101,12 @@ public class MetricsControllerImpl implements MetricsController {
 
     @Override
     @GetMapping("/metrics/date/demo")
-    public ResponseEntity<Object> getDummyMetricsByDate(@RequestParam String resourceType) {
+    public ResponseEntity<Object> getDummyMetricsByDate(@PathVariable String customerId,
+                                                        @RequestParam String resourceId,
+                                                        @RequestParam String parentResourceId,
+                                                        @RequestParam String startDate,
+                                                        @RequestParam String endDate,
+                                                        @RequestParam String resourceType) {
         Object obj = new Object();
         switch (resourceType) {
             case RESOURCE_ACCOUNT:
@@ -126,7 +132,10 @@ public class MetricsControllerImpl implements MetricsController {
 
     @Override
     @GetMapping("/metrics/device/demo")
-    public ResponseEntity<Object> getDummyMetricsByDevice(@RequestParam String resourceType) {
+    public ResponseEntity<Object> getDummyMetricsByDevice(@PathVariable String customerId,
+                                                          @Nullable @RequestParam String resourceId,
+                                                          @Nullable@RequestParam String parentResourceId,
+                                                          @RequestParam String resourceType) {
         return null;
     }
 
