@@ -31,9 +31,9 @@ public class AdControllerImpl implements AdController {
     @PostMapping("create")
     public ResponseEntity<Void> addAdsToAdGroup(@PathVariable long customerId,
                                                 @RequestParam String adGroupId,
-                                                @RequestBody List<AdDetails> adDetailsList) throws Exception {
+                                                @RequestBody List<AdDetails> adDetails) throws Exception {
         String adGroupResourceName = "customers/" + customerId + "/adGroups/" + adGroupId;
-        searchAdService.upsertAds(customerId, adGroupResourceName, adDetailsList, true);
+        searchAdService.upsertAds(customerId, adGroupResourceName, adDetails, true);
         return new ResponseEntity<>(HttpStatus.CREATED);
     }
 
@@ -41,20 +41,20 @@ public class AdControllerImpl implements AdController {
     @PutMapping("update")
     public ResponseEntity<Void> updateAdsInAdGroup(@PathVariable long customerId,
                                                    @RequestParam String adGroupId,
-                                                   @RequestBody List<AdDetails> adDetailsList) throws Exception {
+                                                   @RequestBody List<AdDetails> adDetails) throws Exception {
         String adGroupResourceName = "customers/" + customerId + "/adGroups/" + adGroupId;
-        searchAdService.deleteAds(customerId, adDetailsList, adGroupResourceName);
-        searchAdService.upsertAds(customerId, adGroupResourceName, adDetailsList, true);
-        return new ResponseEntity<>(HttpStatus.ACCEPTED);
+        searchAdService.deleteAds(customerId, adDetails, adGroupResourceName);
+        searchAdService.upsertAds(customerId, adGroupResourceName, adDetails, true);
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 
     @Override
     @PostMapping("remove")
     public ResponseEntity<Void> deleteAdsInAdGroup(@PathVariable long customerId,
                                                    @RequestParam String adGroupId,
-                                                   @RequestBody List<AdDetails> adDetailsList) throws Exception {
+                                                   @RequestBody List<AdDetails> adDetails) throws Exception {
         String adGroupResourceName = "customers/" + customerId + "/adGroups/" + adGroupId;
-        searchAdService.deleteAds(customerId, adDetailsList, adGroupResourceName);
-        return new ResponseEntity<>(HttpStatus.ACCEPTED);
+        searchAdService.deleteAds(customerId, adDetails, adGroupResourceName);
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 }

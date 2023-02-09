@@ -15,7 +15,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/v1/{customerId}")
+@RequestMapping("/api/v1/{customerId}/metrics")
 public class MetricsControllerImpl implements MetricsController {
     private static final String RESOURCE_ACCOUNT = "account";
     private static final String RESOURCE_CAMPAIGN = "campaign";
@@ -36,7 +36,7 @@ public class MetricsControllerImpl implements MetricsController {
     }
 
     @Override
-    @GetMapping("/metrics/date")
+    @GetMapping("/date")
     public ResponseEntity<List<Metrics>> getMetricsByDateRange(@PathVariable String customerId,
                                                                @RequestParam String resourceId,
                                                                @RequestParam String parentResourceId,
@@ -94,7 +94,7 @@ public class MetricsControllerImpl implements MetricsController {
     }
 
     @Override
-    @GetMapping("/metrics/date/demo")
+    @GetMapping("/date/demo")
     public ResponseEntity<Object> getDummyMetricsByDate(@PathVariable String customerId,
                                                         @RequestParam String resourceId,
                                                         @RequestParam String parentResourceId,

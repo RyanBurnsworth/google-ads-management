@@ -34,21 +34,21 @@ public class AssetControllerImpl implements AssetController {
                                           @RequestParam String campaignResName,
                                           @RequestBody List<AssetDetails> assetDetails) throws Exception {
         assetService.upsertAssets(customerId, assetDetails, assetLevel, campaignResName, true);
-        return new ResponseEntity<>(HttpStatus.ACCEPTED);
+        return new ResponseEntity<>(HttpStatus.CREATED);
     }
 
     @Override
-    @PostMapping("update")
+    @PutMapping("update")
     public ResponseEntity<Void> updateAssets(@PathVariable long customerId,
                                              @RequestParam String assetLevel,
                                              @RequestParam String campaignResName,
                                              @RequestBody List<AssetDetails> assetDetailsList) throws Exception {
         assetService.upsertAssets(customerId, assetDetailsList, assetLevel, campaignResName, false);
-        return new ResponseEntity<>(HttpStatus.ACCEPTED);
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 
     @Override
-    @PostMapping("unlink")
+    @PostMapping("remove")
     public ResponseEntity<Void> unlinkAssets(@PathVariable long customerId,
                                              @RequestParam String assetLevel,
                                              @RequestParam String campaignResName,
@@ -69,6 +69,6 @@ public class AssetControllerImpl implements AssetController {
                     campaignResName,
                     false);
         }
-        return new ResponseEntity<>(HttpStatus.ACCEPTED);
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 }

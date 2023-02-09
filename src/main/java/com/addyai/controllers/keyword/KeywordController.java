@@ -23,9 +23,9 @@ import java.util.List;
 public interface KeywordController {
     ResponseEntity<List<KeywordDetails>> findKeywordDetailsByAdGroup(String customerId, String adGroupId) throws Exception;
 
-    ResponseEntity<Void> addKeywordsToAdGroup(String customerId, List<KeywordDetails> keywordDetailsList) throws Exception;
+    ResponseEntity<Void> addKeywordsToAdGroup(String customerId, List<KeywordDetails> keywordDetails) throws Exception;
 
-    ResponseEntity<Void> updateKeywords(String customerId, List<KeywordDetails> keywordDetailsList) throws Exception;
+    ResponseEntity<Void> updateKeywords(String customerId, List<KeywordDetails> keywordDetails) throws Exception;
 
-    ResponseEntity<Void> deleteKeywords(String customerId, List<KeywordDetails> keywordDetailsList) throws Exception;
+    ResponseEntity<Void> deleteKeywords(String customerId, List<KeywordDetails> keywordDetails) throws Exception;
 }

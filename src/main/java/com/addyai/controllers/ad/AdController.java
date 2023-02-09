@@ -10,13 +10,13 @@ public interface AdController {
 
     ResponseEntity<Void> addAdsToAdGroup(long customerId,
                                          String adGroupId,
-                                         List<AdDetails> adDetailsList) throws Exception;
+                                         List<AdDetails> adDetails) throws Exception;
 
     ResponseEntity<Void> updateAdsInAdGroup(long customerId,
                                             String adGroupId,
-                                            List<AdDetails> adDetailsList) throws Exception;
+                                            List<AdDetails> adDetails) throws Exception;
 
     ResponseEntity<Void> deleteAdsInAdGroup(long customerId,
                                             String adGroupId,
-                                            List<AdDetails> adDetailsList) throws Exception;
+                                            List<AdDetails> adDetails) throws Exception;
 }

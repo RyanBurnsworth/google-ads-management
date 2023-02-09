@@ -154,7 +154,6 @@ public class CampaignServiceImpl implements CampaignService {
         if (campaignDetails == null)
             throw new NotFoundException(RESOURCE_NOT_FOUND_ERR_CODE, RESOURCE_NOT_FOUND_ERROR_MSG);
 
-        // TODO create an endpoint to grab a single budget details object by id or name
         // fetch all the campaign budgets from the client's account
         List<BudgetDetails> existingBudgets = budgetRepository.fetchAllBudgetDetails(customerId);
 

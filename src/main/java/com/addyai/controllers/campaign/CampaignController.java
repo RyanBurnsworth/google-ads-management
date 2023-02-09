@@ -21,7 +21,7 @@ import org.springframework.http.ResponseEntity;
 import java.util.List;
 
 public interface CampaignController {
-    ResponseEntity<List<CampaignDetails>> fetchAllCampaignDetails(String customerId) throws Exception;
+    ResponseEntity<List<CampaignDetails>> fetchCampaignsByCustomerId(String customerId) throws Exception;
 
     ResponseEntity<CampaignDetails> fetchCampaignDetailsByName(String customerId,
                                                                String campaignName) throws Exception;

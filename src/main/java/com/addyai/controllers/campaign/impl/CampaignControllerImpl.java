@@ -35,7 +35,7 @@ public class CampaignControllerImpl implements CampaignController {
 
     @Override
     @GetMapping("details")
-    public ResponseEntity<List<CampaignDetails>> fetchAllCampaignDetails(@PathVariable String customerId) throws Exception {
+    public ResponseEntity<List<CampaignDetails>> fetchCampaignsByCustomerId(@PathVariable String customerId) throws Exception {
         List<CampaignDetails> campaignDetails = campaignService.findAllCampaignDetails(Long.parseLong(customerId));
         return new ResponseEntity<>(campaignDetails, HttpStatus.OK);
     }

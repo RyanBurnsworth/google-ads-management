@@ -45,24 +45,24 @@ public class AdGroupControllerImpl implements AdGroupController {
     @Override
     @PostMapping("create")
     public ResponseEntity<Void> createAdGroups(@PathVariable String customerId,
-                                               @RequestBody List<AdGroupDetails> adGroupDetailsList) throws Exception {
-        adGroupService.upsertAdGroups(Long.parseLong(customerId), adGroupDetailsList, true);
+                                               @RequestBody List<AdGroupDetails> adGroupDetails) throws Exception {
+        adGroupService.upsertAdGroups(Long.parseLong(customerId), adGroupDetails, true);
         return new ResponseEntity<>(HttpStatus.CREATED);
     }
 
     @Override
-    @PostMapping("update")
+    @PutMapping("update")
     public ResponseEntity<Void> updateAdGroups(@PathVariable String customerId,
-                                               @RequestBody List<AdGroupDetails> adGroupDetailsList) throws Exception {
-        adGroupService.upsertAdGroups(Long.parseLong(customerId), adGroupDetailsList, false);
+                                               @RequestBody List<AdGroupDetails> adGroupDetails) throws Exception {
+        adGroupService.upsertAdGroups(Long.parseLong(customerId), adGroupDetails, false);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
     @Override
     @PostMapping("remove")
     public ResponseEntity<Void> deleteAdGroups(@PathVariable String customerId,
-                                               @RequestBody List<AdGroupDetails> adGroupDetailsList) throws Exception {
-        adGroupService.deleteAdGroups(Long.parseLong(customerId), adGroupDetailsList);
+                                               @RequestBody List<AdGroupDetails> adGroupDetails) throws Exception {
+        adGroupService.deleteAdGroups(Long.parseLong(customerId), adGroupDetails);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 }

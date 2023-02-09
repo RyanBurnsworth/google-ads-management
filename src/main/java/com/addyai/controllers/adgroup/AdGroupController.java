@@ -23,9 +23,9 @@ import java.util.List;
 public interface AdGroupController {
     ResponseEntity<List<AdGroupDetails>> fetchAllAdGroupDetails(long customerId, String campaignId) throws Exception;
 
-    ResponseEntity<Void> createAdGroups(String customerId, List<AdGroupDetails> adGroupDetailsList) throws Exception;
+    ResponseEntity<Void> createAdGroups(String customerId, List<AdGroupDetails> adGroupDetails) throws Exception;
 
-    ResponseEntity<Void> updateAdGroups(String customerId, List<AdGroupDetails> adGroupDetailsList) throws Exception;
+    ResponseEntity<Void> updateAdGroups(String customerId, List<AdGroupDetails> adGroupDetails) throws Exception;
 
-    ResponseEntity<Void> deleteAdGroups(String customerId, List<AdGroupDetails> adGroupDetailsList) throws Exception;
+    ResponseEntity<Void> deleteAdGroups(String customerId, List<AdGroupDetails> adGroupDetails) throws Exception;
 }

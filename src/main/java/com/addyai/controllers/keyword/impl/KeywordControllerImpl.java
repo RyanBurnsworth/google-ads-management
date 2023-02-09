@@ -47,25 +47,25 @@ public class KeywordControllerImpl implements KeywordController {
     @Override
     @PostMapping("create")
     public ResponseEntity<Void> addKeywordsToAdGroup(@PathVariable String customerId,
-                                                     @RequestBody List<KeywordDetails> keywordDetailsList) throws Exception {
+                                                     @RequestBody List<KeywordDetails> keywordDetails) throws Exception {
 
-        keywordService.upsertKeywords(Long.parseLong(customerId), keywordDetailsList, true);
+        keywordService.upsertKeywords(Long.parseLong(customerId), keywordDetails, true);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
     @Override
-    @PostMapping("update")
+    @PutMapping("update")
     public ResponseEntity<Void> updateKeywords(@PathVariable String customerId,
-                                               @RequestBody List<KeywordDetails> keywordDetailsList) throws Exception {
-        keywordService.upsertKeywords(Long.parseLong(customerId), keywordDetailsList, false);
+                                               @RequestBody List<KeywordDetails> keywordDetails) throws Exception {
+        keywordService.upsertKeywords(Long.parseLong(customerId), keywordDetails, false);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
     @Override
     @PostMapping("remove")
     public ResponseEntity<Void> deleteKeywords(@PathVariable String customerId,
-                                               @RequestBody List<KeywordDetails> keywordDetailsList) throws Exception {
-        keywordService.deleteKeywords(Long.parseLong(customerId), keywordDetailsList);
+                                               @RequestBody List<KeywordDetails> keywordDetails) throws Exception {
+        keywordService.deleteKeywords(Long.parseLong(customerId), keywordDetails);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 }

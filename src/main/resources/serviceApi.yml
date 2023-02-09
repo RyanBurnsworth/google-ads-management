@@ -1,59 +1,1429 @@
 servers:
-    - description: AddyAI's service for communicating with Google Ads
-      url: http://localhost
+  - description: AddyAI's service for communicating with Google Ads
+    url: http://localhost
 info:
-    description: API for managing Google Ads accounts
-    version: 1.0.0
-    title: Google Ads Management Service
-    contact:
-        - ryanburnsworth@gmail.com
-    tags:
-        - name: external
-          description: The GAMS service endpoints
-
-    paths:
-        /api/v1/{customerId}/account/details:
-            get:
-                tags:
-                    - external
-                    - Account
-                summary: Fetch account details for a given customerId
-                operationId: details
-                description:
-                    Fetch the account details from Google Ads given a customerId
-                parameters:
-                    - in: path
-                      name: customerId
-                      description: the id of the customer account in Google Ads
-                      required: true
-                      schema:
-                        type: string
-                responses:
-                    '200':
-                        description: OK
-                        content:
-                            application/json:
-                                schema:
-                                    type: object
-                                    items:
-                                        $ref: "#/components/schemas/AccountDetails"
-                    '400':
-                        content:
-                            application/json:
-                                schema:
-                                    type: object
-                                    items:
-                                        $ref: "#/components/schemas/ApiErrorResponse"
-        ApiErrorResponse:
-            title: ApiErrorResponse
-            type: object
-            properties:
-                timeStamp:
-                    type: date
-                    description: the timestamp of the error occurence
-                errorCode:
-                    type: string
-                    description: the error code
-                errorMessage:
-                    type: string
-                    description: the description of the error
+  description: API for managing Google Ads accounts
+  version: 1.0.0
+  title: Google Ads Management Service
+  contact:
+    - ryanburnsworth@gmail.com
+  tags:
+    - name: external
+      description: The GAMS service endpoints
+  paths:
+    /api/v1/{customerId}/account/details:
+      get:
+        tags:
+          - external
+          - Account
+        summary: Fetch account details for a given customerId
+        operationId: details
+        description:
+          Fetch the account details from Google Ads given a customerId
+        parameters:
+          - in: path
+            name: customerId
+            description: the id of the customer account in Google Ads
+            required: true
+            schema:
+              type: string
+        responses:
+          '200':
+            description: OK
+            content:
+              application/json:
+                schema:
+                  type: object
+                  items:
+                    $ref: "#/components/schemas/AccountDetails"
+          '400':
+            description: Bad Request
+            content:
+              application/json:
+                schema:
+                  type: object
+                  items:
+                    $ref: "#/components/schemas/ApiErrorResponse"
+                  description: "Invalid or Malformed Request"
+          '404':
+            description: Not Found
+            content:
+              application/json:
+                schema:
+                  type: object
+                  items:
+                    $ref: "#/components/schemas/ApiErrorResponse"
+                  description: "The endpoint supplied was not found"
+          '500':
+            description: Internal Server Error
+            content:
+              application/json:
+                schema:
+                  type: object
+                  items:
+                    $ref: "#/components/schemas/ApiErrorResponse"
+                  description: "An internal server error has occurred"
+    /api/v1/{customerId}/campaign/details:
+      get:
+        tags:
+          - external
+          - Campaign
+        summary: Fetch campaign details for a given customerId
+        operationId: details
+        description:
+          Fetch the campaign details from a Google Ads account given a customerId
+        parameters:
+          - in: path
+            name: customerId
+            description: the id of the customer account in Google Ads
+            required: true
+            schema:
+              type: string
+        responses:
+          '200':
+            description: OK
+            content:
+              application/json:
+                schema:
+                  type: array
+                  items:
+                    $ref: "#/components/schemas/CampaignDetails"
+          '400':
+            description: Bad Request
+            content:
+              application/json:
+                schema:
+                  type: object
+                  items:
+                    $ref: "#/components/schemas/ApiErrorResponse"
+                  description: "Invalid or Malformed Request"
+          '404':
+            description: Not Found
+            content:
+              application/json:
+                schema:
+                  type: object
+                  items:
+                    $ref: "#/components/schemas/ApiErrorResponse"
+                  description: "The endpoint supplied was not found"
+          '500':
+            description: Internal Server Error
+            content:
+              application/json:
+                schema:
+                  type: object
+                  items:
+                    $ref: "#/components/schemas/ApiErrorResponse"
+                  description: "An internal server error has occurred"
+    /api/v1/{customerId}/campaign/{campaignName}/details:
+      get:
+        tags:
+          - external
+          - Campaign
+        summary: Fetch campaign details for a given customerId abd campaignName
+        operationId: details
+        description:
+          Fetch the campaign details from Google Ads account given a customerId and campaign name
+        parameters:
+          - in: path
+            name: customerId
+            description: the id of the customer account in Google Ads
+            required: true
+            schema:
+              type: string
+          - in: path
+            name: campaignName
+            description: the name of the campaign to fetch
+            schema:
+              type: string
+        responses:
+          '200':
+            description: OK
+            content:
+              application/json:
+                schema:
+                  type: object
+                  items:
+                    $ref: "#/components/schemas/CampaignDetails"
+          '400':
+            description: Bad Request
+            content:
+              application/json:
+                schema:
+                  type: object
+                  items:
+                    $ref: "#/components/schemas/ApiErrorResponse"
+                  description: "Invalid or Malformed Request"
+          '404':
+            description: Not Found
+            content:
+              application/json:
+                schema:
+                  type: object
+                  items:
+                    $ref: "#/components/schemas/ApiErrorResponse"
+                  description: "The endpoint supplied was not found"
+          '500':
+            description: Internal Server Error
+            content:
+              application/json:
+                schema:
+                  type: object
+                  items:
+                    $ref: "#/components/schemas/ApiErrorResponse"
+                  description: "An internal server error has occurred"
+    /api/v1/{customerId}/campaign/create:
+      post:
+        tags:
+          - external
+          - Campaign
+        summary: Create campaigns in the customer's Google Ads account
+        operationId: create
+        description:
+          Submit a list of CampaignDetails to be created on the customer's account
+        parameters:
+          - in: path
+            name: customerId
+            description: the id of the customer account in Google Ads
+            required: true
+            schema:
+              type: string
+        requestBody:
+          name: campaignDetails
+          description: a list of CampaignDetails to be created in the customer's Google Ads account
+          required: true
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/CampaignDetails"
+        responses:
+          '201':
+            description: CREATED
+          '400':
+            description: Bad Request
+            content:
+              application/json:
+                schema:
+                  type: object
+                  items:
+                    $ref: "#/components/schemas/ApiErrorResponse"
+                  description: "Invalid or Malformed Request"
+          '404':
+            description: Not Found
+            content:
+              application/json:
+                schema:
+                  type: object
+                  items:
+                    $ref: "#/components/schemas/ApiErrorResponse"
+                  description: "The endpoint supplied was not found"
+          '500':
+            description: Internal Server Error
+            content:
+              application/json:
+                schema:
+                  type: object
+                  items:
+                    $ref: "#/components/schemas/ApiErrorResponse"
+                  description: "An internal server error has occurred"
+    /api/v1/{customerId}/campaign/update:
+      put:
+        tags:
+          - external
+          - Campaign
+        summary: Update campaigns in the customer's Google Ads account
+        operationId: update
+        description:
+          Submit a list of CampaignDetails to be updated on the customer's account
+        parameters:
+          - in: path
+            name: customerId
+            description: the id of the customer account in Google Ads
+            required: true
+            schema:
+              type: string
+        requestBody:
+          name: campaignDetails
+          description: a list of CampaignDetails to be updated in the customer's Google Ads account
+          required: true
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/CampaignDetails"
+        responses:
+          '200':
+            description: OK
+          '400':
+            description: Bad Request
+            content:
+              application/json:
+                schema:
+                  type: object
+                  items:
+                    $ref: "#/components/schemas/ApiErrorResponse"
+                  description: "Invalid or Malformed Request"
+          '404':
+            description: Not Found
+            content:
+              application/json:
+                schema:
+                  type: object
+                  items:
+                    $ref: "#/components/schemas/ApiErrorResponse"
+                  description: "The endpoint supplied was not found"
+          '500':
+            description: Internal Server Error
+            content:
+              application/json:
+                schema:
+                  type: object
+                  items:
+                    $ref: "#/components/schemas/ApiErrorResponse"
+                  description: "An internal server error has occurred"
+    /api/v1/{customerId}/campaign/remove:
+      post:
+        tags:
+          - external
+          - Campaign
+        summary: Remove campaigns from the customer's Google Ads account
+        operationId: details
+        description:
+          Submit a list of CampaignDetails to be removed on the customer's account
+        parameters:
+          - in: path
+            name: customerId
+            description: the id of the customer account in Google Ads
+            required: true
+            schema:
+              type: string
+        requestBody:
+          name: campaignDetails
+          description: a list of CampaignDetails to be removed from the customer's Google Ads account
+          required: true
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/CampaignDetails"
+        responses:
+          '200':
+            description: OK
+          '400':
+            description: Bad Request
+            content:
+              application/json:
+                schema:
+                  type: object
+                  items:
+                    $ref: "#/components/schemas/ApiErrorResponse"
+                  description: "Invalid or Malformed Request"
+          '404':
+            description: Not Found
+            content:
+              application/json:
+                schema:
+                  type: object
+                  items:
+                    $ref: "#/components/schemas/ApiErrorResponse"
+                  description: "The endpoint supplied was not found"
+          '500':
+            description: Internal Server Error
+            content:
+              application/json:
+                schema:
+                  type: object
+                  items:
+                    $ref: "#/components/schemas/ApiErrorResponse"
+                  description: "An internal server error has occurred"
+    /api/v1/{customerId}/adgroup/details:
+      get:
+        tags:
+          - external
+          - AdGroup
+        summary: Fetch adGroup details for a given customerId
+        operationId: details
+        description:
+          Fetch the adgroup details from a Google Ads account given a customerId
+        parameters:
+          - in: path
+            name: customerId
+            description: the id of the customer account in Google Ads
+            required: true
+            schema:
+              type: string
+          - in: request
+            name: campaignId
+            description: the id of the campaign containing the adGroups
+            required: true
+            schema:
+              type: string
+        responses:
+          '200':
+            description: OK
+            content:
+              application/json:
+                schema:
+                  type: array
+                  items:
+                    $ref: "#/components/schemas/AdGroupDetails"
+          '400':
+            description: Bad Request
+            content:
+              application/json:
+                schema:
+                  type: object
+                  items:
+                    $ref: "#/components/schemas/ApiErrorResponse"
+                  description: "Invalid or Malformed Request"
+          '404':
+            description: Not Found
+            content:
+              application/json:
+                schema:
+                  type: object
+                  items:
+                    $ref: "#/components/schemas/ApiErrorResponse"
+                  description: "The endpoint supplied was not found"
+          '500':
+            description: Internal Server Error
+            content:
+              application/json:
+                schema:
+                  type: object
+                  items:
+                    $ref: "#/components/schemas/ApiErrorResponse"
+                  description: "An internal server error has occurred"
+    /api/v1/{customerId}/adgroup/create:
+      post:
+        tags:
+          - external
+          - AdGroup
+        summary: Create adGroups in the customer's Google Ads account
+        operationId: details
+        description:
+          Submit a list of AdGroupDetails to be created on the customer's account
+        parameters:
+          - in: path
+            name: customerId
+            description: the id of the customer account in Google Ads
+            required: true
+            schema:
+              type: string
+        requestBody:
+          name: adGroupDetails
+          description: a list of AdGroupDetails to be created in the customer's Google Ads account
+          required: true
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/AdGroupDetails"
+        responses:
+          '201':
+            description: CREATED
+          '400':
+            description: Bad Request
+            content:
+              application/json:
+                schema:
+                  type: object
+                  items:
+                    $ref: "#/components/schemas/ApiErrorResponse"
+                  description: "Invalid or Malformed Request"
+          '404':
+            description: Not Found
+            content:
+              application/json:
+                schema:
+                  type: object
+                  items:
+                    $ref: "#/components/schemas/ApiErrorResponse"
+                  description: "The endpoint supplied was not found"
+          '500':
+            description: Internal Server Error
+            content:
+              application/json:
+                schema:
+                  type: object
+                  items:
+                    $ref: "#/components/schemas/ApiErrorResponse"
+                  description: "An internal server error has occurred"
+    /api/v1/{customerId}/adgroup/update:
+      put:
+        tags:
+          - external
+          - AdGroup
+        summary: Update adGroups in the customer's Google Ads account
+        operationId: details
+        description:
+          Submit a list of AdGroupDetails to be updated on the customer's account
+        parameters:
+          - in: path
+            name: customerId
+            description: the id of the customer account in Google Ads
+            required: true
+            schema:
+              type: string
+        requestBody:
+          name: adGroupDetails
+          description: a list of AdGroupDetails to be updated in the customer's Google Ads account
+          required: true
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/AdGroupDetails"
+        responses:
+          '200':
+            description: OK
+          '400':
+            description: Bad Request
+            content:
+              application/json:
+                schema:
+                  type: object
+                  items:
+                    $ref: "#/components/schemas/ApiErrorResponse"
+                  description: "Invalid or Malformed Request"
+          '404':
+            description: Not Found
+            content:
+              application/json:
+                schema:
+                  type: object
+                  items:
+                    $ref: "#/components/schemas/ApiErrorResponse"
+                  description: "The endpoint supplied was not found"
+          '500':
+            description: Internal Server Error
+            content:
+              application/json:
+                schema:
+                  type: object
+                  items:
+                    $ref: "#/components/schemas/ApiErrorResponse"
+                  description: "An internal server error has occurred"
+    /api/v1/{customerId}/adgroup/remove:
+      post:
+        tags:
+          - external
+          - AdGroup
+        summary: Remove adGroups in the customer's Google Ads account
+        operationId: details
+        description:
+          Submit a list of AdGroupDetails to be removed from the customer's account
+        parameters:
+          - in: path
+            name: customerId
+            description: the id of the customer account in Google Ads
+            required: true
+            schema:
+              type: string
+        requestBody:
+          name: adGroupDetails
+          description: a list of AdGroupDetails to be removed from the customer's Google Ads account
+          required: true
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/AdGroupDetails"
+        responses:
+          '200':
+            description: OK
+          '400':
+            description: Bad Request
+            content:
+              application/json:
+                schema:
+                  type: object
+                  items:
+                    $ref: "#/components/schemas/ApiErrorResponse"
+                  description: "Invalid or Malformed Request"
+          '404':
+            description: Not Found
+            content:
+              application/json:
+                schema:
+                  type: object
+                  items:
+                    $ref: "#/components/schemas/ApiErrorResponse"
+                  description: "The endpoint supplied was not found"
+          '500':
+            description: Internal Server Error
+            content:
+              application/json:
+                schema:
+                  type: object
+                  items:
+                    $ref: "#/components/schemas/ApiErrorResponse"
+                  description: "An internal server error has occurred"
+    /api/v1/{customerId}/ad/details:
+      get:
+        tags:
+          - external
+          - Ad
+        summary: Fetch ad details for a given customerId
+        operationId: details
+        description:
+          Fetch the ad details from a Google Ads account given a customerId
+        parameters:
+          - in: path
+            name: customerId
+            description: the id of the customer account in Google Ads
+            required: true
+            schema:
+              type: string
+          - in: request
+            name: adGroupId
+            description: the id of the adGroup containing the ads
+            required: true
+            schema:
+              type: string
+        responses:
+          '200':
+            description: OK
+            content:
+              application/json:
+                schema:
+                  type: array
+                  items:
+                    $ref: "#/components/schemas/AdDetails"
+          '400':
+            description: Bad Request
+            content:
+              application/json:
+                schema:
+                  type: object
+                  items:
+                    $ref: "#/components/schemas/ApiErrorResponse"
+                  description: "Invalid or Malformed Request"
+          '404':
+            description: Not Found
+            content:
+              application/json:
+                schema:
+                  type: object
+                  items:
+                    $ref: "#/components/schemas/ApiErrorResponse"
+                  description: "The endpoint supplied was not found"
+          '500':
+            description: Internal Server Error
+            content:
+              application/json:
+                schema:
+                  type: object
+                  items:
+                    $ref: "#/components/schemas/ApiErrorResponse"
+                  description: "An internal server error has occurred"
+    /api/v1/{customerId}/ad/create:
+      post:
+        tags:
+          - external
+          - Ad
+        summary: Create ads in the customer's Google Ads account
+        operationId: details
+        description:
+          Submit a list of AdDetails to be created on the customer's account
+        parameters:
+          - in: path
+            name: customerId
+            description: the id of the customer account in Google Ads
+            required: true
+            schema:
+              type: string
+        requestBody:
+          name: adDetails
+          description: a list of AdDetails to be created in the customer's Google Ads account
+          required: true
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/AdDetails"
+        responses:
+          '201':
+            description: CREATED
+          '400':
+            description: Bad Request
+            content:
+              application/json:
+                schema:
+                  type: object
+                  items:
+                    $ref: "#/components/schemas/ApiErrorResponse"
+                  description: "Invalid or Malformed Request"
+          '404':
+            description: Not Found
+            content:
+              application/json:
+                schema:
+                  type: object
+                  items:
+                    $ref: "#/components/schemas/ApiErrorResponse"
+                  description: "The endpoint supplied was not found"
+          '500':
+            description: Internal Server Error
+            content:
+              application/json:
+                schema:
+                  type: object
+                  items:
+                    $ref: "#/components/schemas/ApiErrorResponse"
+                  description: "An internal server error has occurred"
+    /api/v1/{customerId}/ad/update:
+      put:
+        tags:
+          - external
+          - Ad
+        summary: Update ads in the customer's Google Ads account
+        operationId: details
+        description:
+          Submit a list of AdDetails to be updated on the customer's account
+        parameters:
+          - in: path
+            name: customerId
+            description: the id of the customer account in Google Ads
+            required: true
+            schema:
+              type: string
+        requestBody:
+          name: adDetails
+          description: a list of AdDetails to be updated in the customer's Google Ads account
+          required: true
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/AdDetails"
+        responses:
+          '200':
+            description: OK
+          '400':
+            description: Bad Request
+            content:
+              application/json:
+                schema:
+                  type: object
+                  items:
+                    $ref: "#/components/schemas/ApiErrorResponse"
+                  description: "Invalid or Malformed Request"
+          '404':
+            description: Not Found
+            content:
+              application/json:
+                schema:
+                  type: object
+                  items:
+                    $ref: "#/components/schemas/ApiErrorResponse"
+                  description: "The endpoint supplied was not found"
+          '500':
+            description: Internal Server Error
+            content:
+              application/json:
+                schema:
+                  type: object
+                  items:
+                    $ref: "#/components/schemas/ApiErrorResponse"
+                  description: "An internal server error has occurred"
+    /api/v1/{customerId}/ad/remove:
+      post:
+        tags:
+          - external
+          - Ad
+        summary: Remove ads in the customer's Google Ads account
+        operationId: details
+        description:
+          Submit a list of AdDetails to be removed from the customer's account
+        parameters:
+          - in: path
+            name: customerId
+            description: the id of the customer account in Google Ads
+            required: true
+            schema:
+              type: string
+        requestBody:
+          name: adDetails
+          description: a list of AdDetails to be removed from the customer's Google Ads account
+          required: true
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/AdDetails"
+        responses:
+          '200':
+            description: OK
+          '400':
+            description: Bad Request
+            content:
+              application/json:
+                schema:
+                  type: object
+                  items:
+                    $ref: "#/components/schemas/ApiErrorResponse"
+                  description: "Invalid or Malformed Request"
+          '404':
+            description: Not Found
+            content:
+              application/json:
+                schema:
+                  type: object
+                  items:
+                    $ref: "#/components/schemas/ApiErrorResponse"
+                  description: "The endpoint supplied was not found"
+          '500':
+            description: Internal Server Error
+            content:
+              application/json:
+                schema:
+                  type: object
+                  items:
+                    $ref: "#/components/schemas/ApiErrorResponse"
+                  description: "An internal server error has occurred"
+    /api/v1/{customerId}/keyword/details:
+      get:
+        tags:
+          - external
+          - Keyword
+        summary: Fetch keyword details for a given customerId
+        operationId: details
+        description:
+          Fetch the keyword details from a Google Ads account given a customerId
+        parameters:
+          - in: path
+            name: customerId
+            description: the id of the customer account in Google Ads
+            required: true
+            schema:
+              type: string
+          - in: request
+            name: adGroupId
+            description: the id of the adgroup containing the keywords
+            required: true
+            schema:
+              type: string
+        responses:
+          '200':
+            description: OK
+            content:
+              application/json:
+                schema:
+                  type: array
+                  items:
+                    $ref: "#/components/schemas/KeywordDetails"
+          '400':
+            description: Bad Request
+            content:
+              application/json:
+                schema:
+                  type: object
+                  items:
+                    $ref: "#/components/schemas/ApiErrorResponse"
+                  description: "Invalid or Malformed Request"
+          '404':
+            description: Not Found
+            content:
+              application/json:
+                schema:
+                  type: object
+                  items:
+                    $ref: "#/components/schemas/ApiErrorResponse"
+                  description: "The endpoint supplied was not found"
+          '500':
+            description: Internal Server Error
+            content:
+              application/json:
+                schema:
+                  type: object
+                  items:
+                    $ref: "#/components/schemas/ApiErrorResponse"
+                  description: "An internal server error has occurred"
+    /api/v1/{customerId}/keyword/create:
+      post:
+        tags:
+          - external
+          - Keyword
+        summary: Create keywords in the customer's Google Ads account
+        operationId: details
+        description:
+          Submit a list of KeywordDetails to be created on the customer's account
+        parameters:
+          - in: path
+            name: customerId
+            description: the id of the customer account in Google Ads
+            required: true
+            schema:
+              type: string
+        requestBody:
+          name: keywordDetails
+          description: a list of AdDetails to be created in the customer's Google Ads account
+          required: true
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/KeywordDetails"
+        responses:
+          '201':
+            description: CREATED
+          '400':
+            description: Bad Request
+            content:
+              application/json:
+                schema:
+                  type: object
+                  items:
+                    $ref: "#/components/schemas/ApiErrorResponse"
+                  description: "Invalid or Malformed Request"
+          '404':
+            description: Not Found
+            content:
+              application/json:
+                schema:
+                  type: object
+                  items:
+                    $ref: "#/components/schemas/ApiErrorResponse"
+                  description: "The endpoint supplied was not found"
+          '500':
+            description: Internal Server Error
+            content:
+              application/json:
+                schema:
+                  type: object
+                  items:
+                    $ref: "#/components/schemas/ApiErrorResponse"
+                  description: "An internal server error has occurred"
+    /api/v1/{customerId}/keyword/update:
+      put:
+        tags:
+          - external
+          - Keyword
+        summary: Update keywords in the customer's Google Ads account
+        operationId: details
+        description:
+          Submit a list of KeywordDetails to be updated on the customer's account
+        parameters:
+          - in: path
+            name: customerId
+            description: the id of the customer account in Google Ads
+            required: true
+            schema:
+              type: string
+        requestBody:
+          name: adGroupDetails
+          description: a list of KeywordDetails to be updated in the customer's Google Ads account
+          required: true
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/KeywordDetails"
+        responses:
+          '200':
+            description: OK
+          '400':
+            description: Bad Request
+            content:
+              application/json:
+                schema:
+                  type: object
+                  items:
+                    $ref: "#/components/schemas/ApiErrorResponse"
+                  description: "Invalid or Malformed Request"
+          '404':
+            description: Not Found
+            content:
+              application/json:
+                schema:
+                  type: object
+                  items:
+                    $ref: "#/components/schemas/ApiErrorResponse"
+                  description: "The endpoint supplied was not found"
+          '500':
+            description: Internal Server Error
+            content:
+              application/json:
+                schema:
+                  type: object
+                  items:
+                    $ref: "#/components/schemas/ApiErrorResponse"
+                  description: "An internal server error has occurred"
+    /api/v1/{customerId}/keyword/remove:
+      post:
+        tags:
+          - external
+          - Keyword
+        summary: Remove keywords in the customer's Google Ads account
+        operationId: details
+        description:
+          Submit a list of KeywordDetails to be removed from the customer's account
+        parameters:
+          - in: path
+            name: customerId
+            description: the id of the customer account in Google Ads
+            required: true
+            schema:
+              type: string
+        requestBody:
+          name: keywordDetails
+          description: a list of AdDetails to be removed from the customer's Google Ads account
+          required: true
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/KeywordDetails"
+        responses:
+          '200':
+            description: OK
+          '400':
+            description: Bad Request
+            content:
+              application/json:
+                schema:
+                  type: object
+                  items:
+                    $ref: "#/components/schemas/ApiErrorResponse"
+                  description: "Invalid or Malformed Request"
+          '404':
+            description: Not Found
+            content:
+              application/json:
+                schema:
+                  type: object
+                  items:
+                    $ref: "#/components/schemas/ApiErrorResponse"
+                  description: "The endpoint supplied was not found"
+          '500':
+            description: Internal Server Error
+            content:
+              application/json:
+                schema:
+                  type: object
+                  items:
+                    $ref: "#/components/schemas/ApiErrorResponse"
+                  description: "An internal server error has occurred"
+    /api/v1/{customerId}/assets/details:
+      get:
+        tags:
+          - external
+          - Assets
+        summary: Fetch asset details for a given customerId
+        operationId: details
+        description:
+          Fetch the asset details from a Google Ads account given a customerId
+        parameters:
+          - in: path
+            name: customerId
+            description: the id of the customer account in Google Ads
+            required: true
+            schema:
+              type: string
+        responses:
+          '200':
+            description: OK
+            content:
+              application/json:
+                schema:
+                  type: array
+                  items:
+                    $ref: "#/components/schemas/AssetDetails"
+          '400':
+            description: Bad Request
+            content:
+              application/json:
+                schema:
+                  type: object
+                  items:
+                    $ref: "#/components/schemas/ApiErrorResponse"
+                  description: "Invalid or Malformed Request"
+          '404':
+            description: Not Found
+            content:
+              application/json:
+                schema:
+                  type: object
+                  items:
+                    $ref: "#/components/schemas/ApiErrorResponse"
+                  description: "The endpoint supplied was not found"
+          '500':
+            description: Internal Server Error
+            content:
+              application/json:
+                schema:
+                  type: object
+                  items:
+                    $ref: "#/components/schemas/ApiErrorResponse"
+                  description: "An internal server error has occurred"
+    /api/v1/{customerId}/assets/create:
+      post:
+        tags:
+          - external
+          - Assets
+        summary: Create assets in the customer's Google Ads account
+        operationId: details
+        description:
+          Submit a list of AssetDetails to be created on the customer's account
+        parameters:
+          - in: path
+            name: customerId
+            description: the id of the customer account in Google Ads
+            required: true
+            schema:
+              type: string
+          - in: request
+            name: assetLevel
+            description: the level the asset will be associated with -- ACCOUNT_LEVEL or CAMPAIGN_LEVEL
+            required: true
+            schema:
+              type: string
+          - in: request
+            name: campaignResName
+            description: the resource name of the campaign to associate the asset with
+            required: true
+            schema:
+              type: string
+        requestBody:
+          name: assetDetails
+          description: a list of AssetDetails to be created in the customer's Google Ads account
+          required: true
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/AssetDetails"
+        responses:
+          '201':
+            description: CREATED
+          '400':
+            description: Bad Request
+            content:
+              application/json:
+                schema:
+                  type: object
+                  items:
+                    $ref: "#/components/schemas/ApiErrorResponse"
+                  description: "Invalid or Malformed Request"
+          '404':
+            description: Not Found
+            content:
+              application/json:
+                schema:
+                  type: object
+                  items:
+                    $ref: "#/components/schemas/ApiErrorResponse"
+                  description: "The endpoint supplied was not found"
+          '500':
+            description: Internal Server Error
+            content:
+              application/json:
+                schema:
+                  type: object
+                  items:
+                    $ref: "#/components/schemas/ApiErrorResponse"
+                  description: "An internal server error has occurred"
+    /api/v1/{customerId}/assets/update:
+      put:
+        tags:
+          - external
+          - Assets
+        summary: Update assets in the customer's Google Ads account
+        operationId: details
+        description:
+          Submit a list of AssetDetails to be updated on the customer's account
+        parameters:
+          - in: path
+            name: customerId
+            description: the id of the customer account in Google Ads
+            required: true
+            schema:
+              type: string
+          - in: request
+            name: assetLevel
+            description: the level the asset will be associated with -- ACCOUNT_LEVEL or CAMPAIGN_LEVEL
+            required: true
+            schema:
+              type: string
+          - in: request
+            name: campaignResName
+            description: the resource name of the campaign to associate the asset with
+            required: true
+            schema:
+              type: string
+        requestBody:
+          name: assetDetails
+          description: a list of AssetDetails to be created in the customer's Google Ads account
+          required: true
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/AssetDetails"
+        responses:
+          '200':
+            description: OK
+          '400':
+            description: Bad Request
+            content:
+              application/json:
+                schema:
+                  type: object
+                  items:
+                    $ref: "#/components/schemas/ApiErrorResponse"
+                  description: "Invalid or Malformed Request"
+          '404':
+            description: Not Found
+            content:
+              application/json:
+                schema:
+                  type: object
+                  items:
+                    $ref: "#/components/schemas/ApiErrorResponse"
+                  description: "The endpoint supplied was not found"
+          '500':
+            description: Internal Server Error
+            content:
+              application/json:
+                schema:
+                  type: object
+                  items:
+                    $ref: "#/components/schemas/ApiErrorResponse"
+                  description: "An internal server error has occurred"
+    /api/v1/{customerId}/assets/remove:
+      post:
+        tags:
+          - external
+          - Assets
+        summary: Remove assets in the customer's Google Ads account
+        operationId: details
+        description:
+          Submit a list of AssetDetails to be removed from the customer's account
+        parameters:
+          - in: path
+            name: customerId
+            description: the id of the customer account in Google Ads
+            required: true
+            schema:
+              type: string
+          - in: request
+            name: assetLevel
+            description: the level the asset will be associated with -- ACCOUNT_LEVEL or CAMPAIGN_LEVEL
+            required: true
+            schema:
+              type: string
+          - in: request
+            name: campaignResName
+            description: the resource name of the campaign to associate the asset with
+            required: true
+            schema:
+              type: string
+          - in: request
+            name: assetFieldType
+            description: the type of asset (CALL_OUT, SITELINKS, etc.)
+            required: true
+            schema:
+              type: string
+        requestBody:
+          name: assetDetails
+          description: a list of AssetDetails to be created in the customer's Google Ads account
+          required: true
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/AssetDetails"
+        responses:
+          '200':
+            description: OK
+          '400':
+            description: Bad Request
+            content:
+              application/json:
+                schema:
+                  type: object
+                  items:
+                    $ref: "#/components/schemas/ApiErrorResponse"
+                  description: "Invalid or Malformed Request"
+          '404':
+            description: Not Found
+            content:
+              application/json:
+                schema:
+                  type: object
+                  items:
+                    $ref: "#/components/schemas/ApiErrorResponse"
+                  description: "The endpoint supplied was not found"
+          '500':
+            description: Internal Server Error
+            content:
+              application/json:
+                schema:
+                  type: object
+                  items:
+                    $ref: "#/components/schemas/ApiErrorResponse"
+                  description: "An internal server error has occurred"
+    /api/v1/{customerId}/conversions/details:
+      get:
+        tags:
+          - external
+          - Conversions
+        summary: Fetch conversion details for a given customerId
+        operationId: details
+        description:
+          Fetch the conversion details from a Google Ads account given a customerId
+        parameters:
+          - in: path
+            name: customerId
+            description: the id of the customer account in Google Ads
+            required: true
+            schema:
+              type: string
+        responses:
+          '200':
+            description: OK
+            content:
+              application/json:
+                schema:
+                  type: array
+                  items:
+                    $ref: "#/components/schemas/ConversionDetails"
+          '400':
+            description: Bad Request
+            content:
+              application/json:
+                schema:
+                  type: object
+                  items:
+                    $ref: "#/components/schemas/ApiErrorResponse"
+                  description: "Invalid or Malformed Request"
+          '404':
+            description: Not Found
+            content:
+              application/json:
+                schema:
+                  type: object
+                  items:
+                    $ref: "#/components/schemas/ApiErrorResponse"
+                  description: "The endpoint supplied was not found"
+          '500':
+            description: Internal Server Error
+            content:
+              application/json:
+                schema:
+                  type: object
+                  items:
+                    $ref: "#/components/schemas/ApiErrorResponse"
+                  description: "An internal server error has occurred"
+    /api/v1/{customerId}/metrics/date:
+      get:
+        tags:
+          - external
+          - Metrics
+        summary: Fetch metrics from a Google Ads Account for a given customerId
+        operationId: details
+        description:
+          Fetch the metrics from a Google Ads account given a customerId
+        parameters:
+          - in: path
+            name: customerId
+            description: the id of the customer account in Google Ads
+            required: true
+            schema:
+              type: string
+          - in: request
+            name: resourceId
+            description: the id of the resource to retrieve metrics for
+            required: true
+            schema:
+              type: string
+          - in: request
+            name: parentResourceId
+            description: the id of the parent resource to retrieve metrics for
+            required: true
+            schema:
+              type: string
+          - in: request
+            name: startDate
+            description: the beginning of the date range
+            required: true
+            schema:
+              type: string
+          - in: request
+            name: endDate
+            description: the end of the date range
+            required: true
+            schema:
+              type: string
+          - in: request
+            name: resourceType
+            description: the type of resource to gather metrics for
+            required: true
+            schema:
+              type: string
+        responses:
+          '200':
+            description: OK
+            content:
+              application/json:
+                schema:
+                  type: array
+                  items:
+                    $ref: "#/components/schemas/Metrics"
+          '400':
+            description: Bad Request
+            content:
+              application/json:
+                schema:
+                  type: object
+                  items:
+                    $ref: "#/components/schemas/ApiErrorResponse"
+                  description: "Invalid or Malformed Request"
+          '404':
+            description: Not Found
+            content:
+              application/json:
+                schema:
+                  type: object
+                  items:
+                    $ref: "#/components/schemas/ApiErrorResponse"
+                  description: "The endpoint supplied was not found"
+          '500':
+            description: Internal Server Error
+            content:
+              application/json:
+                schema:
+                  type: object
+                  items:
+                    $ref: "#/components/schemas/ApiErrorResponse"
+                  description: "An internal server error has occurred"
+    ApiErrorResponse:
+      title: ApiErrorResponse
+      type: object
+      properties:
+        timeStamp:
+          type: date
+          description: the timestamp of the error occurrence
+        errorCode:
+          type: string
+          description: the error code
+        errorMessage:
+          type: string
+          description: the description of the error
