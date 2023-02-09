@@ -116,8 +116,8 @@ public class MetricsHelper {
                 " metrics.conversions_value" +
                 " FROM ad_group" +
                 " WHERE" +
-                " segments.date > '" + startDate + "'" +
-                " AND segments.date < '" + endDate + "'" +
+                " segments.date >= '" + startDate + "'" +
+                " AND segments.date <= '" + endDate + "'" +
                 " AND ad_group.resource_name = '" + adGroupResourceName + "'";
     }
 
@@ -196,8 +196,8 @@ public class MetricsHelper {
                 " metrics.conversions_value" +
                 " FROM keyword_view" +
                 " WHERE" +
-                " segments.date > '" + startDate + "'" +
-                " AND segments.date < '" + endDate + "'" +
+                " segments.date >= '" + startDate + "'" +
+                " AND segments.date <= '" + endDate + "'" +
                 " AND keyword_view.resource_name = '" + keywordResourceName + "'";
     }
 
@@ -214,9 +214,10 @@ public class MetricsHelper {
         return keywordMetricsList;
     }
 
-    public static String getDeviceMetricsByAccount(String customerId) {
+    public static String getDeviceMetricsByAccount(String customerId, String startDate, String endDate) {
         return "SELECT" +
                 " segments.device," +
+                " segments.date," +
                 " customer.id," +
                 " customer.resource_name," +
                 " metrics.clicks," +
@@ -229,7 +230,9 @@ public class MetricsHelper {
                 " metrics.conversions_value" +
                 " FROM customer" +
                 " WHERE" +
-                " customer.id = " + customerId;
+                " customer.id = " + customerId + " AND" +
+                " segments.date >= '" + startDate + "'" +
+                " AND segments.date <= '" + endDate + "'";
     }
 
     public static List<Metrics> convertStreamToAccountDeviceDetails(ServerStream<SearchGoogleAdsStreamResponse> streamResponses) {
@@ -245,7 +248,7 @@ public class MetricsHelper {
         return accountDeviceMetrics;
     }
 
-    public static String getDeviceMetricsByCampaign(String campaignResourceName) {
+    public static String getDeviceMetricsByCampaign(String campaignResourceName, String startDate, String endDate) {
         return "SELECT" +
                 " segments.device," +
                 " campaign.id," +
@@ -263,7 +266,9 @@ public class MetricsHelper {
                 " metrics.invalid_clicks" +
                 " FROM campaign" +
                 " WHERE" +
-                " campaign.resource_name = '" + campaignResourceName + "'";
+                " campaign.resource_name = '" + campaignResourceName + "'" + " AND" +
+                " segments.date >= '" + startDate + "'" +
+                " AND segments.date <= '" + endDate + "'";
     }
 
     public static List<Metrics> convertStreamToCampaignDeviceDetails(ServerStream<SearchGoogleAdsStreamResponse> streamResponses) {
@@ -279,7 +284,7 @@ public class MetricsHelper {
         return campaignDeviceDataList;
     }
 
-    public static String getDeviceMetricsByAdGroup(String adGroupResourceName) {
+    public static String getDeviceMetricsByAdGroup(String adGroupResourceName, String startDate, String endDate) {
         return "SELECT" +
                 " segments.device," +
                 " ad_group.id," +
@@ -296,7 +301,9 @@ public class MetricsHelper {
                 " metrics.conversions_value" +
                 " FROM ad_group" +
                 " WHERE" +
-                " ad_group.resource_name = '" + adGroupResourceName + "'";
+                " ad_group.resource_name = '" + adGroupResourceName + "'" + " AND" +
+                " segments.date >= '" + startDate + "'" +
+                " AND segments.date <= '" + endDate + "'";
     }
 
     public static List<Metrics> convertStreamToAdGroupDeviceDetails(ServerStream<SearchGoogleAdsStreamResponse> streamResponses) {
@@ -312,7 +319,7 @@ public class MetricsHelper {
         return adGroupDeviceDataList;
     }
 
-    public static String getDeviceMetricsByAd(String adResourceName) {
+    public static String getDeviceMetricsByAd(String adResourceName, String startDate, String endDate) {
         return "SELECT" +
                 " segments.device," +
                 " ad_group_ad.ad.id," +
@@ -329,7 +336,9 @@ public class MetricsHelper {
                 " metrics.conversions_value" +
                 " FROM ad_group_ad" +
                 " WHERE" +
-                " ad_group_ad.ad.resource_name = '" + adResourceName + "'";
+                " ad_group_ad.ad.resource_name = '" + adResourceName + "'" + " AND" +
+                " segments.date >= '" + startDate + "'" +
+                " AND segments.date <= '" + endDate + "'";
     }
 
     public static List<Metrics> convertStreamToAdDeviceDetails(ServerStream<SearchGoogleAdsStreamResponse> streamResponses) {
@@ -345,7 +354,7 @@ public class MetricsHelper {
         return adDeviceDataList;
     }
 
-    public static String getDeviceMetricsByKeyword(String keywordResourceName) {
+    public static String getDeviceMetricsByKeyword(String keywordResourceName, String startDate, String endDate) {
         return "SELECT" +
                 " segments.device," +
                 " keyword_view.resource_name," +
@@ -361,7 +370,9 @@ public class MetricsHelper {
                 " metrics.conversions_value" +
                 " FROM keyword_view" +
                 " WHERE" +
-                " keyword_view.resource_name = '" + keywordResourceName + "'";
+                " keyword_view.resource_name = '" + keywordResourceName + "'" + " AND" +
+                " segments.date >= '" + startDate + "'" +
+                " AND segments.date <= '" + endDate + "'";
     }
 
     public static List<Metrics> convertStreamToKeywordDeviceDetails(ServerStream<SearchGoogleAdsStreamResponse> streamResponses) {

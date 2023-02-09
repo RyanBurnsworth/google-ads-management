@@ -20,14 +20,15 @@ public class MetricServiceImpl implements MetricService {
     }
 
     @Override
-    public List<Metrics> fetchMetricsByDate(String customerId, String resourceId, String parentResourceId, String startDate, String endDate, MetricType type) throws Exception {
+    public List<Metrics> fetchMetricsByDate(String customerId, String resourceId, String parentResourceId,
+                                            String startDate, String endDate, MetricType type) throws Exception {
         String resourceName;
         String parentResourceName;
 
         switch (type) {
             case ACCOUNT:
                 return this.metricRepository.fetchMetricsByResourceName(customerId, "",
-                        null, startDate, endDate, MetricType.ACCOUNT);
+                        "", startDate, endDate, MetricType.ACCOUNT);
             case CAMPAIGN:
                 resourceName = "customers/" + customerId + "/campaigns/" + resourceId;
                 return this.metricRepository.fetchMetricsByResourceName(customerId, resourceName, null,
@@ -48,45 +49,35 @@ public class MetricServiceImpl implements MetricService {
 
                 return this.metricRepository.fetchMetricsByResourceName(customerId, resourceName, parentResourceName,
                         startDate, endDate, KEYWORD);
-            default:
-                break;
-        }
-        return new ArrayList<>();
-    }
-
-    @Override
-    public List<Metrics> fetchMetricsByDevice(String customerId,
-                                              String resourceId,
-                                              String parentResourceId,
-                                              MetricType type) throws Exception {
-        String resourceName = "";
-        String parentResourceName = "";
-        switch (type) {
+            case DEVICE_ACCOUNT:
+                return this.metricRepository.fetchMetricsByResourceName(customerId, "", "",
+                        startDate, endDate, MetricType.DEVICE_ACCOUNT);
             case DEVICE_CAMPAIGN:
                 resourceName = "customers/" + customerId + "/campaigns/" + resourceId;
 
                 return this.metricRepository.fetchMetricsByResourceName(customerId,
-                        resourceName, "", null, null, MetricType.DEVICE_CAMPAIGN);
+                        resourceName, "", startDate, endDate, MetricType.DEVICE_CAMPAIGN);
             case DEVICE_ADGROUP:
                 resourceName = "customers/" + customerId + "/adGroups/" + resourceId;
                 parentResourceName = "customers/" + customerId + "/campaigns/" + parentResourceId;
 
                 return this.metricRepository.fetchMetricsByResourceName(customerId,
-                        resourceName, parentResourceName, null, null, MetricType.DEVICE_ADGROUP);
+                        resourceName, parentResourceName, startDate, endDate, MetricType.DEVICE_ADGROUP);
             case DEVICE_AD:
                 resourceName = "customers/" + customerId + "/ads/" + resourceId;
                 parentResourceName = "customers/" + customerId + "/adGroups/" + parentResourceId;
 
                 return this.metricRepository.fetchMetricsByResourceName(customerId,
-                        resourceName, parentResourceName, null, null, MetricType.DEVICE_AD);
+                        resourceName, parentResourceName, startDate, endDate, MetricType.DEVICE_AD);
             case DEVICE_KEYWORD:
                 resourceName = "customers/" + customerId + "/keywordViews/" + parentResourceId + "~" + resourceId;
                 parentResourceName = "customers/" + customerId + "/adGroups/" + parentResourceId;
 
                 return this.metricRepository.fetchMetricsByResourceName(customerId,
-                        resourceName, parentResourceName, null, null, MetricType.DEVICE_KEYWORD);
+                        resourceName, parentResourceName, startDate, endDate, MetricType.DEVICE_KEYWORD);
             default:
-                return new ArrayList<>();
+                break;
         }
+        return new ArrayList<>();
     }
 }

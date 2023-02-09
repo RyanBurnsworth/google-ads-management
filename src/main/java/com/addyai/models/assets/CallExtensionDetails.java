@@ -6,6 +6,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class CallExtensionDetails extends AssetDetails {
+    private String countryCode;
+    private String phoneNumber;
+    private List<AdSchedulingDetails> adSchedulingDetails = new ArrayList<>();
+    private int conversionId;
+
     @Override
     public long getAssetId() {
         return super.getAssetId();
@@ -45,12 +50,6 @@ public class CallExtensionDetails extends AssetDetails {
     public void setAssetSource(int assetSource) {
         super.setAssetSource(assetSource);
     }
-
-    private String countryCode;
-    private String phoneNumber;
-    private List<AdSchedulingDetails> adSchedulingDetails = new ArrayList<>();
-
-    private int conversionId;
 
     public String getCountryCode() {
         return countryCode;

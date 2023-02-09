@@ -452,14 +452,10 @@ public class GAQLHelper {
 
         for (SearchGoogleAdsStreamResponse searchGoogleAdsStreamResponse : streamResponse) {
             for (GoogleAdsRow googleAdsRow : searchGoogleAdsStreamResponse.getResultsList()) {
-                switch (adType.toLowerCase()) {
-                    case RESPONSIVE_AD_TYPE:
-                        ResponsiveSearchAdDetails adDetails =
-                                googleAdsRowAdapter.getResponsiveSearchAdDetails(googleAdsRow);
-                        adDetailsList.add(adDetails);
-                        break;
-                    default:
-                        break;
+                if (adType.toLowerCase().equals(RESPONSIVE_AD_TYPE)) {
+                    ResponsiveSearchAdDetails adDetails =
+                            googleAdsRowAdapter.getResponsiveSearchAdDetails(googleAdsRow);
+                    adDetailsList.add(adDetails);
                 }
             }
         }

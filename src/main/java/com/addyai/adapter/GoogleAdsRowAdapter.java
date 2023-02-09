@@ -25,6 +25,7 @@ import com.google.ads.googleads.v12.services.GoogleAdsRow;
 
 public interface GoogleAdsRowAdapter {
     AccountDetails getAccountDetails(GoogleAdsRow googleAdsRow);
+
     CampaignDetails getCampaignDetails(GoogleAdsRow googleAdsRow);
 
     BudgetDetails getBudgetDetails(GoogleAdsRow googleAdsRow);

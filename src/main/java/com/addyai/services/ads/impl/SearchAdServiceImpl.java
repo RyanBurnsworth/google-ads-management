@@ -73,7 +73,7 @@ public class SearchAdServiceImpl implements SearchAdService {
 
         // update the adName to match
         // customers/{customer_id}/adGroupAds/{ad_group_id}~{ad_id}
-        for(AdDetails adDetails : adDetailsList) {
+        for (AdDetails adDetails : adDetailsList) {
             adDetails.setAdName(ResourceNameHelper
                     .getAdResourceName(customerId, adGroupResName, adDetails.getAdName()));
         }

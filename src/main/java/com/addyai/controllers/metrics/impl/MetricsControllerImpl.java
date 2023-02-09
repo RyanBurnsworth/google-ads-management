@@ -10,7 +10,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import javax.annotation.Nullable;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -23,6 +22,12 @@ public class MetricsControllerImpl implements MetricsController {
     private static final String RESOURCE_ADGROUP = "adgroup";
     private static final String RESOURCE_AD = "ad";
     private static final String RESOURCE_KEYWORD = "keyword";
+
+    private static final String RESOURCE_DEVICE_ACCOUNT = "device_account";
+    private static final String RESOURCE_DEVICE_CAMPAIGN = "device_campaign";
+    private static final String RESOURCE_DEVICE_ADGROUP = "device_adgroup";
+    private static final String RESOURCE_DEVICE_AD = "device_ad";
+    private static final String RESOURCE_DEVICE_KEYWORD = "device_keyword";
 
     private final MetricService metricService;
 
@@ -61,36 +66,25 @@ public class MetricsControllerImpl implements MetricsController {
                 metricsList = metricService.fetchMetricsByDate(customerId, resourceId, parentResourceId, startDate,
                         endDate, MetricType.KEYWORD);
                 break;
-            default:
+            case RESOURCE_DEVICE_ACCOUNT:
+                metricsList = metricService.fetchMetricsByDate(customerId, resourceId, parentResourceId, startDate,
+                        endDate, MetricType.DEVICE_ACCOUNT);
                 break;
-        }
-
-        return new ResponseEntity<>(metricsList, HttpStatus.OK);
-    }
-
-    @Override
-    @GetMapping("/metrics/device")
-    public ResponseEntity<List<Metrics>> getMetricsByDevice(@PathVariable String customerId,
-                                                            @RequestParam String resourceId,
-                                                            @RequestParam String parentResourceId,
-                                                            @RequestParam String resourceType) throws Exception {
-        List<Metrics> metricsList = new ArrayList<>();
-
-        switch (resourceType) {
-            case RESOURCE_ACCOUNT:
-                metricsList = metricService.fetchMetricsByDevice(customerId, resourceId, parentResourceId, MetricType.ACCOUNT);
+            case RESOURCE_DEVICE_CAMPAIGN:
+                metricsList = metricService.fetchMetricsByDate(customerId, resourceId, parentResourceId, startDate,
+                        endDate, MetricType.DEVICE_CAMPAIGN);
                 break;
-            case RESOURCE_CAMPAIGN:
-                metricsList = metricService.fetchMetricsByDevice(customerId, resourceId, parentResourceId, MetricType.CAMPAIGN);
+            case RESOURCE_DEVICE_ADGROUP:
+                metricsList = metricService.fetchMetricsByDate(customerId, resourceId, parentResourceId, startDate,
+                        endDate, MetricType.DEVICE_ADGROUP);
                 break;
-            case RESOURCE_ADGROUP:
-                metricsList = metricService.fetchMetricsByDevice(customerId, resourceId, parentResourceId, MetricType.ADGROUP);
+            case RESOURCE_DEVICE_AD:
+                metricsList = metricService.fetchMetricsByDate(customerId, resourceId, parentResourceId, startDate,
+                        endDate, MetricType.DEVICE_AD);
                 break;
-            case RESOURCE_AD:
-                metricsList = metricService.fetchMetricsByDevice(customerId, resourceId, parentResourceId, MetricType.AD);
-                break;
-            case RESOURCE_KEYWORD:
-                metricsList = metricService.fetchMetricsByDevice(customerId, resourceId, parentResourceId, MetricType.KEYWORD);
+            case RESOURCE_DEVICE_KEYWORD:
+                metricsList = metricService.fetchMetricsByDate(customerId, resourceId, parentResourceId, startDate,
+                        endDate, MetricType.DEVICE_KEYWORD);
                 break;
             default:
                 break;
@@ -124,19 +118,25 @@ public class MetricsControllerImpl implements MetricsController {
             case RESOURCE_KEYWORD:
                 obj = getDummyJsonObject(4);
                 break;
+            case RESOURCE_DEVICE_ACCOUNT:
+                obj = getDummyJsonObject(4);
+                break;
+            case RESOURCE_DEVICE_CAMPAIGN:
+                obj = getDummyJsonObject(4);
+                break;
+            case RESOURCE_DEVICE_ADGROUP:
+                obj = getDummyJsonObject(4);
+                break;
+            case RESOURCE_DEVICE_AD:
+                obj = getDummyJsonObject(4);
+                break;
+            case RESOURCE_DEVICE_KEYWORD:
+                obj = getDummyJsonObject(4);
+                break;
             default:
                 break;
         }
         return new ResponseEntity<>(obj, HttpStatus.OK);
-    }
-
-    @Override
-    @GetMapping("/metrics/device/demo")
-    public ResponseEntity<Object> getDummyMetricsByDevice(@PathVariable String customerId,
-                                                          @Nullable @RequestParam String resourceId,
-                                                          @Nullable@RequestParam String parentResourceId,
-                                                          @RequestParam String resourceType) {
-        return null;
     }
 
     private Object getDummyJsonObject(int type) {

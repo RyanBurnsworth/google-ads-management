@@ -1,5 +1,6 @@
-package com.addyai.controllers.account;
+package com.addyai.controllers.account.impl;
 
+import com.addyai.controllers.account.AccountController;
 import com.addyai.models.AccountDetails;
 import com.addyai.services.account.AccountService;
 import org.springframework.http.HttpStatus;

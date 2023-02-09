@@ -1,0 +1,59 @@
+servers:
+    - description: AddyAI's service for communicating with Google Ads
+      url: http://localhost
+info:
+    description: API for managing Google Ads accounts
+    version: 1.0.0
+    title: Google Ads Management Service
+    contact:
+        - ryanburnsworth@gmail.com
+    tags:
+        - name: external
+          description: The GAMS service endpoints
+
+    paths:
+        /api/v1/{customerId}/account/details:
+            get:
+                tags:
+                    - external
+                    - Account
+                summary: Fetch account details for a given customerId
+                operationId: details
+                description:
+                    Fetch the account details from Google Ads given a customerId
+                parameters:
+                    - in: path
+                      name: customerId
+                      description: the id of the customer account in Google Ads
+                      required: true
+                      schema:
+                        type: string
+                responses:
+                    '200':
+                        description: OK
+                        content:
+                            application/json:
+                                schema:
+                                    type: object
+                                    items:
+                                        $ref: "#/components/schemas/AccountDetails"
+                    '400':
+                        content:
+                            application/json:
+                                schema:
+                                    type: object
+                                    items:
+                                        $ref: "#/components/schemas/ApiErrorResponse"
+        ApiErrorResponse:
+            title: ApiErrorResponse
+            type: object
+            properties:
+                timeStamp:
+                    type: date
+                    description: the timestamp of the error occurence
+                errorCode:
+                    type: string
+                    description: the error code
+                errorMessage:
+                    type: string
+                    description: the description of the error

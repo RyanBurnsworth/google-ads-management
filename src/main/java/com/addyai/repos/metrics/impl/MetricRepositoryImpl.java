@@ -48,15 +48,15 @@ public class MetricRepositoryImpl implements MetricRepository {
         } else if (metricType == MetricType.AD) {
             query = MetricsHelper.getAdMetrics(resourceName, startDate, endDate);
         } else if (metricType == MetricType.DEVICE_ACCOUNT) {
-            query = MetricsHelper.getDeviceMetricsByAccount(customerId);
+            query = MetricsHelper.getDeviceMetricsByAccount(customerId, startDate, endDate);
         } else if (metricType == MetricType.DEVICE_CAMPAIGN) {
-            query = MetricsHelper.getDeviceMetricsByCampaign(resourceName);
+            query = MetricsHelper.getDeviceMetricsByCampaign(resourceName, startDate, endDate);
         } else if (metricType == MetricType.DEVICE_ADGROUP) {
-            query = MetricsHelper.getDeviceMetricsByAdGroup(resourceName);
+            query = MetricsHelper.getDeviceMetricsByAdGroup(resourceName, startDate, endDate);
         } else if (metricType == MetricType.DEVICE_AD) {
-            query = MetricsHelper.getDeviceMetricsByAd(resourceName);
+            query = MetricsHelper.getDeviceMetricsByAd(resourceName, startDate, endDate);
         } else if (metricType == MetricType.DEVICE_KEYWORD) {
-            query = MetricsHelper.getDeviceMetricsByKeyword(resourceName);
+            query = MetricsHelper.getDeviceMetricsByKeyword(resourceName, startDate, endDate);
         }
 
         SearchGoogleAdsStreamRequest request = SearchGoogleAdsStreamRequest.newBuilder()
