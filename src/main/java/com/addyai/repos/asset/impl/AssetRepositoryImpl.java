@@ -69,6 +69,17 @@ public class AssetRepositoryImpl implements AssetRepository {
                                 GAQLHelper.convertStreamResponseToAssetDetails(response,
                                         AssetTypeEnum.AssetType.CALL);
                         assetDetailsList.addAll(callExtensionDetails);
+                        break;
+                    case 2:
+                        query = GAQLHelper.getCalloutExtensionAssetQuery();
+
+                        request = requestBuilder.buildStreamRequest(customerId, query);
+                        response = requestBuilder.callStreamRequest(request);
+
+                        List<AssetDetails> calloutExtensionDetails =
+                                GAQLHelper.convertStreamResponseToAssetDetails(response, AssetTypeEnum.AssetType.CALLOUT);
+                        assetDetailsList.addAll(calloutExtensionDetails);
+                        break;
                     default:
                         break;
                 }

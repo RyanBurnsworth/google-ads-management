@@ -8,7 +8,8 @@ import com.google.ads.googleads.v12.enums.AssetTypeEnum;
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, property = "type")
 @JsonSubTypes({
         @JsonSubTypes.Type(value = SitelinkDetails.class, name = "sitelinks"),
-        @JsonSubTypes.Type(value = CallExtensionDetails.class, name = "call")
+        @JsonSubTypes.Type(value = CallExtensionDetails.class, name = "call"),
+        @JsonSubTypes.Type(value = CalloutExtensionDetails.class, name="callout"),
 })
 public abstract class AssetDetails {
     private long assetId = 0L;

@@ -20,6 +20,7 @@ import com.addyai.enums.MetricType;
 import com.addyai.models.*;
 import com.addyai.models.ads.ResponsiveSearchAdDetails;
 import com.addyai.models.assets.CallExtensionDetails;
+import com.addyai.models.assets.CalloutExtensionDetails;
 import com.addyai.models.assets.SitelinkDetails;
 import com.addyai.models.campaign_criterion.*;
 import com.addyai.models.metrics.Metrics;
@@ -296,9 +297,40 @@ public class GoogleAdsRowAdapterImpl implements GoogleAdsRowAdapter {
                 adSchedulingDetailsList.add(adSchedulingDetails);
             }
             callExtensionDetails.setAdSchedulingDetails(adSchedulingDetailsList);
+        } else {
+            callExtensionDetails.setAdSchedulingDetails(new ArrayList<>());
         }
 
         return callExtensionDetails;
+    }
+    @Override
+    public CalloutExtensionDetails getCalloutExtensionDetails(GoogleAdsRow googleAdsRow) {
+        CalloutExtensionDetails calloutExtensionDetails = new CalloutExtensionDetails();
+        calloutExtensionDetails.setAssetId(googleAdsRow.getAsset().getId());
+        calloutExtensionDetails.setAssetName(googleAdsRow.getAsset().getResourceName());
+        calloutExtensionDetails.setAssetSource(googleAdsRow.getAsset().getSourceValue());
+        calloutExtensionDetails.setAssetType(googleAdsRow.getAsset().getTypeValue());
+        calloutExtensionDetails.setStartDate(googleAdsRow.getAsset().getCalloutAsset().getStartDate());
+        calloutExtensionDetails.setEndDate(googleAdsRow.getAsset().getCalloutAsset().getEndDate());
+        calloutExtensionDetails.setText(googleAdsRow.getAsset().getCalloutAsset().getCalloutText());
+        if (googleAdsRow.getAsset().getCalloutAsset().getAdScheduleTargetsCount() > 0) {
+            List<AdSchedulingDetails> adSchedulingDetailsList = new ArrayList<>();
+            for (AdScheduleInfo adscheduleInfo : googleAdsRow.getAsset().getCalloutAsset().getAdScheduleTargetsList()) {
+                AdSchedulingDetails adSchedulingDetails = new AdSchedulingDetails();
+                adSchedulingDetails.setDayOfWeek(adscheduleInfo.getDayOfWeekValue());
+                adSchedulingDetails.setEndHour(adscheduleInfo.getEndHour());
+                adSchedulingDetails.setEndMinute(adscheduleInfo.getEndMinuteValue());
+                adSchedulingDetails.setStartMinute(adscheduleInfo.getStartMinuteValue());
+                adSchedulingDetails.setStartHour(adscheduleInfo.getStartHour());
+
+                adSchedulingDetailsList.add(adSchedulingDetails);
+            }
+            calloutExtensionDetails.setAdSchedulingDetailsList(adSchedulingDetailsList);
+        } else {
+            calloutExtensionDetails.setAdSchedulingDetailsList(new ArrayList<>());
+        }
+
+        return calloutExtensionDetails;
     }
 
     @Override

@@ -22,6 +22,7 @@ import com.addyai.models.ads.AdDetails;
 import com.addyai.models.ads.ResponsiveSearchAdDetails;
 import com.addyai.models.assets.AssetDetails;
 import com.addyai.models.assets.CallExtensionDetails;
+import com.addyai.models.assets.CalloutExtensionDetails;
 import com.addyai.models.assets.SitelinkDetails;
 import com.addyai.models.campaign_criterion.*;
 import com.google.ads.googleads.v12.enums.AssetTypeEnum;
@@ -246,6 +247,12 @@ public class GAQLHelper {
                 "' AND ad_group_criterion.status IN ('ENABLED', 'PAUSED')";
     }
 
+    /**
+     * Create a query that fetches Sitelink Asset details where the link_text is non-empty and
+     * the asset has been created by the Advertiser
+     *
+     * @return a query for fetching sitelink details
+     */
     public static String getSitelinksAssetQuery() {
         return "SELECT " +
                 "asset.id, " +
@@ -260,9 +267,15 @@ public class GAQLHelper {
                 "asset.sitelink_asset.link_text, " +
                 "asset.sitelink_asset.start_date, " +
                 "asset.sitelink_asset.end_date " +
-                "FROM asset WHERE asset.sitelink_asset.link_text != ''";
+                "FROM asset WHERE asset.sitelink_asset.link_text != '' AND asset.source = 'ADVERTISER'";
     }
 
+    /**
+     * Create a query that fetches call extension asset details where the phone number is non-empty and
+     * the call asset has been created by the Advertiser
+     *
+     * @return a query for fetching call extension details
+     */
     public static String getCallExtensionAssetQuery() {
         return "SELECT " +
                 "asset.id, " +
@@ -272,7 +285,26 @@ public class GAQLHelper {
                 "asset.call_asset.ad_schedule_targets, " +
                 "asset.call_asset.country_code, " +
                 "asset.call_asset.phone_number " +
-                "FROM asset WHERE asset.call_asset.phone_number != ''";
+                "FROM asset WHERE asset.call_asset.phone_number != '' AND asset.source = 'ADVERTISER'";
+    }
+
+    /**
+     * Create a query that fetches call extension asset details where the phone number is non-empty and
+     * the call asset has been created by the Advertiser
+     *
+     * @return a query for fetching call extension details
+     */
+    public static String getCalloutExtensionAssetQuery() {
+        return "SELECT " +
+                "asset.id, " +
+                "asset.name, " +
+                "asset.type, " +
+                "asset.source, " +
+                "asset.callout_asset.ad_schedule_targets, " +
+                "asset.callout_asset.callout_text, " +
+                "asset.callout_asset.start_date, " +
+                "asset.callout_asset.end_date " +
+                "FROM asset WHERE asset.callout_asset.callout_text != '' AND asset.source = 'ADVERTISER'";
     }
 
     public static String getResponsiveSearchAdQuery(String adGroupResourceName) {
@@ -434,6 +466,10 @@ public class GAQLHelper {
                         CallExtensionDetails callExtensionDetails =
                                 googleAdsRowAdapter.getCallExtensionDetails(googleAdsRow);
                         assetDetailsList.add(callExtensionDetails);
+                    case CALLOUT:
+                        CalloutExtensionDetails calloutExtensionDetails =
+                                googleAdsRowAdapter.getCalloutExtensionDetails(googleAdsRow);
+                        assetDetailsList.add(calloutExtensionDetails);
                         break;
                     default:
                         break;

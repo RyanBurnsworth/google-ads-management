@@ -26,7 +26,7 @@ public class Constants {
 
     public static final int NUM_SEARCH_AD_TYPES = 1;
 
-    public static final int NUM_ASSET_CLASSES_SUPPORTED = 2;
+    public static final int NUM_ASSET_CLASSES_SUPPORTED = 3;
 
     public static final String DEFAULT_LOCALE = "en";
     public static final String DEFAULT_COUNTRY_CODE = "US";
