@@ -57,4 +57,15 @@ public class AdControllerImpl implements AdController {
         searchAdService.deleteAds(customerId, adDetails, adGroupResourceName);
         return new ResponseEntity<>(HttpStatus.OK);
     }
+
+    @Override
+    @PostMapping("validate")
+    public ResponseEntity<List<String>> validateAd(@PathVariable long customerId,
+                                                   @RequestParam String adGroupId,
+                                                   @RequestBody List<AdDetails> adDetails) {
+        String adGroupResourceName = "customers/" + customerId + "/adGroups/" + adGroupId;
+        List<String> errors = searchAdService.validateAd(customerId, adGroupResourceName, adDetails);
+
+        return new ResponseEntity<>(errors, HttpStatus.OK);
+    }
 }

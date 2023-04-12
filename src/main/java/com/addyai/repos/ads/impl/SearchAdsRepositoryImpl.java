@@ -7,6 +7,7 @@ import com.addyai.repos.ads.SearchAdsRepository;
 import com.addyai.repos.request.StreamRequest;
 import com.addyai.repos.request.impl.StreamRequestImpl;
 import com.addyai.utils.helpers.GAQLHelper;
+import com.google.ads.googleads.v12.errors.GoogleAdsException;
 import com.google.ads.googleads.v12.services.*;
 import com.google.api.gax.rpc.ServerStream;
 import org.springframework.stereotype.Repository;
@@ -57,7 +58,6 @@ public class SearchAdsRepositoryImpl implements SearchAdsRepository {
     @Override
     public List<String> performSearchAdOperations(long customerId, List<AdGroupAdOperation> adGroupAdOperations) throws Exception {
         List<String> adResourceNameList = new ArrayList<>();
-
         try {
             MutateAdGroupAdsResponse response =
                     adGroupAdServiceClient.mutateAdGroupAds(Long.toString(customerId), adGroupAdOperations);
@@ -68,6 +68,42 @@ public class SearchAdsRepositoryImpl implements SearchAdsRepository {
             return adResourceNameList;
         } catch (Exception e) {
             throw ApiExceptionResolver.doResolveException(e);
+        }
+    }
+
+    @Override
+    public List<String> validateSearchAd(long customerId, List<AdGroupAdOperation> adGroupAdOperations) {
+        try {
+            MutateAdGroupAdsRequest request = MutateAdGroupAdsRequest.newBuilder()
+                    .setCustomerId(Long.toString(customerId))
+                    .addOperations(adGroupAdOperations.get(0))
+                    .setValidateOnly(true)
+                    .build();
+
+            adGroupAdServiceClient.mutateAdGroupAds(request);
+
+            return new ArrayList<>();
+        } catch (GoogleAdsException e) {
+            List<String> errorList = new ArrayList<>();
+
+            // extract the error reasons from Google Ads and put into a string
+            // send the list of error strings back
+            e.getGoogleAdsFailure().getErrorsList().forEach(err -> {
+                if (err != null && err.getDetails().hasPolicyFindingDetails() && err.getDetails().getPolicyFindingDetails().getPolicyTopicEntriesList().size() > 0 && err.getDetails().getPolicyFindingDetails().getPolicyTopicEntries(0).getEvidencesList().size() > 0) {
+                    String topic = err.getDetails().getPolicyFindingDetails().getPolicyTopicEntries(0).getTopic();
+                    String type = err.getDetails().getPolicyFindingDetails().getPolicyTopicEntries(0).getType().toString();
+                    String culprit = err.getDetails().getPolicyFindingDetails().getPolicyTopicEntries(0).getEvidences(0).getTextList().getTexts(0);
+
+                    String finalStr = topic + " " + type + ": " + culprit;
+                    errorList.add(finalStr);
+                } else {
+                    assert err != null;
+                    String finalStr = err.getMessage() + ": " + err.getTrigger().getStringValue();
+                    errorList.add(finalStr);
+                }
+            });
+
+            return errorList;
         }
     }
 }

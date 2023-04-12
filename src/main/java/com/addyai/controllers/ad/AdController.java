@@ -19,4 +19,8 @@ public interface AdController {
     ResponseEntity<Void> deleteAdsInAdGroup(long customerId,
                                             String adGroupId,
                                             List<AdDetails> adDetails) throws Exception;
+
+    ResponseEntity<List<String>> validateAd(long customerId,
+                                            String adGroupId,
+                                            List<AdDetails> adDetails);
 }
