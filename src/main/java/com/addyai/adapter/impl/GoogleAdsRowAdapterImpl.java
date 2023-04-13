@@ -303,6 +303,7 @@ public class GoogleAdsRowAdapterImpl implements GoogleAdsRowAdapter {
 
         return callExtensionDetails;
     }
+
     @Override
     public CalloutExtensionDetails getCalloutExtensionDetails(GoogleAdsRow googleAdsRow) {
         CalloutExtensionDetails calloutExtensionDetails = new CalloutExtensionDetails();

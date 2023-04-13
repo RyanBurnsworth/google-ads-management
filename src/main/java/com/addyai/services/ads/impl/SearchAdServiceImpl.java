@@ -10,7 +10,6 @@ import com.addyai.repos.ads.SearchAdsRepository;
 import com.addyai.services.ads.SearchAdService;
 import com.addyai.utils.helpers.ResourceNameHelper;
 import com.addyai.utils.validators.EntityValidator;
-import com.google.ads.googleads.v12.common.PolicyTopicEntry;
 import com.google.ads.googleads.v12.services.AdGroupAdOperation;
 import org.springframework.stereotype.Service;
 
@@ -23,10 +22,12 @@ import static com.addyai.utils.misc.Constants.*;
 public class SearchAdServiceImpl implements SearchAdService {
     private final SearchAdsRepository searchAdsRepository;
     private final OperationBuilder operationBuilder;
+
     public SearchAdServiceImpl(SearchAdsRepository searchAdsRepository) {
         this.searchAdsRepository = searchAdsRepository;
         this.operationBuilder = new OperationBuilderImpl();
     }
+
     @Override
     public List<AdDetails> findAllAdsByAdGroup(long customerId, String adGroupResName) throws Exception {
         List<AdDetails> adDetailsList = new ArrayList<>();
@@ -42,6 +43,7 @@ public class SearchAdServiceImpl implements SearchAdService {
 
         return adDetailsList;
     }
+
     @Override
     public void upsertAds(long customerId,
                           String adGroupResName,
@@ -85,8 +87,7 @@ public class SearchAdServiceImpl implements SearchAdService {
     public List<String> validateAd(long customerId, String adGroupResName, List<AdDetails> adDetailsList) {
         List<AdGroupAdOperation> adGroupAdOperationList =
                 operationBuilder.buildAdGroupAdOperationList(adDetailsList, OperationType.CREATE, adGroupResName);
-        List<String> errorList = searchAdsRepository.validateSearchAd(customerId, adGroupAdOperationList);
 
-        return errorList;
+        return searchAdsRepository.validateSearchAd(customerId, adGroupAdOperationList);
     }
 }

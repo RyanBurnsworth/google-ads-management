@@ -90,14 +90,21 @@ public class SearchAdsRepositoryImpl implements SearchAdsRepository {
             // send the list of error strings back
             e.getGoogleAdsFailure().getErrorsList().forEach(err -> {
                 if (err != null && err.getDetails().hasPolicyFindingDetails() && err.getDetails().getPolicyFindingDetails().getPolicyTopicEntriesList().size() > 0 && err.getDetails().getPolicyFindingDetails().getPolicyTopicEntries(0).getEvidencesList().size() > 0) {
-                    String topic = err.getDetails().getPolicyFindingDetails().getPolicyTopicEntries(0).getTopic();
-                    String type = err.getDetails().getPolicyFindingDetails().getPolicyTopicEntries(0).getType().toString();
-                    String culprit = err.getDetails().getPolicyFindingDetails().getPolicyTopicEntries(0).getEvidences(0).getTextList().getTexts(0);
+                    if (err.getDetails().getPolicyFindingDetails().getPolicyTopicEntriesList().get(0).getEvidencesList().get(0).hasDestinationNotWorking()) {
+                        String error_type = err.getDetails().getPolicyFindingDetails().getPolicyTopicEntriesList().get(0).getEvidencesList().get(0).getDestinationNotWorking().getDnsErrorType().toString();
+                        String expanded_url = err.getDetails().getPolicyFindingDetails().getPolicyTopicEntriesList().get(0).getEvidencesList().get(0).getDestinationNotWorking().getExpandedUrl();
 
-                    String finalStr = topic + " " + type + ": " + culprit;
-                    errorList.add(finalStr);
-                } else {
-                    assert err != null;
+                        String finalStr = error_type + ": " + expanded_url;
+                        errorList.add(finalStr);
+                    } else {
+                        String topic = err.getDetails().getPolicyFindingDetails().getPolicyTopicEntries(0).getTopic();
+                        String type = err.getDetails().getPolicyFindingDetails().getPolicyTopicEntries(0).getType().toString();
+                        String culprit = err.getDetails().getPolicyFindingDetails().getPolicyTopicEntries(0).getEvidences(0).getTextList().getTexts(0);
+
+                        String finalStr = topic + " " + type + ": " + culprit;
+                        errorList.add(finalStr);
+                    }
+                } else if (err != null && err.getTrigger() != null) {
                     String finalStr = err.getMessage() + ": " + err.getTrigger().getStringValue();
                     errorList.add(finalStr);
                 }

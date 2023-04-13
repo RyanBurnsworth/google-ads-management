@@ -28,6 +28,101 @@ public class DemoDataGenerator {
     private double phoneThroughRate;
     private String lastUpdated;
 
+    public static DemoDataGenerator getRandomCampaignObject(String resourceId, String resourceName) {
+        DemoDataGenerator object = new DemoDataGenerator();
+        Random random = new Random();
+
+        object.type = 1;
+        object.date = generateDate();
+        object.customerId = "9059845250";
+        object.resourceId = resourceId;
+        object.parentId = "";
+        object.resourceName = resourceName;
+        object.clicks = random.nextInt(1000);
+        object.impressions = random.nextInt(10000);
+        object.ctr = random.nextDouble(5);
+        object.qualityScore = random.nextInt(10);
+        object.averageCpc = random.nextDouble(25);
+        object.cost = random.nextDouble(5000);
+        object.conversions = random.nextDouble(50);
+        object.costPerConversion = random.nextDouble(36);
+        object.conversionValue = random.nextDouble(112);
+        object.invalidClickRate = random.nextDouble(5);
+        object.invalidClicks = random.nextInt(100);
+        object.phoneCalls = random.nextInt(45);
+        object.phoneImpressions = random.nextInt(1000);
+        object.phoneThroughRate = random.nextDouble(5);
+        object.lastUpdated = new Date().toString();
+
+        return object;
+    }
+
+    public static DemoDataGenerator getRandomAdGroupObject() {
+        DemoDataGenerator object = new DemoDataGenerator();
+        Random random = new Random();
+
+        object.type = random.nextInt(5);
+        object.date = generateDate();
+        object.customerId = "9059845250";
+        object.resourceId = "Test AdGroup Refactor 2022-1004";
+        object.parentId = "Test Campaign Refactor 2022-1004";
+        object.resourceName = "CampaignResource" + random.nextInt(100);
+        object.clicks = random.nextInt(1000);
+        object.impressions = random.nextInt(10000);
+        object.ctr = random.nextDouble(5);
+        object.qualityScore = random.nextInt(10);
+        object.averageCpc = random.nextDouble(25);
+        object.cost = random.nextDouble(5000);
+        object.conversions = random.nextDouble(50);
+        object.costPerConversion = random.nextDouble(36);
+        object.conversionValue = random.nextDouble(112);
+        object.invalidClickRate = random.nextDouble(5);
+        object.invalidClicks = random.nextInt(100);
+        object.phoneCalls = random.nextInt(45);
+        object.phoneImpressions = random.nextInt(1000);
+        object.phoneThroughRate = random.nextDouble(5);
+        object.lastUpdated = new Date().toString();
+
+        return object;
+    }
+
+    public static DemoDataGenerator getRandomAdObject() {
+        DemoDataGenerator object = new DemoDataGenerator();
+        Random random = new Random();
+
+        object.type = random.nextInt(5);
+        object.date = generateDate();
+        object.customerId = "9059845250";
+        object.resourceId = "Test Ad 2022-1004";
+        object.parentId = "Test Campaign Refactor 2022-1004";
+        object.resourceName = "CampaignResource" + random.nextInt(100);
+        object.clicks = random.nextInt(1000);
+        object.impressions = random.nextInt(10000);
+        object.ctr = random.nextDouble(5);
+        object.qualityScore = random.nextInt(10);
+        object.averageCpc = random.nextDouble(25);
+        object.cost = random.nextDouble(5000);
+        object.conversions = random.nextDouble(50);
+        object.costPerConversion = random.nextDouble(36);
+        object.conversionValue = random.nextDouble(112);
+        object.invalidClickRate = random.nextDouble(5);
+        object.invalidClicks = random.nextInt(100);
+        object.phoneCalls = random.nextInt(45);
+        object.phoneImpressions = random.nextInt(1000);
+        object.phoneThroughRate = random.nextDouble(5);
+        object.lastUpdated = new Date().toString();
+
+        return object;
+    }
+
+    public static Date generateDate() {
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(new Date());
+        calendar.add(Calendar.MONTH, -6);
+        calendar.set(Calendar.DATE, (int) (Math.random() * calendar.getActualMaximum(Calendar.DATE)));
+        return calendar.getTime();
+    }
+
     public int getType() {
         return type;
     }
@@ -194,101 +289,5 @@ public class DemoDataGenerator {
 
     public void setLastUpdated(String lastUpdated) {
         this.lastUpdated = lastUpdated;
-    }
-
-    public static DemoDataGenerator getRandomCampaignObject(String resourceId, String resourceName) {
-        DemoDataGenerator object = new DemoDataGenerator();
-        Random random = new Random();
-
-        object.type = 1;
-        object.date = generateDate();
-        object.customerId = "9059845250";
-        object.resourceId = resourceId;
-        object.parentId = "";
-        object.resourceName = resourceName;
-        object.clicks = random.nextInt(1000);
-        object.impressions = random.nextInt(10000);
-        object.ctr = random.nextDouble(5);
-        object.qualityScore = random.nextInt(10);
-        object.averageCpc = random.nextDouble(25);
-        object.cost = random.nextDouble(5000);
-        object.conversions = random.nextDouble(50);
-        object.costPerConversion = random.nextDouble(36);
-        object.conversionValue = random.nextDouble(112);
-        object.invalidClickRate = random.nextDouble(5);
-        object.invalidClicks = random.nextInt(100);
-        object.phoneCalls = random.nextInt(45);
-        object.phoneImpressions = random.nextInt(1000);
-        object.phoneThroughRate = random.nextDouble(5);
-        object.lastUpdated = new Date().toString();
-
-        return object;
-    }
-
-    public static DemoDataGenerator getRandomAdGroupObject() {
-        DemoDataGenerator object = new DemoDataGenerator();
-        Random random = new Random();
-
-        object.type = random.nextInt(5);
-        object.date = generateDate();
-        object.customerId = "9059845250";
-        object.resourceId = "Test AdGroup Refactor 2022-1004";
-        object.parentId = "Test Campaign Refactor 2022-1004";
-        object.resourceName = "CampaignResource" + random.nextInt(100);
-        object.clicks = random.nextInt(1000);
-        object.impressions = random.nextInt(10000);
-        object.ctr = random.nextDouble(5);
-        object.qualityScore = random.nextInt(10);
-        object.averageCpc = random.nextDouble(25);
-        object.cost = random.nextDouble(5000);
-        object.conversions = random.nextDouble(50);
-        object.costPerConversion = random.nextDouble(36);
-        object.conversionValue = random.nextDouble(112);
-        object.invalidClickRate = random.nextDouble(5);
-        object.invalidClicks = random.nextInt(100);
-        object.phoneCalls = random.nextInt(45);
-        object.phoneImpressions = random.nextInt(1000);
-        object.phoneThroughRate = random.nextDouble(5);
-        object.lastUpdated = new Date().toString();
-
-        return object;
-    }
-
-
-    public static DemoDataGenerator getRandomAdObject() {
-        DemoDataGenerator object = new DemoDataGenerator();
-        Random random = new Random();
-
-        object.type = random.nextInt(5);
-        object.date = generateDate();
-        object.customerId = "9059845250";
-        object.resourceId = "Test Ad 2022-1004";
-        object.parentId = "Test Campaign Refactor 2022-1004";
-        object.resourceName = "CampaignResource" + random.nextInt(100);
-        object.clicks = random.nextInt(1000);
-        object.impressions = random.nextInt(10000);
-        object.ctr = random.nextDouble(5);
-        object.qualityScore = random.nextInt(10);
-        object.averageCpc = random.nextDouble(25);
-        object.cost = random.nextDouble(5000);
-        object.conversions = random.nextDouble(50);
-        object.costPerConversion = random.nextDouble(36);
-        object.conversionValue = random.nextDouble(112);
-        object.invalidClickRate = random.nextDouble(5);
-        object.invalidClicks = random.nextInt(100);
-        object.phoneCalls = random.nextInt(45);
-        object.phoneImpressions = random.nextInt(1000);
-        object.phoneThroughRate = random.nextDouble(5);
-        object.lastUpdated = new Date().toString();
-
-        return object;
-    }
-
-    public static Date generateDate() {
-        Calendar calendar = Calendar.getInstance();
-        calendar.setTime(new Date());
-        calendar.add(Calendar.MONTH, -6);
-        calendar.set(Calendar.DATE, (int) (Math.random() * calendar.getActualMaximum(Calendar.DATE)));
-        return calendar.getTime();
     }
 }

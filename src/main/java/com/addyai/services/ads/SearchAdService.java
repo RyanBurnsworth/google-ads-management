@@ -1,6 +1,7 @@
 package com.addyai.services.ads;
 
 import com.addyai.models.ads.AdDetails;
+
 import java.util.List;
 
 public interface SearchAdService {

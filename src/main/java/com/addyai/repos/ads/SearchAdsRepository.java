@@ -10,5 +10,6 @@ public interface SearchAdsRepository {
 
     List<String> performSearchAdOperations(long customerId,
                                            List<AdGroupAdOperation> adGroupAdOperations) throws Exception;
+
     List<String> validateSearchAd(long customerId, List<AdGroupAdOperation> adGroupAdOperations);
 }

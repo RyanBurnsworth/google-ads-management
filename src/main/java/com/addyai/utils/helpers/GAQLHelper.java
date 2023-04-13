@@ -488,7 +488,7 @@ public class GAQLHelper {
 
         for (SearchGoogleAdsStreamResponse searchGoogleAdsStreamResponse : streamResponse) {
             for (GoogleAdsRow googleAdsRow : searchGoogleAdsStreamResponse.getResultsList()) {
-                if (adType.toLowerCase().equals(RESPONSIVE_AD_TYPE)) {
+                if (adType.equalsIgnoreCase(RESPONSIVE_AD_TYPE)) {
                     ResponsiveSearchAdDetails adDetails =
                             googleAdsRowAdapter.getResponsiveSearchAdDetails(googleAdsRow);
                     adDetailsList.add(adDetails);
