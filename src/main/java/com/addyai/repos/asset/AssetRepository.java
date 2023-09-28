@@ -1,7 +1,7 @@
 package com.addyai.repos.asset;
 
 import com.addyai.models.assets.AssetDetails;
-import com.google.ads.googleads.v12.services.AssetOperation;
+import com.google.ads.googleads.v14.services.AssetOperation;
 
 import java.util.List;
 

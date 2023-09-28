@@ -7,8 +7,8 @@ import com.addyai.repos.asset.AssetRepository;
 import com.addyai.repos.request.StreamRequest;
 import com.addyai.repos.request.impl.StreamRequestImpl;
 import com.addyai.utils.helpers.GAQLHelper;
-import com.google.ads.googleads.v12.enums.AssetTypeEnum;
-import com.google.ads.googleads.v12.services.*;
+import com.google.ads.googleads.v14.enums.AssetTypeEnum;
+import com.google.ads.googleads.v14.services.*;
 import com.google.api.gax.rpc.ServerStream;
 import org.springframework.stereotype.Repository;
 

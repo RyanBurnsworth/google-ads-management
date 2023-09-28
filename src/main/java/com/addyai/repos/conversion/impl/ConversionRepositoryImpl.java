@@ -7,10 +7,10 @@ import com.addyai.repos.conversion.ConversionRepository;
 import com.addyai.repos.request.StreamRequest;
 import com.addyai.repos.request.impl.StreamRequestImpl;
 import com.addyai.utils.helpers.GAQLHelper;
-import com.google.ads.googleads.v12.services.ConversionActionServiceClient;
-import com.google.ads.googleads.v12.services.GoogleAdsServiceClient;
-import com.google.ads.googleads.v12.services.SearchGoogleAdsStreamRequest;
-import com.google.ads.googleads.v12.services.SearchGoogleAdsStreamResponse;
+import com.google.ads.googleads.v14.services.ConversionActionServiceClient;
+import com.google.ads.googleads.v14.services.GoogleAdsServiceClient;
+import com.google.ads.googleads.v14.services.SearchGoogleAdsStreamRequest;
+import com.google.ads.googleads.v14.services.SearchGoogleAdsStreamResponse;
 import com.google.api.gax.rpc.ServerStream;
 import org.springframework.stereotype.Repository;
 

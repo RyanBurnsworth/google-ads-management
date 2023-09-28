@@ -24,7 +24,7 @@ import com.addyai.models.KeywordDetails;
 import com.addyai.repos.keyword.KeywordRepository;
 import com.addyai.services.keyword.KeywordService;
 import com.addyai.utils.validators.EntityValidator;
-import com.google.ads.googleads.v12.services.AdGroupCriterionOperation;
+import com.google.ads.googleads.v14.services.AdGroupCriterionOperation;
 import org.springframework.stereotype.Service;
 
 import java.util.List;

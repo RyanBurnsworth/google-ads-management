@@ -3,10 +3,10 @@ package com.addyai.repos.linker.impl;
 import com.addyai.builder.GoogleAdsClientBuilder;
 import com.addyai.error_handling.ApiExceptionResolver;
 import com.addyai.repos.linker.AssetLinkerRepository;
-import com.google.ads.googleads.v12.services.CampaignAssetOperation;
-import com.google.ads.googleads.v12.services.CampaignAssetServiceClient;
-import com.google.ads.googleads.v12.services.CustomerAssetOperation;
-import com.google.ads.googleads.v12.services.CustomerAssetServiceClient;
+import com.google.ads.googleads.v14.services.CampaignAssetOperation;
+import com.google.ads.googleads.v14.services.CampaignAssetServiceClient;
+import com.google.ads.googleads.v14.services.CustomerAssetOperation;
+import com.google.ads.googleads.v14.services.CustomerAssetServiceClient;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;

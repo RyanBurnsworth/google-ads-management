@@ -16,7 +16,7 @@
 package com.addyai.repos.keyword;
 
 import com.addyai.models.KeywordDetails;
-import com.google.ads.googleads.v12.services.AdGroupCriterionOperation;
+import com.google.ads.googleads.v14.services.AdGroupCriterionOperation;
 
 import java.util.List;
 

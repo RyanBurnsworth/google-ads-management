@@ -39,14 +39,14 @@ public class AdGroupDetails {
     /**
      * The type of AdGroup
      *
-     * @see com.google.ads.googleads.v12.enums.AdGroupTypeEnum.AdGroupType
+     * @see com.google.ads.googleads.v14.enums.AdGroupTypeEnum.AdGroupType
      */
     private int type = -1;
 
     /**
      * The status of the adgroup
      *
-     * @see com.google.ads.googleads.v12.enums.AdGroupStatusEnum.AdGroupStatus
+     * @see com.google.ads.googleads.v14.enums.AdGroupStatusEnum.AdGroupStatus
      */
     private int status = -1;
 

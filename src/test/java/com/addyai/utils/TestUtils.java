@@ -19,9 +19,9 @@ import com.addyai.models.AdGroupDetails;
 import com.addyai.models.BudgetDetails;
 import com.addyai.models.CampaignDetails;
 import com.addyai.models.campaign_criterion.*;
-import com.google.ads.googleads.v12.common.*;
-import com.google.ads.googleads.v12.enums.*;
-import com.google.ads.googleads.v12.resources.*;
+import com.google.ads.googleads.v14.common.*;
+import com.google.ads.googleads.v14.enums.*;
+import com.google.ads.googleads.v14.resources.*;
 
 import java.util.ArrayList;
 import java.util.HashMap;

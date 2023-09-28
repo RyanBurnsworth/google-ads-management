@@ -12,10 +12,10 @@ import com.addyai.repos.asset.AssetRepository;
 import com.addyai.repos.linker.AssetLinkerRepository;
 import com.addyai.services.asset.AssetService;
 import com.addyai.utils.validators.EntityValidator;
-import com.google.ads.googleads.v12.enums.AssetFieldTypeEnum;
-import com.google.ads.googleads.v12.services.AssetOperation;
-import com.google.ads.googleads.v12.services.CampaignAssetOperation;
-import com.google.ads.googleads.v12.services.CustomerAssetOperation;
+import com.google.ads.googleads.v14.enums.AssetFieldTypeEnum;
+import com.google.ads.googleads.v14.services.AssetOperation;
+import com.google.ads.googleads.v14.services.CampaignAssetOperation;
+import com.google.ads.googleads.v14.services.CustomerAssetOperation;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -48,7 +48,7 @@ public class AssetServiceImpl implements AssetService {
     }
 
     /**
-     * Create or update {@link com.google.ads.googleads.v12.resources.Asset} on a client account
+     * Create or update {@link com.google.ads.googleads.v14.resources.Asset} on a client account
      *
      * @param customerId       the id of the customer account
      * @param assetDetailsList a list of the details of the assets
@@ -100,7 +100,7 @@ public class AssetServiceImpl implements AssetService {
 
 
     /**
-     * Link or unlink a list of {@link com.google.ads.googleads.v12.resources.CampaignAsset} to a campaign
+     * Link or unlink a list of {@link com.google.ads.googleads.v14.resources.CampaignAsset} to a campaign
      *
      * @param customerId           the customer id to be used
      * @param assetResourceNames   a list of resources names for each of the assets
@@ -131,7 +131,7 @@ public class AssetServiceImpl implements AssetService {
     }
 
     /**
-     * Link or unlink a list of {@link com.google.ads.googleads.v12.resources.CustomerAsset} to an account
+     * Link or unlink a list of {@link com.google.ads.googleads.v14.resources.CustomerAsset} to an account
      *
      * @param customerId         the customer id to be used
      * @param assetResourceNames a list of resources names for each of the assets

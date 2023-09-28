@@ -25,10 +25,10 @@ import com.addyai.models.assets.CallExtensionDetails;
 import com.addyai.models.assets.CalloutExtensionDetails;
 import com.addyai.models.assets.SitelinkDetails;
 import com.addyai.models.campaign_criterion.*;
-import com.google.ads.googleads.v12.enums.AssetTypeEnum;
-import com.google.ads.googleads.v12.enums.CriterionTypeEnum;
-import com.google.ads.googleads.v12.services.GoogleAdsRow;
-import com.google.ads.googleads.v12.services.SearchGoogleAdsStreamResponse;
+import com.google.ads.googleads.v14.enums.AssetTypeEnum;
+import com.google.ads.googleads.v14.enums.CriterionTypeEnum;
+import com.google.ads.googleads.v14.services.GoogleAdsRow;
+import com.google.ads.googleads.v14.services.SearchGoogleAdsStreamResponse;
 import com.google.api.gax.rpc.ServerStream;
 
 import java.util.ArrayList;
@@ -44,6 +44,8 @@ public class GAQLHelper {
                 " customer.currency_code," +
                 " customer.time_zone," +
                 " customer.resource_name," +
+                " customer.descriptive_name," +
+                " customer.manager," +
                 " customer.call_reporting_setting.call_reporting_enabled," +
                 " customer.call_reporting_setting.call_conversion_reporting_enabled," +
                 " customer.call_reporting_setting.call_conversion_action," +
@@ -52,6 +54,25 @@ public class GAQLHelper {
                 " FROM customer" +
                 " WHERE" +
                 " customer.id = " + customerId;
+    }
+
+    public static String getAccountDetailsQueryByResourceName(String resourceName) {
+        return "SELECT" +
+                " customer.id," +
+                " customer.status," +
+                " customer.currency_code," +
+                " customer.time_zone," +
+                " customer.resource_name," +
+                " customer.descriptive_name," +
+                " customer.manager," +
+                " customer.call_reporting_setting.call_reporting_enabled," +
+                " customer.call_reporting_setting.call_conversion_reporting_enabled," +
+                " customer.call_reporting_setting.call_conversion_action," +
+                " customer.optimization_score," +
+                " customer.remarketing_setting.google_global_site_tag" +
+                " FROM customer" +
+                " WHERE" +
+                " customer.resource_name = '" + resourceName + "'";
     }
 
     public static String getCampaignDetailsQuery() {

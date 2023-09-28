@@ -22,7 +22,7 @@ public class AdScheduleDetails extends CriterionDetails {
      * The day of the week the ad scheduling is targeting.
      * Defaults to DayOfWeekEnum.DayOfWeek.THURSDAY_VALUE
      *
-     * @see com.google.ads.googleads.v12.enums.DayOfWeekEnum.DayOfWeek
+     * @see com.google.ads.googleads.v14.enums.DayOfWeekEnum.DayOfWeek
      */
     private int dayOfWeek = DAY_OF_WEEK_THURSDAY;
 
@@ -44,7 +44,7 @@ public class AdScheduleDetails extends CriterionDetails {
      * The minute the ad scheduling should start targeting.
      * Defaults to MinuteOfHourEnum.MinuteOfHour.ZERO_VALUE
      *
-     * @see com.google.ads.googleads.v12.enums.MinuteOfHourEnum.MinuteOfHour
+     * @see com.google.ads.googleads.v14.enums.MinuteOfHourEnum.MinuteOfHour
      */
     private int startMinute = MINUTE_OF_HOUR_ZERO;
 
@@ -52,7 +52,7 @@ public class AdScheduleDetails extends CriterionDetails {
      * The minute the ad scheduling should stop targeting..
      * Defaults to MinuteOfHourEnum.MinuteOfHour.FORTY_FIVE_VALUE
      *
-     * @see com.google.ads.googleads.v12.enums.MinuteOfHourEnum.MinuteOfHour
+     * @see com.google.ads.googleads.v14.enums.MinuteOfHourEnum.MinuteOfHour
      */
     private int endMinute = MINUTE_OF_HOUR_FORTY_FIVE;
 

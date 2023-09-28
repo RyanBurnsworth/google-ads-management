@@ -17,8 +17,8 @@ package com.addyai.models;
 
 import com.addyai.models.campaign_criterion.CriterionDetails;
 import com.addyai.utils.helpers.DateTimeHelper;
-import com.google.ads.googleads.v12.enums.AdvertisingChannelTypeEnum;
-import com.google.ads.googleads.v12.enums.CampaignStatusEnum;
+import com.google.ads.googleads.v14.enums.AdvertisingChannelTypeEnum;
+import com.google.ads.googleads.v14.enums.CampaignStatusEnum;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -63,7 +63,7 @@ public class CampaignDetails {
      * or interested in the campaign's targeted areas or only located within the targeted area.
      * Defaults to PositiveGeoTargetTypeEnum.PositiveGeoTargetType.PRESENCE_OR_INTEREST_VALUE
      *
-     * @see com.google.ads.googleads.v12.enums.PositiveGeoTargetTypeEnum.PositiveGeoTargetType
+     * @see com.google.ads.googleads.v14.enums.PositiveGeoTargetTypeEnum.PositiveGeoTargetType
      */
     private int positiveGeoTargetType = POSITIVE_GEO_TARGET_TYPE_PRESENCE_OR_INTEREST;
 
@@ -72,7 +72,7 @@ public class CampaignDetails {
      * or interested in the campaign's targeted areas or only located within the targeted area.
      * Defaults to NegativeGeoTargetTypeEnum.NegativeGeoTargetType.PRESENCE
      *
-     * @see com.google.ads.googleads.v12.enums.NegativeGeoTargetTypeEnum.NegativeGeoTargetType
+     * @see com.google.ads.googleads.v14.enums.NegativeGeoTargetTypeEnum.NegativeGeoTargetType
      */
     private int negativeGeoTargetType = NEGATIVE_GEO_TARGET_TYPE_PRESENCE;
 

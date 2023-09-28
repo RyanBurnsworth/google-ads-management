@@ -24,8 +24,8 @@ import com.addyai.models.assets.CallExtensionDetails;
 import com.addyai.models.assets.SitelinkDetails;
 import com.addyai.models.campaign_criterion.*;
 import com.addyai.utils.TestUtils;
-import com.google.ads.googleads.v12.enums.*;
-import com.google.ads.googleads.v12.services.GoogleAdsRow;
+import com.google.ads.googleads.v14.enums.*;
+import com.google.ads.googleads.v14.services.GoogleAdsRow;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,7 +33,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 
 import static com.addyai.utils.TestUtils.*;
 import static com.addyai.utils.misc.Constants.*;
-import static com.google.ads.googleads.v12.enums.PositiveGeoTargetTypeEnum.PositiveGeoTargetType.PRESENCE;
+import static com.google.ads.googleads.v14.enums.PositiveGeoTargetTypeEnum.PositiveGeoTargetType.PRESENCE;
 import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest(classes = GoogleAdsRowAdapterImpl.class)

@@ -41,6 +41,7 @@ public class CampaignControllerImpl implements CampaignController {
     }
 
     @Override
+    @CrossOrigin(origins = "http://localhost:4200")
     @GetMapping("{campaignName}/details")
     public ResponseEntity<CampaignDetails> fetchCampaignDetailsByName(@PathVariable String customerId,
                                                                       @PathVariable String campaignName) throws Exception {

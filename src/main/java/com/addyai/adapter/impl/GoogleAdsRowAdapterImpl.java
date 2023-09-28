@@ -26,8 +26,8 @@ import com.addyai.models.campaign_criterion.*;
 import com.addyai.models.metrics.Metrics;
 import com.addyai.utils.helpers.DateTimeHelper;
 import com.addyai.utils.helpers.ResourceNameHelper;
-import com.google.ads.googleads.v12.common.AdScheduleInfo;
-import com.google.ads.googleads.v12.services.GoogleAdsRow;
+import com.google.ads.googleads.v14.common.AdScheduleInfo;
+import com.google.ads.googleads.v14.services.GoogleAdsRow;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -44,6 +44,8 @@ public class GoogleAdsRowAdapterImpl implements GoogleAdsRowAdapter {
         accountDetails.setTimeZone(googleAdsRow.getCustomer().getTimeZone());
         accountDetails.setStatus(googleAdsRow.getCustomer().getStatusValue());
         accountDetails.setResourceName(googleAdsRow.getCustomer().getResourceName());
+        accountDetails.setDescriptiveName(googleAdsRow.getCustomer().getDescriptiveName());
+        accountDetails.setManager(googleAdsRow.getCustomer().getManager());
         accountDetails.setCallReportingEnabled(googleAdsRow.getCustomer().getCallReportingSetting().getCallReportingEnabled());
         accountDetails.setCallConversionActionResourceName(googleAdsRow.getCustomer().getCallReportingSetting().getCallConversionAction());
         accountDetails.setCallConversionReportingEnabled(googleAdsRow.getCustomer().getCallReportingSetting().getCallConversionReportingEnabled());

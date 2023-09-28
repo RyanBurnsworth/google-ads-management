@@ -1,7 +1,7 @@
 package com.addyai.repos.ads;
 
 import com.addyai.models.ads.AdDetails;
-import com.google.ads.googleads.v12.services.AdGroupAdOperation;
+import com.google.ads.googleads.v14.services.AdGroupAdOperation;
 
 import java.util.List;
 

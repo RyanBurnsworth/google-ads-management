@@ -16,7 +16,7 @@
 package com.addyai.repos.campaign.criterion;
 
 import com.addyai.models.campaign_criterion.CriterionDetails;
-import com.google.ads.googleads.v12.services.CampaignCriterionOperation;
+import com.google.ads.googleads.v14.services.CampaignCriterionOperation;
 
 import java.util.List;
 

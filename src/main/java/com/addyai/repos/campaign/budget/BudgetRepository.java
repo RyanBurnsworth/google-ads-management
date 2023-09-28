@@ -16,7 +16,7 @@
 package com.addyai.repos.campaign.budget;
 
 import com.addyai.models.BudgetDetails;
-import com.google.ads.googleads.v12.services.CampaignBudgetOperation;
+import com.google.ads.googleads.v14.services.CampaignBudgetOperation;
 
 import java.util.List;
 

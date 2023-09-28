@@ -2,8 +2,8 @@ package com.addyai.utils.helpers;
 
 import com.addyai.adapter.impl.GoogleAdsRowAdapterImpl;
 import com.addyai.models.metrics.Metrics;
-import com.google.ads.googleads.v12.services.GoogleAdsRow;
-import com.google.ads.googleads.v12.services.SearchGoogleAdsStreamResponse;
+import com.google.ads.googleads.v14.services.GoogleAdsRow;
+import com.google.ads.googleads.v14.services.SearchGoogleAdsStreamResponse;
 import com.google.api.gax.rpc.ServerStream;
 
 import java.util.ArrayList;

@@ -22,7 +22,7 @@ import com.addyai.repos.campaign.CampaignRepository;
 import com.addyai.repos.request.StreamRequest;
 import com.addyai.repos.request.impl.StreamRequestImpl;
 import com.addyai.utils.helpers.GAQLHelper;
-import com.google.ads.googleads.v12.services.*;
+import com.google.ads.googleads.v14.services.*;
 import com.google.api.gax.rpc.ServerStream;
 import org.springframework.stereotype.Repository;
 
@@ -88,7 +88,7 @@ public class CampaignRepositoryImpl implements CampaignRepository {
     @Override
     public CampaignDetails fetchCampaignDetailsByName(long customerId, String campaignName) throws Exception {
         List<CampaignDetails> campaignDetailsList;
-
+        System.out.println("CampaignName: " + campaignName);
         try {
             String query = GAQLHelper.getCampaignDetailsByNameQuery(campaignName);
 

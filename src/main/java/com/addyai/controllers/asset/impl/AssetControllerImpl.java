@@ -4,7 +4,7 @@ import com.addyai.controllers.asset.AssetController;
 import com.addyai.enums.AssetLevel;
 import com.addyai.models.assets.AssetDetails;
 import com.addyai.services.asset.AssetService;
-import com.google.ads.googleads.v12.enums.AssetFieldTypeEnum;
+import com.google.ads.googleads.v14.enums.AssetFieldTypeEnum;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;

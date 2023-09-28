@@ -1,7 +1,7 @@
 package com.addyai.services.asset;
 
 import com.addyai.models.assets.AssetDetails;
-import com.google.ads.googleads.v12.enums.AssetFieldTypeEnum;
+import com.google.ads.googleads.v14.enums.AssetFieldTypeEnum;
 
 import java.util.List;
 

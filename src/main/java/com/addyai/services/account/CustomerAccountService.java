@@ -16,8 +16,8 @@
 package com.addyai.services.account;
 
 import com.google.ads.googleads.lib.GoogleAdsClient;
-import com.google.ads.googleads.v12.resources.Customer;
-import com.google.ads.googleads.v12.services.*;
+import com.google.ads.googleads.v14.resources.Customer;
+import com.google.ads.googleads.v14.services.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -47,6 +47,7 @@ public class CustomerAccountService {
                             ListAccessibleCustomersRequest.newBuilder().build());
 
             for (String customerResourceName : response.getResourceNamesList()) {
+
                 String customerId = stripToAccountId(customerResourceName);
                 accountIdList.add(customerId);
             }

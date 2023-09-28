@@ -32,9 +32,9 @@ import com.addyai.repos.campaign.budget.BudgetRepository;
 import com.addyai.repos.campaign.criterion.CriterionRepository;
 import com.addyai.services.campaign.CampaignService;
 import com.addyai.utils.validators.EntityValidator;
-import com.google.ads.googleads.v12.services.CampaignBudgetOperation;
-import com.google.ads.googleads.v12.services.CampaignCriterionOperation;
-import com.google.ads.googleads.v12.services.CampaignOperation;
+import com.google.ads.googleads.v14.services.CampaignBudgetOperation;
+import com.google.ads.googleads.v14.services.CampaignCriterionOperation;
+import com.google.ads.googleads.v14.services.CampaignOperation;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -163,6 +163,12 @@ public class CampaignServiceImpl implements CampaignService {
         // set the budget details object
         campaignDetails.setBudgetDetails(budgetDetails);
 
+        // retrieve the campaign criterion from the account
+        List<CriterionDetails> criterionDetailsList = criterionRepository.fetchCampaignCriterionDetails(customerId,
+                campaignDetails.getCampaignResourceName());
+
+        // update the CriterionDetails list in the CampaignDetails object
+        campaignDetails.setCampaignCriteriaList(criterionDetailsList);
         return campaignDetails;
     }
 

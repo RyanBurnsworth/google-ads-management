@@ -6,9 +6,9 @@ import com.addyai.error_handling.ApiExceptionResolver;
 import com.addyai.models.metrics.Metrics;
 import com.addyai.repos.metrics.MetricRepository;
 import com.addyai.utils.helpers.MetricsHelper;
-import com.google.ads.googleads.v12.services.GoogleAdsServiceClient;
-import com.google.ads.googleads.v12.services.SearchGoogleAdsStreamRequest;
-import com.google.ads.googleads.v12.services.SearchGoogleAdsStreamResponse;
+import com.google.ads.googleads.v14.services.GoogleAdsServiceClient;
+import com.google.ads.googleads.v14.services.SearchGoogleAdsStreamRequest;
+import com.google.ads.googleads.v14.services.SearchGoogleAdsStreamResponse;
 import com.google.api.gax.rpc.ServerStream;
 import org.springframework.stereotype.Repository;
 

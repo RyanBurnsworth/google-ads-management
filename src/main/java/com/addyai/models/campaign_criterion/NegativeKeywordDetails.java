@@ -27,7 +27,7 @@ public class NegativeKeywordDetails extends CriterionDetails {
     /**
      * The match type of the negative keyword
      *
-     * @see com.google.ads.googleads.v12.enums.KeywordMatchTypeEnum.KeywordMatchType
+     * @see com.google.ads.googleads.v14.enums.KeywordMatchTypeEnum.KeywordMatchType
      */
     private int keywordMatchType = KEYWORD_MATCH_TYPE_BROAD;
 

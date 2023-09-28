@@ -1,6 +1,6 @@
 package com.addyai.models;
 
-import com.google.ads.googleads.v12.enums.AssetFieldTypeEnum;
+import com.google.ads.googleads.v14.enums.AssetFieldTypeEnum;
 
 public class AssetLinkerDetails {
     private String assetResourceName;

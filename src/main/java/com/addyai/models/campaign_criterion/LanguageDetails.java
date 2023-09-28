@@ -23,7 +23,7 @@ public class LanguageDetails extends CriterionDetails {
      * Defaults to "languagesConstants/1000" - English
      * Format: languageConstants/{languageConstant}
      *
-     * @see com.google.ads.googleads.v12.resources.LanguageConstant
+     * @see com.google.ads.googleads.v14.resources.LanguageConstant
      */
     private String languageCode = LANGUAGE_CONSTANT_EN;
 

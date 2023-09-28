@@ -7,8 +7,8 @@ import com.addyai.repos.ads.SearchAdsRepository;
 import com.addyai.repos.request.StreamRequest;
 import com.addyai.repos.request.impl.StreamRequestImpl;
 import com.addyai.utils.helpers.GAQLHelper;
-import com.google.ads.googleads.v12.errors.GoogleAdsException;
-import com.google.ads.googleads.v12.services.*;
+import com.google.ads.googleads.v14.errors.GoogleAdsException;
+import com.google.ads.googleads.v14.services.*;
 import com.google.api.gax.rpc.ServerStream;
 import org.springframework.stereotype.Repository;
 

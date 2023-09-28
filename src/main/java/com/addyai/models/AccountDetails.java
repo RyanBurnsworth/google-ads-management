@@ -1,14 +1,17 @@
 package com.addyai.models;
 
-import com.google.ads.googleads.v12.enums.CustomerStatusEnum;
+import com.google.ads.googleads.v14.enums.CustomerStatusEnum;
 
 public class AccountDetails {
     String customerId = "";
     String resourceName = "";
+    String descriptiveName = "";
+
     int status = CustomerStatusEnum.CustomerStatus.UNKNOWN_VALUE;
     String currencyCode = "";
     String timeZone = "";
     double optimizationScore = 0.0;
+    boolean isManager = false;
     boolean isCallReportingEnabled = false;
     boolean isCallConversionReportingEnabled = false;
     String callConversionActionResourceName = "";
@@ -28,6 +31,14 @@ public class AccountDetails {
 
     public void setResourceName(String resourceName) {
         this.resourceName = resourceName;
+    }
+
+    public String getDescriptiveName() {
+        return descriptiveName;
+    }
+
+    public void setDescriptiveName(String descriptiveName) {
+        this.descriptiveName = descriptiveName;
     }
 
     public int getStatus() {
@@ -60,6 +71,14 @@ public class AccountDetails {
 
     public void setOptimizationScore(double optimizationScore) {
         this.optimizationScore = optimizationScore;
+    }
+
+    public boolean isManager() {
+        return isManager;
+    }
+
+    public void setManager(boolean manager) {
+        isManager = manager;
     }
 
     public boolean isCallReportingEnabled() {

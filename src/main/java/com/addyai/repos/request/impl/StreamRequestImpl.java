@@ -16,9 +16,9 @@
 package com.addyai.repos.request.impl;
 
 import com.addyai.repos.request.StreamRequest;
-import com.google.ads.googleads.v12.services.GoogleAdsServiceClient;
-import com.google.ads.googleads.v12.services.SearchGoogleAdsStreamRequest;
-import com.google.ads.googleads.v12.services.SearchGoogleAdsStreamResponse;
+import com.google.ads.googleads.v14.services.GoogleAdsServiceClient;
+import com.google.ads.googleads.v14.services.SearchGoogleAdsStreamRequest;
+import com.google.ads.googleads.v14.services.SearchGoogleAdsStreamResponse;
 import com.google.api.gax.rpc.ServerStream;
 
 public class StreamRequestImpl implements StreamRequest {

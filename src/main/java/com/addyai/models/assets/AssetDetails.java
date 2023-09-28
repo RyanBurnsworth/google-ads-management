@@ -2,8 +2,8 @@ package com.addyai.models.assets;
 
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
-import com.google.ads.googleads.v12.enums.AssetSourceEnum;
-import com.google.ads.googleads.v12.enums.AssetTypeEnum;
+import com.google.ads.googleads.v14.enums.AssetSourceEnum;
+import com.google.ads.googleads.v14.enums.AssetTypeEnum;
 
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, property = "type")
 @JsonSubTypes({

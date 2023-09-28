@@ -61,14 +61,14 @@ public abstract class CriterionDetails {
     /**
      * The identifier for the type of criterion
      *
-     * @see com.google.ads.googleads.v12.enums.CriterionTypeEnum.CriterionType
+     * @see com.google.ads.googleads.v14.enums.CriterionTypeEnum.CriterionType
      */
     private int criterionType = 1;
 
     /**
      * The status of the criterion
      *
-     * @see com.google.ads.googleads.v12.enums.CampaignCriterionStatusEnum.CampaignCriterionStatus
+     * @see com.google.ads.googleads.v14.enums.CampaignCriterionStatusEnum.CampaignCriterionStatus
      */
     private int status = 2;
 

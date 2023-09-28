@@ -22,7 +22,7 @@ import com.addyai.models.assets.CalloutExtensionDetails;
 import com.addyai.models.assets.SitelinkDetails;
 import com.addyai.models.campaign_criterion.*;
 import com.addyai.models.metrics.Metrics;
-import com.google.ads.googleads.v12.services.GoogleAdsRow;
+import com.google.ads.googleads.v14.services.GoogleAdsRow;
 
 public interface GoogleAdsRowAdapter {
     AccountDetails getAccountDetails(GoogleAdsRow googleAdsRow);

@@ -10,7 +10,7 @@ import com.addyai.repos.ads.SearchAdsRepository;
 import com.addyai.services.ads.SearchAdService;
 import com.addyai.utils.helpers.ResourceNameHelper;
 import com.addyai.utils.validators.EntityValidator;
-import com.google.ads.googleads.v12.services.AdGroupAdOperation;
+import com.google.ads.googleads.v14.services.AdGroupAdOperation;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
